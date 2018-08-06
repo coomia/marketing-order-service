@@ -4,12 +4,7 @@ import com.meiye.model.config.AppConfig;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import java.util.Date;
-
-import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 
 /**
  * Created by Administrator on 2018/8/5 0005.
