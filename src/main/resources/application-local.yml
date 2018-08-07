@@ -9,3 +9,17 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/static/
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+
+server:
+  port: 8080
+  servlet:
+    context-path: /MeiYe
