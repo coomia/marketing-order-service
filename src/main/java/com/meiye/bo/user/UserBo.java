@@ -1,7 +1,7 @@
 package com.meiye.bo.user;
 
 import com.meiye.system.ParentEntity;
-import lombok.Data;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,6 +11,11 @@ import java.util.Collection;
  * Created by Administrator on 2018/8/5 0005.
  */
 @Data
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserBo extends ParentEntity implements UserDetails {
     private Long id;
     private String username;
@@ -20,4 +25,18 @@ public class UserBo extends ParentEntity implements UserDetails {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
+
+    @Override
+    public String toString() {
+        return "UserBo{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", authorities=" + authorities +
+                ", accountNonExpired=" + accountNonExpired +
+                ", accountNonLocked=" + accountNonLocked +
+                ", credentialsNonExpired=" + credentialsNonExpired +
+                ", enabled=" + enabled +
+                '}';
+    }
 }
