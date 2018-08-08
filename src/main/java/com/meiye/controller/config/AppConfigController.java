@@ -6,22 +6,24 @@ import com.meiye.bo.user.UserBo;
 import com.meiye.service.config.AppConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Date;
-import java.util.List;
 
 /**
- * Created by Administrator on 2018/8/6 0006.
+ * Created by Administrator on 2018/8/8 0008.
  */
-@RestController
-@RequestMapping(path = "/appConfig")
+@Controller
+@RequestMapping(path = "/web")
 public class AppConfigController {
+
     @Autowired
     AppConfigService appConfigService;
 
-    @PostMapping(path = "/new")
-    public void newConfig(@RequestBody AppConfigBo appConfigBo, @CurrentUser UserBo userBo){
+    @PostMapping(path = "/config/new")
+    public String newConfig(@RequestBody AppConfigBo appConfigBo, @CurrentUser UserBo userBo){
         if(appConfigBo!=null){
             appConfigBo.setEntryId(userBo.getId());
             Date now=new Date();
@@ -30,21 +32,9 @@ public class AppConfigController {
             appConfigBo.setUpdateId(userBo.getId());
             appConfigBo.setUpdateDatetime(now);
             appConfigService.saveConfig(appConfigBo);
+            return "index";
         }else{
-            return;
+            return "";
         }
-    }
-
-    @RequestMapping(path = "/list")
-    public List<AppConfigBo> loadAppConfig(){
-        List<AppConfigBo> appConfigBos=appConfigService.listAppConfigs();
-        return appConfigBos;
-    }
-
-
-    @RequestMapping(path = "/get/{configId}")
-    public AppConfigBo loadAppConfig(@PathVariable Long configId){
-        AppConfigBo appConfigBo=appConfigService.getAppConfig(configId);
-        return appConfigBo;
     }
 }
