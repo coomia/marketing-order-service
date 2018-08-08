@@ -9,6 +9,16 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
+
+server:
+  port: 8080
+  servlet:
+    context-path: /MeiYe
 
   mybatis:
     type-aliases-package: com.meiye.bo
