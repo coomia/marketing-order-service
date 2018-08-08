@@ -21,7 +21,7 @@ public class CacheDemoTest {
 
     @Test
     public void testCreate(){
-      UserBo userBo = UserBo.builder().id(new Long(1)).username("ryner").entryId(new Long(110486)).entryDatetime(new Date()).build();
+      UserBo userBo = UserBo.builder().id(new Long(1)).username("ryner").build();
         cacheDemoService.create(userBo);
     }
 
@@ -64,14 +64,14 @@ public class CacheDemoTest {
 
     private void addUser1(){
         System.out.println("------------成功添加新user1 结束--------------");
-        UserBo userBo2 = UserBo.builder().id(new Long(1)).username("ryne").entryId(new Long(110486)).entryDatetime(new Date()).build();
+        UserBo userBo2 = UserBo.builder().id(new Long(1)).username("ryne").build();
         cacheDemoService.create(userBo2);
         System.out.println("------------成功添加新user1 结束--------------");
     }
 
     private void addUser2(){
         System.out.println("------------成功添加新user2 结束--------------");
-        UserBo userBo2 = UserBo.builder().id(new Long(2)).username("shawn").entryId(new Long(110486)).entryDatetime(new Date()).build();
+        UserBo userBo2 = UserBo.builder().id(new Long(2)).username("shawn").build();
         cacheDemoService.create(userBo2);
         System.out.println("------------成功添加新user2 结束--------------");
     }

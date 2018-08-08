@@ -1,6 +1,6 @@
 package com.meiye.system;
 
-import lombok.Data;
+import lombok.*;
 
 import java.util.Date;
 
@@ -8,6 +8,8 @@ import java.util.Date;
  * Created by jonyh on 08/08/18.
  */
 @Data
+@Getter
+@Setter
 public class ParentEntity {
     private Long updateId;
     private Date updateDatetime;

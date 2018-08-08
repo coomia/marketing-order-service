@@ -26,5 +26,17 @@ public class UserBo extends ParentEntity implements UserDetails {
     private boolean credentialsNonExpired;
     private boolean enabled;
 
-
+    @Override
+    public String toString() {
+        return "UserBo{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", authorities=" + authorities +
+                ", accountNonExpired=" + accountNonExpired +
+                ", accountNonLocked=" + accountNonLocked +
+                ", credentialsNonExpired=" + credentialsNonExpired +
+                ", enabled=" + enabled +
+                '}';
+    }
 }
