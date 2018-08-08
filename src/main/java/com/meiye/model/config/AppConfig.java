@@ -1,10 +1,10 @@
 package com.meiye.model.config;
 
+import com.meiye.system.*;
 import lombok.Data;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Entity;
 
 /**
  * Created by Administrator on 2018/8/5 0005.
@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "app_config")
-public class AppConfig {
+public class AppConfig extends ParentEntity {
     @Id
     @GeneratedValue
     private Long id;
@@ -20,10 +20,6 @@ public class AppConfig {
     private String configName;
     private String configValue;
     private String status;
-    private Long updateId;
-    private Date updateDatetime;
-    private Long entryId;
-    private Date entryDatetime;
     @Version
     private Long version;
 }
