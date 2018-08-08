@@ -1,21 +1,12 @@
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<head th:replace="common_header :: header(~{::title})">
     <title>登录</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/jquery-easyui-1.5.5.5/themes/material/easyui.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/jquery-easyui-1.5.5.5/themes/icon.css}">
-    <script type="text/javascript" th:src="@{/jquery-easyui-1.5.5.5/jquery.min.js}"></script>
-    <script type="text/javascript" th:src="@{/jquery-easyui-1.5.5.5/jquery.easyui.min.js}"></script>
 </head>
 <body class="easyui-layout">
-
-<div data-options="region:'north',border:false" style="height:5%;background:black;padding:10px;color: white">
-    ***管理系统
-</div>
-<div data-options="region:'center',border:false" style="padding-top: 10%;padding-left: 30%">
+<div th:replace="common_menu :: menu"/>
+<div data-options="region:'center',border:false" style="padding-top: 7%;padding-left: 50%">
     <div class="easyui-panel" style="width:400px;padding:50px 60px">
         <form th:action="@{/auth/login}" method="post">
 
@@ -36,5 +27,6 @@
         </form>
     </div>
 </div>
+<div th:replace="common_footer :: footer"></div>
 </body>
 </html>
