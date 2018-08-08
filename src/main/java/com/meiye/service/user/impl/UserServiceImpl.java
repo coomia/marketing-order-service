@@ -25,8 +25,10 @@ public class UserServiceImpl implements UserDetailsService,UserService {
         userBo.setUsername(userName);
         userBo.setPassword("123456");
         List<SimpleGrantedAuthority> roles=new ArrayList<SimpleGrantedAuthority>();
-        roles.add(new SimpleGrantedAuthority("Manager"));
-        roles.add(new SimpleGrantedAuthority("Skiller"));
+        roles.add(new SimpleGrantedAuthority("ROLE_Manager"));
+        roles.add(new SimpleGrantedAuthority("ROLE_Skiller"));
+
+        userBo.setAuthorities(roles);
         return userBo;
     }
 
