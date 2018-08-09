@@ -1,6 +1,6 @@
 package com.meiye.bo.user;
 
-import com.meiye.system.ParentEntity;
+import com.meiye.bo.ParentBo;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,7 @@ import java.util.Collection;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserBo extends ParentEntity implements UserDetails {
+public class UserBo extends ParentBo implements UserDetails {
     private Long id;
     private String username;
     private String password;

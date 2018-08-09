@@ -24,12 +24,12 @@ public class AppConfigRestController {
     @PostMapping(path = "/new")
     public void newConfig(@RequestBody AppConfigBo appConfigBo, @CurrentUser UserBo userBo){
         if(appConfigBo!=null){
-            appConfigBo.setEntryId(userBo.getId());
+            appConfigBo.setCreatorId(userBo.getId());
             Date now=new Date();
-            appConfigBo.setStatus("Y");
-            appConfigBo.setEntryDatetime(now);
-            appConfigBo.setUpdateId(userBo.getId());
-            appConfigBo.setUpdateDatetime(now);
+            appConfigBo.setStatusFlag(1);
+            appConfigBo.setServerCreateTime(now);
+            appConfigBo.setUpdatorId(userBo.getId());
+            appConfigBo.setServerUpdateTime(now);
             appConfigService.saveConfig(appConfigBo);
         }else{
             return;

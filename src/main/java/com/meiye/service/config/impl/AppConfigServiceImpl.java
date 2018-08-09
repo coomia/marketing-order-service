@@ -61,7 +61,7 @@ public class AppConfigServiceImpl implements AppConfigService {
 
 
     private AppConfigBo copy(AppConfig appconfig){
-        return AppConfigBo.copy(appconfig);
+        return appconfig==null?null:appconfig.copyTo(AppConfigBo.class);
     }
 
     private List<AppConfigBo> copy(List<AppConfig> appconfigs){
