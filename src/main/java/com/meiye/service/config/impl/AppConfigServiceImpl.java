@@ -52,8 +52,7 @@ public class AppConfigServiceImpl implements AppConfigService {
 
     @Override
     public void saveConfig(@NotNull AppConfigBo appConfigBo){
-        AppConfig appConfig=new AppConfig();
-        BeanUtils.copyProperties(appConfigBo,appConfig);
+        AppConfig appConfig=appConfigBo.copyTo(AppConfig.class);
         appConfigRepository.save(appConfig);
     }
 

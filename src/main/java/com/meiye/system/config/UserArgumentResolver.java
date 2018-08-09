@@ -2,6 +2,7 @@ package com.meiye.system.config;
 
 import com.meiye.annotation.CurrentUser;
 import com.meiye.bo.user.UserBo;
+import com.meiye.system.util.WebUtil;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,11 +24,6 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, @Nullable ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, @Nullable WebDataBinderFactory webDataBinderFactory) throws Exception {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal != null && principal instanceof UserBo) {
-            UserBo user = (UserBo) principal;
-            return user;
-        }else
-            return null;
+        return WebUtil.getCurrentUser();
     }
 }
