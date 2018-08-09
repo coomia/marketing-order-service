@@ -1,4 +1,4 @@
-package com.meiye;
+package com.meiye.system.config;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
