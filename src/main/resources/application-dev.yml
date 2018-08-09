@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://118.113.202.197:8805/store
+    url: jdbc:mysql://118.112.52.2:8805/store
     username: root
     password: Hj_1987121
     driver-class-name: com.mysql.jdbc.Driver
@@ -27,3 +27,6 @@ server:
   port: 8080
   servlet:
     context-path: /MeiYe
+
+  mybatis:
+    type-aliases-package: com.meiye.bo
