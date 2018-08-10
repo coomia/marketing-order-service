@@ -20,11 +20,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal != null && principal instanceof UserDetails) {
-            UserDetails user = (UserDetails) principal;
-            System.out.println("loginUser:" + user.getUsername());
-            //维护在session中
-            httpServletRequest.getSession().setAttribute("userDetail", user);
-            httpServletResponse.sendRedirect(httpServletRequest.getContextPath()+"/meiyeSys");
+            httpServletResponse.sendRedirect(httpServletRequest.getContextPath()+"/index");
         }
     }
 }
