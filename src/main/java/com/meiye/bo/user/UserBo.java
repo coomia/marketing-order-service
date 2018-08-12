@@ -1,5 +1,6 @@
 package com.meiye.bo.user;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.ParentBo;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,9 +22,13 @@ public class UserBo extends ParentBo implements UserDetails {
     private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
+    @JSONField(serialize=false)
     private boolean accountNonExpired;
+    @JSONField(serialize=false)
     private boolean accountNonLocked;
+    @JSONField(serialize=false)
     private boolean credentialsNonExpired;
+    @JSONField(serialize=false)
     private boolean enabled;
 
     @Override

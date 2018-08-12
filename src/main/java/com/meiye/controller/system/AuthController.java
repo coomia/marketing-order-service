@@ -20,9 +20,9 @@ public class AuthController {
         return "/auth/login";
     }
 
-    @RequestMapping("/meiyeSys")
+    @RequestMapping("/index")
     public String index(Model model,@CurrentUser UserBo userBo){
         model.addAttribute("user",userBo);
-        return "main";
+        return "index";
     }
 }

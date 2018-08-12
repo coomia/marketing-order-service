@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<head th:replace="common_header :: header(~{::title})">
+    <title>美业管理系统</title>
+</head>
+<body class= "easyui-layout">
+
+    <div th:replace="common_menu :: menu"/>
+    <div id="content" style="background: #EAE8EA" >
+
+    </div>
+    <div th:replace="common_footer :: footer"></div>
+
+<script type="text/javascript">
+    $(function(){
+        loadContent({
+            url:contentPath+"/web/part/loadBrandTypes",
+            data:{},
+            appendTo:"#content",
+            displayLoading:true,
+            message:"品项加载中..."
+        });
+    });
+
+</script>
+</body>
+
+</html>

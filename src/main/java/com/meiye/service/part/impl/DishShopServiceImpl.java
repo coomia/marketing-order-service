@@ -32,6 +32,11 @@ public class DishShopServiceImpl implements DishShopService{
     @Autowired
     DishShopRepository dishShopRepository;
 
+    @Autowired
+    DishSetmealRepository dishSetmealRepository;
+
+    @Autowired
+    DishSetmealGroupRepository dishSetmealGroupRepository;
 
     @Override
     public Page<DishShop> getDishShopByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo) {
@@ -57,5 +62,39 @@ public class DishShopServiceImpl implements DishShopService{
             }
         },pageable);
         return shopPage;
+    }
+
+
+    public DishShopBo getDishShopById(Long id){
+        DishShop dishShop= dishShopRepository.getOne(id);
+        DishShopBo dishShopBo=dishShop.copyTo(DishShopBo.class);
+        return dishShopBo;
+    }
+
+    public void saveDishShop(DishShopBo dishShopBo){
+        if(dishShopBo!=null){
+            DishShop dishShop=dishShopBo.copyTo(DishShop.class);
+            dishShopRepository.save(dishShop);
+            //如果是单品
+            if(dishShopBo.getType()==0){
+
+            }
+            //如果是套餐
+            else if(dishShopBo.getType()==1&&dishShopBo.getDishSetmealGroupBos()!=null){
+                dishShopBo.getDishSetmealGroupBos().forEach(dishSetmealGroupBo -> {
+                    DishSetmealGroup dishSetmealGroup=dishSetmealGroupBo.copyTo(DishSetmealGroup.class);
+                    dishSetmealGroup.setSetmealDishId(dishShop.getId());
+                    dishSetmealGroupRepository.save(dishSetmealGroup);
+                    if(dishSetmealGroupBo.getDishSetmealBos()!=null){
+                        dishSetmealGroupBo.getDishSetmealBos().forEach(dishSetmealBo -> {
+                            DishSetmeal dishSetmeal=dishSetmealBo.copyTo(DishSetmeal.class);
+                            dishSetmeal.setDishId(dishShop.getId());
+                            dishSetmeal.setComboDishTypeId(dishSetmealGroup.getId());
+                            dishSetmealRepository.save(dishSetmeal);
+                        });
+                    }
+                });
+            }
+        }
     }
 }

@@ -6,9 +6,9 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.List;
 
 @Data
-@Entity
 public class DishSetmealGroupBo extends ParentBo {
   @Id
   @GeneratedValue
@@ -20,4 +20,5 @@ public class DishSetmealGroupBo extends ParentBo {
   private Double orderMax;
   private Long brandIdenty;
   private Long sort;
+  private List<DishSetmealBo> dishSetmealBos;
 }

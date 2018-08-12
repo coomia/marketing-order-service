@@ -1,4 +1,4 @@
-package com.meiye.repository.config;
+package com.meiye.repository.part;
 
 import com.meiye.model.config.AppConfig;
 import com.meiye.model.part.DishBrandType;

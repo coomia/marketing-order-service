@@ -8,7 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
-@Entity
 public class DishUnitDictionaryBo extends ParentBo {
   @Id
   @GeneratedValue
