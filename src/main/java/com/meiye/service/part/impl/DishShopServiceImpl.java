@@ -1,8 +1,12 @@
 package com.meiye.service.part.impl;
 
 import com.meiye.bo.part.DishShopBo;
+import com.meiye.model.part.DishSetmeal;
+import com.meiye.model.part.DishSetmealGroup;
 import com.meiye.model.part.DishShop;
-import com.meiye.repository.config.DishShopRepository;
+import com.meiye.repository.part.DishSetmealGroupRepository;
+import com.meiye.repository.part.DishSetmealRepository;
+import com.meiye.repository.part.DishShopRepository;
 import com.meiye.service.part.DishShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
