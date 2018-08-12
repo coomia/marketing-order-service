@@ -1,6 +1,7 @@
 package com.meiye.service.part;
 
 import com.meiye.bo.part.DishShopBo;
+import com.meiye.model.part.DishShop;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -15,11 +16,11 @@ public interface DishShopService {
 
     /**
      * 根据查询条件查询商品信息
-     * @param page
-     * @param size
+     * @param pageNum
+     * @param pageSize
      * @param dishShopBo
      * @return
      */
-    Page<DishShopBo> getDishShopByCriteria(Integer page, Integer size, DishShopBo dishShopBo);
+    Page<DishShop> getDishShopByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo);
 
 }

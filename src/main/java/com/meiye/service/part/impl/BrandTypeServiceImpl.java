@@ -26,7 +26,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     @Autowired
     DishBrandTypeRepository dishBrandTypeRepository;
 
-    @Transactional
+    @Transactional(rollbackOn = {Exception.class})
     @Override
     public int delete(@NotNull Long id) {
        return dishBrandTypeRepository.deleteDishBrandType(new Long(2),id);
@@ -48,7 +48,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
         return dishBrandTypeBo;
     }
 
-    @Transactional
+    @Transactional(rollbackOn = {Exception.class})
     @Override
     public int update(DishBrandTypeBo dishBrandTypeBo) {
         return dishBrandTypeRepository.updateDishBrandType(dishBrandTypeBo.getName(),dishBrandTypeBo.getTypeCode(),dishBrandTypeBo.getId());

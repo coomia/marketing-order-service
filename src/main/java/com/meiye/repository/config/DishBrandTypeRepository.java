@@ -5,6 +5,7 @@ import com.meiye.model.part.DishBrandType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * @Date: Created in 18:30 2018/8/12
  * @Modified By:
  */
+@Repository
 public interface DishBrandTypeRepository  extends JpaRepository<DishBrandType,Long> {
 
     /**
