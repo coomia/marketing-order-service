@@ -1,4 +1,4 @@
-package com.meiye.repository.config;
+package com.meiye.repository.part;
 
 import com.meiye.model.part.DishShop;
 import org.springframework.data.jpa.repository.JpaRepository;

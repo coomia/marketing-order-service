@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
-@Entity
 public class DishPropertyBo extends ParentBo {
   @Id
   @GeneratedValue

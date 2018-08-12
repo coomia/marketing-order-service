@@ -6,9 +6,9 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.List;
 
 @Data
-@Entity
 public class DishShopBo extends ParentBo {
   @Id
   @GeneratedValue
@@ -63,4 +63,5 @@ public class DishShopBo extends ParentBo {
   private Long currRemainTotal;
   private Long isChangePrice;
   private Long productId;
+  private List<DishSetmealGroupBo> dishSetmealGroupBos;
 }

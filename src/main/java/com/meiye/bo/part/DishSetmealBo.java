@@ -8,13 +8,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
-@Entity
 public class DishSetmealBo extends ParentBo {
   @Id
   @GeneratedValue
   private Long id;
   private Long childDishId;
   private Long dishId;
+  private DishShopBo dishShopBo;
   private Long comboDishTypeId;
   private Long childDishType;
   private Double price;

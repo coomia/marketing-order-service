@@ -1,11 +1,8 @@
 package com.meiye.service.part.impl;
 
-import com.meiye.bo.config.AppConfigBo;
-import com.meiye.bo.part.DishBrandPropertyBo;
 import com.meiye.bo.part.DishBrandTypeBo;
-import com.meiye.model.config.AppConfig;
 import com.meiye.model.part.DishBrandType;
-import com.meiye.repository.config.DishBrandTypeRepository;
+import com.meiye.repository.part.DishBrandTypeRepository;
 import com.meiye.service.part.BrandTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
