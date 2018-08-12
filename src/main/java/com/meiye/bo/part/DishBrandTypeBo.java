@@ -1,7 +1,10 @@
 package com.meiye.bo.part;
 
-import com.meiye.model.ParentEntity;
+import com.meiye.bo.ParentBo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,7 +12,10 @@ import javax.persistence.Id;
 
 @Data
 @Entity
-public class DishBrandTypeBo extends ParentEntity {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class DishBrandTypeBo extends ParentBo {
   @Id
   @GeneratedValue
   private Long id;
