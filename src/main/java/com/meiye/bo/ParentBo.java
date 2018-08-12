@@ -19,7 +19,7 @@ public class ParentBo{
     private Long updatorId;
     private java.util.Date serverCreateTime;
     private java.util.Date serverUpdateTime;
-    private Integer statusFlag;
+    private Long  statusFlag;
 
     public <T extends ParentEntity> T copyTo(Class<T> target){
         try {

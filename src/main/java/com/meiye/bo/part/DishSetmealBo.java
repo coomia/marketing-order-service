@@ -1,6 +1,6 @@
 package com.meiye.bo.part;
 
-import com.meiye.model.ParentEntity;
+import com.meiye.bo.ParentBo;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 @Data
 @Entity
-public class DishSetmealBo extends ParentEntity {
+public class DishSetmealBo extends ParentBo {
   @Id
   @GeneratedValue
   private Long id;

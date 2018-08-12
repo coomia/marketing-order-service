@@ -28,7 +28,6 @@ public class AppConfigServiceImpl implements AppConfigService {
     @Autowired
     private AppConfigRepository appConfigRepository;
 
-    @Cacheable
     @Override
     public List<AppConfigBo> listAppConfigs(){
         List<AppConfig> appConfigs=appConfigRepository.findAll();
