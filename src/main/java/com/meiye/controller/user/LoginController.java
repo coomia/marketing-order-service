@@ -1,13 +1,19 @@
 package com.meiye.controller.user;
 
-import org.springframework.stereotype.Controller;
+import com.meiye.bo.system.ResetApiResult;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by Administrator on 2018/8/6 0006.
  */
 
-@Controller
+@RestController
 public class LoginController {
+
+    @RequestMapping("/login")
+    public String login(){
+        return ResetApiResult.sucess("");
+    }
 
 }

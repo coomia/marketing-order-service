@@ -15,12 +15,11 @@ import java.util.List;
 /**
  * Created by jonyh on 08/08/18.
  */
-@Component
 @Service
-public class UserServiceImpl implements UserDetailsService,UserService {
-    @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+public class UserServiceImpl implements UserService {
 
+    @Override
+    public UserBo getUserByName(String userName) {
         UserBo userBo=new UserBo();
         userBo.setUsername(userName);
         userBo.setPassword("123456");
@@ -30,10 +29,5 @@ public class UserServiceImpl implements UserDetailsService,UserService {
 
         userBo.setAuthorities(roles);
         return userBo;
-    }
-
-    @Override
-    public UserBo getUserByName(String userName) {
-        return null;
     }
 }
