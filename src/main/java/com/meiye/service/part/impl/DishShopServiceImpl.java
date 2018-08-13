@@ -1,9 +1,11 @@
 package com.meiye.service.part.impl;
 
 import com.meiye.bo.part.DishShopBo;
+import com.meiye.model.part.DishBrandProperty;
 import com.meiye.model.part.DishSetmeal;
 import com.meiye.model.part.DishSetmealGroup;
 import com.meiye.model.part.DishShop;
+import com.meiye.repository.part.DishBrandPropertyRepository;
 import com.meiye.repository.part.DishSetmealGroupRepository;
 import com.meiye.repository.part.DishSetmealRepository;
 import com.meiye.repository.part.DishShopRepository;
@@ -41,6 +43,9 @@ public class DishShopServiceImpl implements DishShopService{
 
     @Autowired
     DishSetmealGroupRepository dishSetmealGroupRepository;
+
+    @Autowired
+    DishBrandPropertyRepository dishBrandPropertyRepository;
 
     @Override
     public Page<DishShop> getDishShopByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo) {
@@ -80,8 +85,12 @@ public class DishShopServiceImpl implements DishShopService{
             DishShop dishShop=dishShopBo.copyTo(DishShop.class);
             dishShopRepository.save(dishShop);
             //如果是单品
-            if(dishShopBo.getType()==0){
-
+            if(dishShopBo.getType()==0 && dishShopBo.getDishBrandPropertyBos() != null && dishShopBo.getDishBrandPropertyBos().size()>0){
+                dishShopBo.getDishBrandPropertyBos().forEach(dishBrandPropertyBo ->{
+                    DishBrandProperty dishBrandProperty = dishBrandPropertyBo.copyTo(DishBrandProperty.class);
+                    dishBrandProperty.setDishId(dishShop.getId());
+                    dishBrandPropertyRepository.save(dishBrandProperty);
+                });
             }
             //如果是套餐
             else if(dishShopBo.getType()==1&&dishShopBo.getDishSetmealGroupBos()!=null){
