@@ -1,11 +1,12 @@
 package com.meiye.service.part.impl;
 
+import com.meiye.bo.part.DishPropertyBo;
 import com.meiye.bo.part.DishShopBo;
-import com.meiye.model.part.DishBrandProperty;
+import com.meiye.model.part.DishProperty;
 import com.meiye.model.part.DishSetmeal;
 import com.meiye.model.part.DishSetmealGroup;
 import com.meiye.model.part.DishShop;
-import com.meiye.repository.part.DishBrandPropertyRepository;
+import com.meiye.repository.part.DishPropertyRepository;
 import com.meiye.repository.part.DishSetmealGroupRepository;
 import com.meiye.repository.part.DishSetmealRepository;
 import com.meiye.repository.part.DishShopRepository;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -45,7 +45,7 @@ public class DishShopServiceImpl implements DishShopService{
     DishSetmealGroupRepository dishSetmealGroupRepository;
 
     @Autowired
-    DishBrandPropertyRepository dishBrandPropertyRepository;
+    DishPropertyRepository dishPropertyRepository;
 
     @Override
     public Page<DishShop> getDishShopByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo) {
@@ -77,6 +77,18 @@ public class DishShopServiceImpl implements DishShopService{
     public DishShopBo getDishShopById(Long id){
         DishShop dishShop= dishShopRepository.getOne(id);
         DishShopBo dishShopBo=dishShop.copyTo(DishShopBo.class);
+        //根据shopid得到加项
+        if(dishShop.getType()==0){
+            List<DishProperty> dishPropertysByShopID = dishPropertyRepository.findByDishShopId(id);
+            if(dishPropertysByShopID != null && dishPropertysByShopID.size()>0){
+                List<DishPropertyBo> dishPropertyBos = new ArrayList<DishPropertyBo>();
+                dishPropertysByShopID.forEach(dishProperty ->{
+                    DishPropertyBo dishPropertyBo = dishProperty.copyTo(DishPropertyBo.class);
+                    dishPropertyBos.add(dishPropertyBo);
+                });
+                dishShopBo.setDishPropertyBos(dishPropertyBos);
+            }
+        }
         return dishShopBo;
     }
 
@@ -85,11 +97,11 @@ public class DishShopServiceImpl implements DishShopService{
             DishShop dishShop=dishShopBo.copyTo(DishShop.class);
             dishShopRepository.save(dishShop);
             //如果是单品
-            if(dishShopBo.getType()==0 && dishShopBo.getDishBrandPropertyBos() != null && dishShopBo.getDishBrandPropertyBos().size()>0){
-                dishShopBo.getDishBrandPropertyBos().forEach(dishBrandPropertyBo ->{
-                    DishBrandProperty dishBrandProperty = dishBrandPropertyBo.copyTo(DishBrandProperty.class);
-                    dishBrandProperty.setDishId(dishShop.getId());
-                    dishBrandPropertyRepository.save(dishBrandProperty);
+            if(dishShopBo.getType()==0 && dishShopBo.getDishPropertyBos() != null && dishShopBo.getDishPropertyBos().size()>0){
+                dishShopBo.getDishPropertyBos().forEach(dishPropertyBo ->{
+                    DishProperty dishProperty = dishPropertyBo.copyTo(DishProperty.class);
+                    dishProperty.setDishShopId(dishShop.getId());
+                    dishPropertyRepository.save(dishProperty);
                 });
             }
             //如果是套餐

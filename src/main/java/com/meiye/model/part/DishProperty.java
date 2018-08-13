@@ -15,6 +15,7 @@ public class DishProperty extends ParentEntity {
   private Long id;
   private Long propertyTypeId;
   private Long propertyKind;
+  private Long dishShopId;
   private String name;
   private String aliasName;
   private Double reprice;

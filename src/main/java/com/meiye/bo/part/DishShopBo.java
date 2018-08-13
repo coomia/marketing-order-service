@@ -64,5 +64,5 @@ public class DishShopBo extends ParentBo {
   private Long isChangePrice;
   private Long productId;
   private List<DishSetmealGroupBo> dishSetmealGroupBos;
-  private List<DishBrandPropertyBo> dishBrandPropertyBos;
+  private List<DishPropertyBo> dishPropertyBos;
 }
