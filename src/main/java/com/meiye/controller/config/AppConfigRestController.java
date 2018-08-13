@@ -2,6 +2,7 @@ package com.meiye.controller.config;
 
 import com.meiye.annotation.CurrentUser;
 import com.meiye.bo.config.AppConfigBo;
+import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.user.UserBo;
 import com.meiye.service.config.AppConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import java.util.List;
  * Created by Administrator on 2018/8/6 0006.
  */
 @RestController
-@RequestMapping(path = "/api/appConfig")
+@RequestMapping(path = "/public/api/appConfig")
 public class AppConfigRestController {
     @Autowired
     AppConfigService appConfigService;
@@ -37,9 +38,9 @@ public class AppConfigRestController {
     }
 
     @RequestMapping(path = "/list")
-    public List<AppConfigBo> loadAppConfig(){
+    public ResetApiResult loadAppConfig(){
         List<AppConfigBo> appConfigBos=appConfigService.listAppConfigs();
-        return appConfigBos;
+        return ResetApiResult.sucess(appConfigBos);
     }
 
 
