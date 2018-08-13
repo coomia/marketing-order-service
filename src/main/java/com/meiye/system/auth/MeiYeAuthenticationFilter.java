@@ -37,6 +37,8 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+        httpServletResponse.setContentType("application/json");
+        httpServletResponse.setCharacterEncoding("UTF-8");
         Authentication authentication=null;
         try {
             authentication = getAuthentication(httpServletRequest);
@@ -44,13 +46,9 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
                     .setAuthentication(authentication);
             filterChain.doFilter(httpServletRequest,httpServletResponse);
         }catch (ExpiredJwtException exp){
-            httpServletResponse.setContentType("application/json");
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            exp.printStackTrace();
             httpServletResponse.getWriter().print(ResetApiResult.authFailed(null,exp.getMessage()));
         }catch (Exception exp){
-            exp.printStackTrace();
-            httpServletResponse.setContentType("application/json");
             httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             httpServletResponse.getWriter().print(ResetApiResult.error(null,exp.getMessage()));
         }
@@ -58,24 +56,17 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
 
 
     private Authentication getAuthentication(HttpServletRequest request) {
-        // 从Header中拿到token
         String token = request.getHeader(jwtConfiguration.getTokenInHeader());
 
         if (token != null) {
-                // 解析 Token
                 Claims claims = Jwts.parser()
-                        // 验签
                         .setSigningKey(jwtConfiguration.getSecret())
-                        // 去掉 Bearer
                         .parseClaimsJws(token.replace(jwtConfiguration.getValidTokenStartWith(), ""))
                         .getBody();
 
-                // 拿用户名
                 UserBo userBo=new UserBo();
                 BeanUtils.copyProperties(((LinkedHashMap)claims.get("userBo")).get("principal"),userBo);
                 List<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
-
-                // 返回验证令牌
                 return userBo != null ?
                         new UsernamePasswordAuthenticationToken(userBo, null, userBo.getAuthorities()) :
                         null;

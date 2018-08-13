@@ -1,5 +1,6 @@
 package com.meiye.system.auth;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meiye.bo.system.JWTConfiguration;
 import com.meiye.bo.system.ResetApiResult;
@@ -35,6 +36,8 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
+        httpServletResponse.setContentType("application/json");
+        httpServletResponse.setCharacterEncoding("UTF-8");
 
         String userName=null;
         String password=null;
@@ -51,9 +54,6 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
                 return null;
             }
         }
-
-
-
         // 返回一个验证令牌
         return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -74,33 +74,25 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
 
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().println(ResetApiResult.authFailed(null,failed.getMessage()));
+        response.getWriter().println(JSON.toJSONString(ResetApiResult.authFailed(null,failed.getMessage())));
     }
 
 
     private void addAuthentication(HttpServletResponse response, Authentication authResult) {
 
-        // 生成JWT
         String JWT =jwtConfiguration.getValidTokenStartWith() + Jwts.builder()
-                // 保存权限（角色）
                 .claim("userBo", authResult)
-                // 用户名写入标题
                 .setSubject(authResult.getName())
-                // 有效期设置
                 .setExpiration(new Date(System.currentTimeMillis() + jwtConfiguration.getTimeOut()))
-                // 签名设置
                 .signWith(SignatureAlgorithm.HS512, jwtConfiguration.getSecret())
                 .compact();
-
-        // 将 JWT 写入 body
         try {
-            response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_OK);
             response.setHeader(jwtConfiguration.getTokenInHeader(),JWT);
             HashMap<String,Object> objectHashMap=new HashMap<String,Object>();
             objectHashMap.put("user",authResult.getPrincipal());
             objectHashMap.put("token",JWT);
-            response.getWriter().println(ResetApiResult.sucess(objectHashMap));
+            response.getWriter().println(JSON.toJSONString(ResetApiResult.sucess(objectHashMap)));
         } catch (IOException e) {
             e.printStackTrace();
         }

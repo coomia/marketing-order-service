@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     @RequestMapping("/login")
-    public String login(){
+    public ResetApiResult login(){
         return ResetApiResult.sucess("");
     }
 
