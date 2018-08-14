@@ -25,7 +25,7 @@ public class ResetApiResult {
 
     public static ResetApiResult sucess(Object data){
         ResetApiResult resetApiResult =new ResetApiResult();
-        resetApiResult.setData(data);
+        resetApiResult.setData(data==null?new Object():data);
         resetApiResult.setMessage("");
         resetApiResult.setMessageType(STATUS_IGNORE);
         resetApiResult.setStatusCode(STATUS_CODE_200);
@@ -34,17 +34,17 @@ public class ResetApiResult {
 
     public static ResetApiResult error(Object data, String errorMessage){
         ResetApiResult resetApiResult =new ResetApiResult();
-        resetApiResult.setData(data);
+        resetApiResult.setData(data==null?new Object():data);
         resetApiResult.setMessage(errorMessage);
         resetApiResult.setMessageType(STATUS_ERROR);
-        resetApiResult.setStatusCode(STATUS_CODE_500);
+        resetApiResult.setStatusCode(STATUS_CODE_200);
         return resetApiResult;
     }
 
 
     public static ResetApiResult sucessWithWarning(Object data, String warningMessage){
         ResetApiResult resetApiResult =new ResetApiResult();
-        resetApiResult.setData(data);
+        resetApiResult.setData(data==null?new Object():data);
         resetApiResult.setMessage(warningMessage);
         resetApiResult.setMessageType(STATUS_WARNING);
         resetApiResult.setStatusCode(STATUS_CODE_200);
@@ -54,7 +54,7 @@ public class ResetApiResult {
 
     public static ResetApiResult sucessWithInfo(Object data, String tips){
         ResetApiResult resetApiResult =new ResetApiResult();
-        resetApiResult.setData(data);
+        resetApiResult.setData(data==null?new Object():data);
         resetApiResult.setMessage(tips);
         resetApiResult.setMessageType(STATUS_SUCCESS);
         resetApiResult.setStatusCode(STATUS_CODE_200);
@@ -63,10 +63,10 @@ public class ResetApiResult {
 
     public static ResetApiResult authFailed(Object data, String errorMessage){
         ResetApiResult resetApiResult =new ResetApiResult();
-        resetApiResult.setData(data);
+        resetApiResult.setData(data==null?new Object():data);
         resetApiResult.setMessage(errorMessage);
         resetApiResult.setMessageType(STATUS_ERROR);
-        resetApiResult.setStatusCode(STATUS_CODE_403);
+        resetApiResult.setStatusCode(STATUS_CODE_200);
         return resetApiResult;
     }
 }

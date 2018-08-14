@@ -1,10 +1,12 @@
 package com.meiye.system.auth;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meiye.bo.system.JWTConfiguration;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.user.UserBo;
+import com.meiye.system.util.WebUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -71,10 +73,8 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-
-        response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().println(JSON.toJSONString(ResetApiResult.authFailed(null,failed.getMessage())));
+        response.getWriter().println(JSON.toJSONString(ResetApiResult.authFailed(null,failed.getMessage()),WebUtil.getFastJsonSerializerFeature()));
     }
 
 
@@ -92,7 +92,7 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
             HashMap<String,Object> objectHashMap=new HashMap<String,Object>();
             objectHashMap.put("user",authResult.getPrincipal());
             objectHashMap.put("token",JWT);
-            response.getWriter().println(JSON.toJSONString(ResetApiResult.sucess(objectHashMap)));
+            response.getWriter().println(JSON.toJSONString(ResetApiResult.sucess(objectHashMap), WebUtil.getFastJsonSerializerFeature()));
         } catch (IOException e) {
             e.printStackTrace();
         }
