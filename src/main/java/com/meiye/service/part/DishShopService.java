@@ -23,4 +23,7 @@ public interface DishShopService {
      */
     Page<DishShop> getDishShopByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo);
 
+    void saveDishShop(DishShopBo dishShopBo);
+
+    DishShopBo getDishShopById(Long id);
 }

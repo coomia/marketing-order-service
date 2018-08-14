@@ -78,8 +78,9 @@ public class DishShopServiceImpl implements DishShopService{
         DishShop dishShop= dishShopRepository.getOne(id);
         DishShopBo dishShopBo=dishShop.copyTo(DishShopBo.class);
         //根据shopid得到加项
-        if(dishShop.getType()==0){
-            List<DishProperty> dishPropertysByShopID = dishPropertyRepository.findByDishShopId(id);
+        if(dishShop != null && dishShop.getType()==0){
+            //enabledflag : 1 启用 0：停用
+            List<DishProperty> dishPropertysByShopID = dishPropertyRepository.findByDishShopIdAndEnabledFlag(id,1L);
             if(dishPropertysByShopID != null && dishPropertysByShopID.size()>0){
                 List<DishPropertyBo> dishPropertyBos = new ArrayList<DishPropertyBo>();
                 dishPropertysByShopID.forEach(dishProperty ->{
@@ -119,6 +120,28 @@ public class DishShopServiceImpl implements DishShopService{
                         });
                     }
                 });
+            }
+        }
+    }
+
+    public void updateDishShop(DishShopBo dishShopBo){
+        if(dishShopBo != null){
+            //如果是单品
+            if(dishShopBo.getType()==0){
+
+            }else if(true){//套餐
+
+            }
+        }
+    }
+
+    public void deleteDishShop(DishShopBo dishShopBo){
+        if(dishShopBo != null){
+            //如果是单品
+            if(dishShopBo.getType()==0){
+
+            }else if(true){//套餐
+
             }
         }
     }

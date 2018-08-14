@@ -13,6 +13,6 @@ import java.util.List;
 @Repository
 public interface DishPropertyRepository extends JpaRepository<DishProperty,Long> {
 
-    List<DishProperty> findByDishShopId(Long dishShopId); //通过ShopId 得到所有的加项
+    List<DishProperty> findByDishShopIdAndEnabledFlag(Long dishShopId,Long enAbledFlag); //通过ShopId 得到所有的加项
 
 }
