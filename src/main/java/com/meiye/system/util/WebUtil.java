@@ -1,5 +1,6 @@
 package com.meiye.system.util;
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.meiye.bo.user.UserBo;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -18,5 +19,9 @@ public class WebUtil {
             return user;
         }else
             return null;
+    }
+
+    public static SerializerFeature[] getFastJsonSerializerFeature(){
+        return new SerializerFeature[]{SerializerFeature.PrettyFormat,SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullListAsEmpty,SerializerFeature.WriteNullStringAsEmpty,SerializerFeature.WriteNullBooleanAsFalse,SerializerFeature.WriteNullNumberAsZero};
     }
 }

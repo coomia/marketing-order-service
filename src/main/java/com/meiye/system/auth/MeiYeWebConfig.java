@@ -5,6 +5,7 @@ import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.meiye.bo.system.JWTConfiguration;
 import com.meiye.service.user.UserService;
+import com.meiye.system.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
@@ -53,16 +54,5 @@ public class MeiYeWebConfig extends WebSecurityConfigurerAdapter {
                 // 添加一个过滤器验证其他请求的Token是否合法
                 .addFilterBefore(new MeiYeAuthenticationFilter(jwtConfiguration),
                         UsernamePasswordAuthenticationFilter.class);
-    }
-
-    @Bean
-    public HttpMessageConverters fastJsonConfigure(){
-        FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
-        FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,SerializerFeature.WriteNullListAsEmpty,SerializerFeature.WriteNullStringAsEmpty,SerializerFeature.WriteNullBooleanAsFalse);
-        //日期格式化
-        fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
-        converter.setFastJsonConfig(fastJsonConfig);
-        return  new HttpMessageConverters(converter);
     }
 }

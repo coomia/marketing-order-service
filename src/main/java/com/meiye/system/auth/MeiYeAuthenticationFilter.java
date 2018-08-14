@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.meiye.bo.system.JWTConfiguration;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.user.UserBo;
+import com.meiye.system.util.WebUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -47,10 +48,10 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(httpServletRequest,httpServletResponse);
         }catch (ExpiredJwtException exp){
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpServletResponse.getWriter().print(ResetApiResult.authFailed(null,exp.getMessage()));
+            httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"登录过期，请重新登录!"), WebUtil.getFastJsonSerializerFeature()));
         }catch (Exception exp){
             httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            httpServletResponse.getWriter().print(ResetApiResult.error(null,exp.getMessage()));
+            httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"系统错误!"), WebUtil.getFastJsonSerializerFeature()));
         }
     }
 
