@@ -4,9 +4,7 @@ import com.meiye.bo.part.DishShopBo;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.service.part.DishShopService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -17,24 +15,24 @@ public class DishShopController {
     DishShopService dishShopService;
 
     @PostMapping("/save")
-    public ResetApiResult saveDishShop(DishShopBo dishShopBo){
+    public ResetApiResult saveDishShop(@RequestBody DishShopBo dishShopBo){
         dishShopService.saveDishShop(dishShopBo);
         return ResetApiResult.sucess("");
     }
 
-    @PostMapping("/load")
-    public ResetApiResult getDishShopById(Long shopId){
+    @GetMapping("/load")
+    public ResetApiResult getDishShopById(@RequestParam Long shopId){
         dishShopService.getDishShopById(shopId);
         return ResetApiResult.sucess("");
     }
 
-    @RequestMapping("/update")
-    public ResetApiResult updateDishShop(DishShopBo dishShopBo){
+    @PostMapping("/update")
+    public ResetApiResult updateDishShop(@RequestBody DishShopBo dishShopBo){
         return ResetApiResult.sucess("");
     }
 
-    @RequestMapping("/delete")
-    public ResetApiResult deleteDishShop(Long dishShopId){
+    @PostMapping("/delete")
+    public ResetApiResult deleteDishShop(@RequestBody Long dishShopId){
         return ResetApiResult.sucess("");
     }
 
