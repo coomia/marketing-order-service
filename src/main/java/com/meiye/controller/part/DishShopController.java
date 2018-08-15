@@ -4,6 +4,7 @@ import com.meiye.bo.part.DishShopBo;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.service.part.DishShopService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,13 +16,13 @@ public class DishShopController {
     @Autowired
     DishShopService dishShopService;
 
-    @RequestMapping("/save")
+    @PostMapping("/save")
     public ResetApiResult saveDishShop(DishShopBo dishShopBo){
         dishShopService.saveDishShop(dishShopBo);
         return ResetApiResult.sucess("");
     }
 
-    @RequestMapping("/load")
+    @PostMapping("/load")
     public ResetApiResult getDishShopById(Long shopId){
         dishShopService.getDishShopById(shopId);
         return ResetApiResult.sucess("");

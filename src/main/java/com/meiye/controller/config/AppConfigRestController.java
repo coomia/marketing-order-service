@@ -37,14 +37,14 @@ public class AppConfigRestController {
         }
     }
 
-    @RequestMapping(path = "/list")
+    @GetMapping(path = "/list")
     public ResetApiResult loadAppConfig(){
         List<AppConfigBo> appConfigBos=appConfigService.listAppConfigs();
         return ResetApiResult.sucess(appConfigBos);
     }
 
 
-    @RequestMapping(path = "/get/{configId}")
+    @GetMapping(path = "/get/{configId}")
     public AppConfigBo loadAppConfig(@PathVariable Long configId){
         AppConfigBo appConfigBo=appConfigService.getAppConfig(configId);
         return appConfigBo;
