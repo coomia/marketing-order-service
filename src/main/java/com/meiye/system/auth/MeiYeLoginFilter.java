@@ -1,9 +1,12 @@
 package com.meiye.system.auth;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meiye.bo.system.JWTConfiguration;
+import com.meiye.bo.system.LoginBo;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.user.UserBo;
 import com.meiye.system.util.WebUtil;
@@ -15,12 +18,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.util.StringUtils;
+import sun.reflect.annotation.ExceptionProxy;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -38,29 +45,42 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
-        httpServletResponse.setContentType("application/json");
-        httpServletResponse.setCharacterEncoding("UTF-8");
-
-        String userName=null;
-        String password=null;
-        if(httpServletRequest.getParameter("username")!=null&&httpServletRequest.getParameter("password")!=null){
-            userName=httpServletRequest.getParameter("username");
-            password=httpServletRequest.getParameter("password");
-        }else{
+        LoginBo loginBo = new LoginBo();
+        if (httpServletRequest.getParameter("username") != null && httpServletRequest.getParameter("password") != null && httpServletRequest.getParameter("storeid") != null && httpServletRequest.getParameter("verifycode") != null) {
+            loginBo.setUserName(httpServletRequest.getParameter("username"));
+            loginBo.setPassword(httpServletRequest.getParameter("password"));
+            loginBo.setStoreId(httpServletRequest.getParameter("storeid"));
+            loginBo.setVerifyCode(httpServletRequest.getParameter("verifycode"));
+        } else {
+            String loginBody = "";
             try {
-                UserBo creds = new ObjectMapper().readValue(httpServletRequest.getInputStream(), UserBo.class);
-                userName = creds.getUsername();
-                password = creds.getPassword();
+                String line = "";
+                BufferedReader reader = new BufferedReader(new InputStreamReader(httpServletRequest.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    loginBody += line;
+                }
+                if (!StringUtils.isEmpty(loginBody)) {
+                    loginBo = JSON.parseObject(loginBody, LoginBo.class, Feature.values());
+                }
             }catch (Exception exp){
                 exp.printStackTrace();
-                return null;
+            }
+            if (StringUtils.isEmpty(loginBody) || StringUtils.isEmpty(loginBo.getUserName())) {
+                try {
+                    UserBo creds = new ObjectMapper().readValue(httpServletRequest.getInputStream(), UserBo.class);
+                    loginBo.setUserName(creds.getUsername());
+                    loginBo.setPassword(creds.getPassword());
+                } catch (Exception exp) {
+                    exp.printStackTrace();
+                    return null;
+                }
             }
         }
         // 返回一个验证令牌
         return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        userName,
-                        password
+                        loginBo.getUserName(),
+                        loginBo.getPassword()
                 )
         );
     }
