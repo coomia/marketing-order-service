@@ -23,4 +23,5 @@ public class DishPropertyBo extends ParentBo {
   private String uuid;
   private Long isCure;
   private Long enabledFlag;
+  private Long dishShopId;
 }
