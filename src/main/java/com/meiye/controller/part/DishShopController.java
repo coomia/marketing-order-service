@@ -36,4 +36,16 @@ public class DishShopController {
         return ResetApiResult.sucess("");
     }
 
+    @PostMapping("/group/save")
+    public ResetApiResult newDishGroup(@RequestBody DishShopBo dishShopBo){
+        dishShopService.saveDishShop(dishShopBo);
+        return ResetApiResult.sucess("");
+    }
+
+    @PostMapping("/group/update")
+    public ResetApiResult updateDishGroup(@RequestBody DishShopBo dishShopBo){
+        dishShopService.saveDishShop(dishShopBo);
+        return ResetApiResult.sucess("");
+    }
+
 }

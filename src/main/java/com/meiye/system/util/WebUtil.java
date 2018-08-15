@@ -4,6 +4,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.meiye.bo.user.UserBo;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
 /**
@@ -23,5 +24,13 @@ public class WebUtil {
 
     public static SerializerFeature[] getFastJsonSerializerFeature(){
         return new SerializerFeature[]{SerializerFeature.PrettyFormat,SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullListAsEmpty,SerializerFeature.WriteNullStringAsEmpty,SerializerFeature.WriteNullBooleanAsFalse,SerializerFeature.WriteNullNumberAsZero};
+    }
+
+
+    public static void setRestResponseHeader(HttpServletResponse httpServletResponse){
+        httpServletResponse.setHeader("Access-Control-Allow-Origin","*");
+        httpServletResponse.setHeader("Access-Control-Allow-Methods","POST, GET, OPTIONS");
+        httpServletResponse.setHeader("Access-Control-Allow-Headers","token, Content-Type");
+        httpServletResponse.setHeader("Content-Type","application/json;charset=UTF-8");
     }
 }

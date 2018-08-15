@@ -126,11 +126,31 @@ public class DishShopServiceImpl implements DishShopService{
 
     public void updateDishShop(DishShopBo dishShopBo){
         if(dishShopBo != null){
-            //如果是单品
-            if(dishShopBo.getType()==0){
+            if(dishShopBo.getId()==null)
+                saveDishShop(dishShopBo);
+            else {
+                DishShop dishShop=dishShopBo.copyTo(DishShop.class);
+                dishShopRepository.updateDishShop(dishShop.getName(),dishShop.getDishCode(),dishShop.getMarketPrice(),dishShop.getUnitName(),dishShop.getDishQty(),dishShop.getId());
+                //如果是单品
+                if (dishShopBo.getType() == 0) {
 
-            }else if(true){//套餐
-
+                } else if (dishShopBo.getType() == 0) {//套餐
+                    dishShopBo.getDishSetmealGroupBos().forEach(dishSetmealGroupBo -> {
+                        DishSetmealGroup dishSetmealGroup=dishSetmealGroupBo.copyTo(DishSetmealGroup.class);
+                        dishSetmealGroup.setSetmealDishId(dishShop.getId());
+                        if(dishSetmealGroup.getId()==null)
+                            dishSetmealGroupRepository.save(dishSetmealGroup);
+                        else
+                        if(dishSetmealGroupBo.getDishSetmealBos()!=null){
+                            dishSetmealGroupBo.getDishSetmealBos().forEach(dishSetmealBo -> {
+                                DishSetmeal dishSetmeal=dishSetmealBo.copyTo(DishSetmeal.class);
+                                dishSetmeal.setDishId(dishShop.getId());
+                                dishSetmeal.setComboDishTypeId(dishSetmealGroup.getId());
+                                dishSetmealRepository.save(dishSetmeal);
+                            });
+                        }
+                    });
+                }
             }
         }
     }

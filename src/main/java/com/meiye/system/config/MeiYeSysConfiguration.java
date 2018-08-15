@@ -10,9 +10,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 
 import java.util.Iterator;
 import java.util.List;
@@ -47,8 +49,6 @@ public class MeiYeSysConfiguration extends WebMvcConfigurationSupport {
         FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
         fastJsonConfig.setSerializerFeatures(WebUtil.getFastJsonSerializerFeature());
-        //日期格式化
-        fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
         converter.setFastJsonConfig(fastJsonConfig);
         converters.add(converter);
     }

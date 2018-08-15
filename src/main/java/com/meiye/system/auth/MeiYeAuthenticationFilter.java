@@ -38,8 +38,8 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        httpServletResponse.setContentType("application/json");
-        httpServletResponse.setCharacterEncoding("UTF-8");
+
+        WebUtil.setRestResponseHeader(httpServletResponse);
         Authentication authentication=null;
         try {
             authentication = getAuthentication(httpServletRequest);
