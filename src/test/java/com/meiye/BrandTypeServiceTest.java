@@ -54,19 +54,19 @@ public class BrandTypeServiceTest {
 
     @Test
     public void findAll(){
-        Map<DishBrandTypeBo, List<DishBrandTypeBo>> allDishBrandTypeMap = brandTypeService.getAllDishBrandTypeList();
+        List<DishBrandTypeBo> allDishBrandTypeList = brandTypeService.getAllDishBrandTypeList();
         System.out.println("查询结果：");
-        for(DishBrandTypeBo parent :allDishBrandTypeMap.keySet()){
-            System.out.println("一级菜单ID："+parent.getId());
-            List<DishBrandTypeBo> children = allDishBrandTypeMap.get(parent);
-            if(Objects.nonNull(children)){
-                for(DishBrandTypeBo child : children){
-                    System.out.println("二级菜单父ID:"+child.getParentId());
-                }
-            }else{
-                System.out.println("无二级菜单");
-            }
-        }
+//        for(DishBrandTypeBo parent :allDishBrandTypeMap.keySet()){
+//            System.out.println("一级菜单ID："+parent.getId());
+//            List<DishBrandTypeBo> children = allDishBrandTypeMap.get(parent);
+//            if(Objects.nonNull(children)){
+//                for(DishBrandTypeBo child : children){
+//                    System.out.println("二级菜单父ID:"+child.getParentId());
+//                }
+//            }else{
+//                System.out.println("无二级菜单");
+//            }
+//        }
     }
 
 

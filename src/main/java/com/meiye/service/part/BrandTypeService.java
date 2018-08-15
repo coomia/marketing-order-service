@@ -24,7 +24,7 @@ public interface BrandTypeService {
      * 获取所有启用的分类列表，并且按照一级分类组装好对应二级分类
      * @return
      */
-    Map<DishBrandTypeBo,List<DishBrandTypeBo>> getAllDishBrandTypeList();
+    List<DishBrandTypeBo> getAllDishBrandTypeList();
 
     /**
      * 保存或更新实体， 更新前提要求传入参数为完整的实体,不然用update()方法

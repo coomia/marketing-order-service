@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.List;
 
 @Data
 @Builder
@@ -29,4 +30,6 @@ public class DishBrandTypeBo extends ParentBo {
   private Long brandIdenty;
   private Long enabledFlag;
   private Long isCure;
+  private List<DishBrandTypeBo> dishBrandTypeBoList;
+
 }

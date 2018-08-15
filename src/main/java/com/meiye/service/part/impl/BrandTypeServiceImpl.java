@@ -30,7 +30,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     }
 
     @Override
-    public Map<DishBrandTypeBo,List<DishBrandTypeBo>> getAllDishBrandTypeList() {
+    public List<DishBrandTypeBo> getAllDishBrandTypeList() {
         List<DishBrandType> dishBrandTypes = dishBrandTypeRepository.findAllByEnabledFlagOrderBySortDesc(new Long(1));
         List<DishBrandTypeBo> dishBrandTypeBos = this.copy(dishBrandTypes);
         return this.sortBrandTypeByParentId(dishBrandTypeBos);
@@ -105,10 +105,10 @@ public class BrandTypeServiceImpl implements BrandTypeService {
      * @param dishBrandTypeBos
      * @return
      */
-    private Map<DishBrandTypeBo,List<DishBrandTypeBo>> sortBrandTypeByParentId(List<DishBrandTypeBo> dishBrandTypeBos){
+    private List<DishBrandTypeBo> sortBrandTypeByParentId(List<DishBrandTypeBo> dishBrandTypeBos){
         Map<DishBrandTypeBo,List<DishBrandTypeBo>> map= new HashMap<>();
         if(Objects.isNull(dishBrandTypeBos)||dishBrandTypeBos.size()<1){
-            return map;
+            return null;
         }
         List<DishBrandTypeBo> parentDishBrandTypeBo = new ArrayList<>();
         List<DishBrandTypeBo> childrenDishBrandTypeBo = new ArrayList<>();
@@ -128,9 +128,9 @@ public class BrandTypeServiceImpl implements BrandTypeService {
                     children.add(childBo);
                 }
             }
-            map.put(parentBo,children);
+            parentBo.setDishBrandTypeBoList(children);
         }
-        return map;
+        return parentDishBrandTypeBo;
     }
 
 }
