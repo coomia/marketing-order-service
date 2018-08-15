@@ -45,6 +45,7 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
+        WebUtil.setRestResponseHeader(httpServletResponse);
         LoginBo loginBo = new LoginBo();
         if (httpServletRequest.getParameter("username") != null && httpServletRequest.getParameter("password") != null && httpServletRequest.getParameter("storeid") != null && httpServletRequest.getParameter("verifycode") != null) {
             loginBo.setUserName(httpServletRequest.getParameter("username"));
