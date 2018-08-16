@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class MeiYeControllerAdvice extends FastJsonViewResponseBodyAdvice {
     @ExceptionHandler(value = Exception.class)
     public ResetApiResult errorHandler(Exception ex) {
-        return ResetApiResult.error(null,ex.getMessage());
+        ex.printStackTrace();
+        return ResetApiResult.error(null,"未知错误.");
     }
 }

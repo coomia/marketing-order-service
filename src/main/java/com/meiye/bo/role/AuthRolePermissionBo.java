@@ -14,10 +14,7 @@ import javax.persistence.Id;
  * create time: 2018-08-15 22:12:36
  */
 @Data
-@Entity
 public class AuthRolePermissionBo extends ParentBo {
-	@Id
-	@GeneratedValue
 	private long id;
 	private long roleId;
 	private long permissionId;

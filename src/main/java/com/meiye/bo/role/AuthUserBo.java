@@ -15,10 +15,7 @@ import java.sql.Timestamp;
  * create time: 2018-08-15 22:12:36
  */
 @Data
-@Entity
 public class AuthUserBo extends ParentBo {
-	@Id
-	@GeneratedValue
 	private long id;
 	private long roleId;
 	private String account;

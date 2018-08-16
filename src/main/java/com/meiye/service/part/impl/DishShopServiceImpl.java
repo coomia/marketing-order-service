@@ -89,6 +89,8 @@ public class DishShopServiceImpl implements DishShopService{
                 });
                 dishShopBo.setDishPropertyBos(dishPropertyBos);
             }
+        }else if(dishShop!=null&&dishShop.getType()==1){
+
         }
         return dishShopBo;
     }
@@ -96,6 +98,7 @@ public class DishShopServiceImpl implements DishShopService{
     public void saveDishShop(DishShopBo dishShopBo){
         if(dishShopBo!=null){
             DishShop dishShop=dishShopBo.copyTo(DishShop.class);
+            dishShop.setStatusFlag(1l);
             dishShopRepository.save(dishShop);
             //如果是单品
             if(dishShopBo.getType()==0 && dishShopBo.getDishPropertyBos() != null && dishShopBo.getDishPropertyBos().size()>0){
@@ -124,6 +127,7 @@ public class DishShopServiceImpl implements DishShopService{
         }
     }
 
+    @Override
     public void updateDishShop(DishShopBo dishShopBo){
         if(dishShopBo != null){
             if(dishShopBo.getId()==null)
@@ -136,18 +140,31 @@ public class DishShopServiceImpl implements DishShopService{
 
                 } else if (dishShopBo.getType() == 0) {//套餐
                     dishShopBo.getDishSetmealGroupBos().forEach(dishSetmealGroupBo -> {
-                        DishSetmealGroup dishSetmealGroup=dishSetmealGroupBo.copyTo(DishSetmealGroup.class);
-                        dishSetmealGroup.setSetmealDishId(dishShop.getId());
-                        if(dishSetmealGroup.getId()==null)
-                            dishSetmealGroupRepository.save(dishSetmealGroup);
-                        else
-                        if(dishSetmealGroupBo.getDishSetmealBos()!=null){
-                            dishSetmealGroupBo.getDishSetmealBos().forEach(dishSetmealBo -> {
-                                DishSetmeal dishSetmeal=dishSetmealBo.copyTo(DishSetmeal.class);
-                                dishSetmeal.setDishId(dishShop.getId());
-                                dishSetmeal.setComboDishTypeId(dishSetmealGroup.getId());
-                                dishSetmealRepository.save(dishSetmeal);
-                            });
+                        if(dishSetmealGroupBo.getStatusFlag()==1l) {
+                            DishSetmealGroup dishSetmealGroup = dishSetmealGroupBo.copyTo(DishSetmealGroup.class);
+                            dishSetmealGroup.setSetmealDishId(dishShop.getId());
+                            if (dishSetmealGroup.getId() == null)
+                                dishSetmealGroupRepository.save(dishSetmealGroup);
+                            else
+                                dishSetmealGroupRepository.updateDishSetmealGroup(dishSetmealGroup.getSetmealDishId(), dishSetmealGroup.getName(), dishSetmealGroup.getOrderMin(), dishSetmealGroup.getOrderMax(), dishSetmealGroup.getId());
+                            if (dishSetmealGroupBo.getDishSetmealBos() != null) {
+                                dishSetmealGroupBo.getDishSetmealBos().forEach(dishSetmealBo -> {
+                                    if (dishSetmealBo.getStatusFlag() == 1l) {
+                                        DishSetmeal dishSetmeal = dishSetmealBo.copyTo(DishSetmeal.class);
+                                        dishSetmeal.setDishId(dishShop.getId());
+                                        dishSetmeal.setComboDishTypeId(dishSetmealGroup.getId());
+                                        if (dishSetmeal.getId() == null) {
+                                            dishSetmealRepository.save(dishSetmeal);
+                                        } else {
+                                            dishSetmealRepository.updateDishSetmealGroup(dishSetmeal.getComboDishTypeId(),dishSetmeal.getPrice(),dishSetmeal.getLeastCellNum(),dishSetmeal.getIsReplace(),dishSetmeal.getIsDefault(),dishSetmeal.getIsMulti(),dishSetmeal.getId());
+                                        }
+                                    } else if(dishSetmealBo.getId()!=null){
+                                        dishSetmealRepository.deleteDishSetmeal(dishSetmealBo.getId());
+                                    }
+                                });
+                            }
+                        }else if(dishSetmealGroupBo.getId()!=null){
+                            dishSetmealGroupRepository.deleteDishSetmealGroup(dishSetmealGroupBo.getId());
                         }
                     });
                 }

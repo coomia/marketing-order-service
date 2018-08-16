@@ -44,8 +44,13 @@ public class DishShopController {
 
     @PostMapping("/group/update")
     public ResetApiResult updateDishGroup(@RequestBody DishShopBo dishShopBo){
-        dishShopService.saveDishShop(dishShopBo);
+        dishShopService.updateDishShop(dishShopBo);
         return ResetApiResult.sucess("");
     }
 
+    @PostMapping("/group/find/{dishShopId}")
+    public ResetApiResult findDishShop(@PathVariable Long dishShopId){
+        DishShopBo dishShopBo=dishShopService.getDishShopById(dishShopId);
+        return ResetApiResult.sucess(dishShopBo);
+    }
 }

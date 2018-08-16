@@ -1,5 +1,6 @@
 package com.meiye.bo;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.user.UserBo;
 import com.meiye.model.ParentEntity;
 import com.meiye.system.util.WebUtil;
@@ -13,11 +14,17 @@ import java.util.Date;
  */
 @Data
 public class ParentBo{
+    @JSONField(serialize=false)
     private String creatorName;
+    @JSONField(serialize=false)
     private Long creatorId;
+    @JSONField(serialize=false)
     private String updatorName;
+    @JSONField(serialize=false)
     private Long updatorId;
+    @JSONField(serialize=false)
     private java.util.Date serverCreateTime;
+    @JSONField(serialize=false)
     private java.util.Date serverUpdateTime;
     private Long  statusFlag;
 

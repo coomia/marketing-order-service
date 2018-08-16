@@ -23,6 +23,7 @@ public class ResetApiResult {
     public static final int STATUS_CODE_403=403;
     public static final int STATUS_CODE_500=500;
 
+
     public static ResetApiResult sucess(Object data){
         ResetApiResult resetApiResult =new ResetApiResult();
         resetApiResult.setData(data==null?new Object():data);

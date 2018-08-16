@@ -26,4 +26,6 @@ public interface DishShopService {
     void saveDishShop(DishShopBo dishShopBo);
 
     DishShopBo getDishShopById(Long id);
+
+    void updateDishShop(DishShopBo dishShopBo);
 }
