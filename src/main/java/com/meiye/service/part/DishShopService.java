@@ -21,7 +21,7 @@ public interface DishShopService {
      * @param dishShopBo
      * @return
      */
-    Page<DishShop> getDishShopByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo);
+    Page<DishShop> getDishShopPageByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo);
 
     void saveDishShop(DishShopBo dishShopBo);
 

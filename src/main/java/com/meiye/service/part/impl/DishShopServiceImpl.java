@@ -48,7 +48,7 @@ public class DishShopServiceImpl implements DishShopService{
     DishPropertyRepository dishPropertyRepository;
 
     @Override
-    public Page<DishShop> getDishShopByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo) {
+    public Page<DishShop> getDishShopPageByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo) {
         Pageable pageable = new PageRequest(pageNum,pageSize, Sort.Direction.DESC,"sort");
         Page<DishShop> shopPage = dishShopRepository.findAll(new Specification<DishShop>(){
             @Override

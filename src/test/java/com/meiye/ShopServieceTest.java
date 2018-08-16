@@ -30,7 +30,7 @@ public class ShopServieceTest {
         DishShopBo bo = new DishShopBo();
         bo.setName("ryne");
         bo.setDishTypeId(new Long(1));
-        Page<DishShop> pageShop = dishShopService.getDishShopByCriteria(page,size,bo);
+        Page<DishShop> pageShop = dishShopService.getDishShopPageByCriteria(page,size,bo);
         System.out.println(pageShop);
 
     }
