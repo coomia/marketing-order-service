@@ -25,6 +25,12 @@ public class DishShopController {
         return ResetApiResult.sucess(dishShopService.getDishShopById(shopId));
     }
 
+
+    @PostMapping("/getDishShopPageByCriteria")
+    public ResetApiResult getDishShopPageByCriteria(@RequestBody DishShopBo dishShopBo){
+        return ResetApiResult.sucess(dishShopService.getDishShopPageByCriteria(dishShopBo.getPageNum(),dishShopBo.getPageSize(),dishShopBo));
+    }
+
     @PostMapping("/update")
     public ResetApiResult updateDishShop(@RequestBody DishShopBo dishShopBo){
         dishShopService.updateDishShop(dishShopBo);
