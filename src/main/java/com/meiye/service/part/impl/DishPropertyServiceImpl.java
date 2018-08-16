@@ -8,6 +8,7 @@ import com.meiye.service.part.DishShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,12 +18,14 @@ public class DishPropertyServiceImpl implements DishPropertyService{
     @Autowired
     DishPropertyRepository dishPropertyRepository;
 
+    @Transactional
     @Override
-    public void save(DishPropertyBo dishPropertyBo) {
+    public DishPropertyBo save(DishPropertyBo dishPropertyBo) {
         if(dishPropertyBo != null){
             DishProperty dishProperty = dishPropertyBo.copyTo(DishProperty.class);
             dishPropertyRepository.save(dishProperty);
         }
+        return dishPropertyBo;
     }
 
     @Override
@@ -46,5 +49,23 @@ public class DishPropertyServiceImpl implements DishPropertyService{
             return dishPropertyBos;
         }
         return null;
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    @Override
+    public void deleteByIds(List<Long> ids) {
+        dishPropertyRepository.deleteByIdS(ids);
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    @Override
+    public void deleteById(Long id) {
+        dishPropertyRepository.deleteById(id);
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    @Override
+    public void deleteBySopId(Long dishShopId) {
+        dishPropertyRepository.deleteByShopId(dishShopId);
     }
 }
