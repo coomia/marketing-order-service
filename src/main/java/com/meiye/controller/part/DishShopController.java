@@ -22,23 +22,30 @@ public class DishShopController {
 
     @GetMapping("/load")
     public ResetApiResult getDishShopById(@RequestParam Long shopId){
-        dishShopService.getDishShopById(shopId);
-        return ResetApiResult.sucess("");
+        return ResetApiResult.sucess(dishShopService.getDishShopById(shopId));
+    }
+
+
+    @PostMapping("/getDishShopPageByCriteria")
+    public ResetApiResult getDishShopPageByCriteria(@RequestBody DishShopBo dishShopBo){
+        return ResetApiResult.sucess(dishShopService.getDishShopPageByCriteria(dishShopBo.getPageNum(),dishShopBo.getPageSize(),dishShopBo));
     }
 
     @PostMapping("/update")
     public ResetApiResult updateDishShop(@RequestBody DishShopBo dishShopBo){
+        dishShopService.updateDishShop(dishShopBo);
         return ResetApiResult.sucess("");
     }
 
     @PostMapping("/delete")
     public ResetApiResult deleteDishShop(@RequestBody Long dishShopId){
+        dishShopService.deleteDishShop(dishShopId);
         return ResetApiResult.sucess("");
     }
 
     @PostMapping("/group/save")
     public ResetApiResult newDishGroup(@RequestBody DishShopBo dishShopBo){
-        dishShopService.saveDishShop(dishShopBo);
+
         return ResetApiResult.sucess("");
     }
 

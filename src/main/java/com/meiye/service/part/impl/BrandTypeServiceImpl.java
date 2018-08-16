@@ -63,7 +63,13 @@ public class BrandTypeServiceImpl implements BrandTypeService {
             dishBrandTypeBo.setUuid(uuid);
         }
         if(Objects.isNull(dishBrandTypeBo.getSort())){
-            dishBrandTypeBo.setSort((long) (Math.random()*9+1)*100000);
+            Random random = new Random();
+            String result="";
+            for (int i=0;i<6;i++)
+            {
+                result+=random.nextInt(10);
+            }
+            dishBrandTypeBo.setSort(Long.valueOf(result));
         }
         if(Objects.isNull(dishBrandTypeBo.getStatusFlag())){
             dishBrandTypeBo.setStatusFlag(new Long(1));

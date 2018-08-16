@@ -21,11 +21,15 @@ public interface DishShopService {
      * @param dishShopBo
      * @return
      */
-    Page<DishShop> getDishShopByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo);
+    Page<DishShop> getDishShopPageByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo);
 
     void saveDishShop(DishShopBo dishShopBo);
 
     DishShopBo getDishShopById(Long id);
+
+    public void updateDishShop(DishShopBo dishShopBo);
+
+    public void deleteDishShop(Long shopId);
 
     void updateDishShop(DishShopBo dishShopBo);
 }

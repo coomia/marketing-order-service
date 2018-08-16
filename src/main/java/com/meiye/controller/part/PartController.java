@@ -29,8 +29,8 @@ public class PartController {
         return ResetApiResult.sucess(brandTypeService.saveOrUpdate(dishBrandTypeBo));
     }
 
-    @PostMapping("/deleteBrandType")
-    public ResetApiResult loadBrandTypes(@RequestBody Long id){
+    @GetMapping("/deleteBrandType/{id}")
+    public ResetApiResult loadBrandTypes(@PathVariable Long id){
         return ResetApiResult.sucess(brandTypeService.delete(id));
     }
 
@@ -39,8 +39,8 @@ public class PartController {
         return ResetApiResult.sucess(brandTypeService.update(dishBrandTypeBo));
     }
 
-    @GetMapping("/getBrandTypeById")
-    public ResetApiResult addBrandType(@RequestBody Long id){
+    @GetMapping("/getBrandTypeById/{id}")
+    public ResetApiResult addBrandType(@PathVariable Long id){
         return ResetApiResult.sucess(brandTypeService.getDishBrandType(id));
     }
 

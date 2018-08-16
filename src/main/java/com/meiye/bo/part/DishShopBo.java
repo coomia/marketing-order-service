@@ -89,4 +89,6 @@ public class DishShopBo extends ParentBo {
   private Long productId;
   private List<DishSetmealGroupBo> dishSetmealGroupBos;
   private List<DishPropertyBo> dishPropertyBos;
+  Integer pageNum;
+  Integer pageSize;
 }

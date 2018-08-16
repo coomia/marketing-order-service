@@ -16,25 +16,9 @@ public class DishPropertyController {
     @Autowired
     DishPropertyService dishPropertyService;
 
-    @PostMapping("/save")
-    public ResetApiResult save(@RequestBody DishPropertyBo dishPropertyBo){
-        //dishPropertyService.save
-        return ResetApiResult.sucess("");
-    }
-
-    @GetMapping("/load")
-    public ResetApiResult getById(@RequestParam Long shopId){
-        //dishPropertyService.get
-        return ResetApiResult.sucess("");
-    }
-
-    @PostMapping("/update")
-    public ResetApiResult update(@RequestBody DishPropertyBo dishPropertyBo){
-        return ResetApiResult.sucess("");
-    }
-
     @PostMapping("/delete")
-    public ResetApiResult delete(@RequestBody Long dishShopId){
+    public ResetApiResult delete(@RequestBody Long id){
+        dishPropertyService.deleteById(id);
         return ResetApiResult.sucess("");
     }
 }
