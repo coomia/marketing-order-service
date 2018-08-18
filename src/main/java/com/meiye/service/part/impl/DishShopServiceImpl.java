@@ -83,7 +83,7 @@ public class DishShopServiceImpl implements DishShopService{
         //根据shopid得到加项
         if (dishShop != null && dishShop.getType() == 0) {
             //enabledflag : 1 启用 0：停用
-            List<DishProperty> dishPropertysByShopID = dishPropertyRepository.findByDishShopIdAndEnabledFlag(id, 1L);
+            List<DishProperty> dishPropertysByShopID = dishPropertyRepository.findByDishShopIdAndStatusFlag(id, 1);
             if (dishPropertysByShopID != null && dishPropertysByShopID.size() > 0) {
                 List<DishPropertyBo> dishPropertyBos = new ArrayList<DishPropertyBo>();
                 dishPropertysByShopID.forEach(dishProperty -> {

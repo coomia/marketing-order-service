@@ -20,9 +20,9 @@ public class DishShopController {
         return ResetApiResult.sucess("");
     }
 
-    @GetMapping("/load")
-    public ResetApiResult getDishShopById(@RequestParam Long shopId){
-        return ResetApiResult.sucess(dishShopService.getDishShopById(shopId));
+    @GetMapping("/load/{dishShopId}")
+    public ResetApiResult getDishShopById(@PathVariable Long dishShopId){
+        return ResetApiResult.sucess(dishShopService.getDishShopById(dishShopId));
     }
 
 

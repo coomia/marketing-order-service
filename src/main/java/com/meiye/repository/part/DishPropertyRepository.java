@@ -16,7 +16,7 @@ import java.util.List;
 @Repository
 public interface DishPropertyRepository extends JpaRepository<DishProperty,Long> {
 
-    List<DishProperty> findByDishShopIdAndEnabledFlag(Long dishShopId,Long enAbledFlag); //通过ShopId 得到所有的加项
+    List<DishProperty> findByDishShopIdAndStatusFlag(Long dishShopId,Integer statusFlag); //通过ShopId 得到所有的加项
 
     List<DishProperty> findByIdInAndEnabledFlag(List<Long> id,Long enAbledFlag);//多个id 获取DishProperty
 

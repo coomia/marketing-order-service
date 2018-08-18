@@ -24,6 +24,6 @@ public interface DishShopRepository extends JpaRepository<DishShop,Long>,JpaSpec
 
 
     @Modifying
-    @Query("update DishShop ds set ds.enabledFlag=2 where ds.id=?1")
+    @Query("update DishShop ds set ds.statusFlag=2 where ds.id=?1")
     public int deleteDishShop(Long id);
 }

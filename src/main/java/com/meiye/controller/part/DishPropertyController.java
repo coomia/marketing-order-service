@@ -16,8 +16,8 @@ public class DishPropertyController {
     @Autowired
     DishPropertyService dishPropertyService;
 
-    @PostMapping("/delete")
-    public ResetApiResult delete(@RequestBody Long id){
+    @PostMapping("/delete/{id}")
+    public ResetApiResult delete(@PathVariable Long id){
         dishPropertyService.deleteById(id);
         return ResetApiResult.sucess("");
     }
