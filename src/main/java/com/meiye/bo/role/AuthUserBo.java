@@ -49,7 +49,7 @@ public class AuthUserBo extends ParentBo {
 	private String password;
 	private String passwordNum;
 	private byte sourceFlag;
-	private String salt;
+	private String salt ="";
 	private long shopIdenty;
 	private long brandIdenty;
 	private byte enabledFlag;

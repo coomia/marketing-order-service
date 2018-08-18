@@ -18,6 +18,6 @@ public interface AuthUserRepository extends JpaRepository<AuthUser,Long> {
      * 查找最新加入门店的员工信息
      * @return
      */
-   // AuthUser findFirst1OrderByServerCreateTimeDesc();
+    AuthUser findFirstByOrderByServerCreateTimeDesc();
 
 }

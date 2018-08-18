@@ -30,8 +30,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Override
     public AuthUserBo findLatestAuthUser() {
-        AuthUser authUser = null;
-                //authUserRepository.findFirst1OrderByServerCreateTimeDesc();
+        AuthUser authUser = authUserRepository.findFirstByOrderByServerCreateTimeDesc();
         return authUser.copyTo(AuthUserBo.class);
     }
 }
