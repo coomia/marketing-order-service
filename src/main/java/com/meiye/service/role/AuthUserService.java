@@ -14,7 +14,7 @@ public interface AuthUserService {
      * 添加员工
      * @param authUserBo
      */
-    void AddAuthUser(AuthUserBo authUserBo);
+    void addAuthUser(AuthUserBo authUserBo);
 
 
     /**

@@ -7,6 +7,8 @@ import com.meiye.service.role.AuthUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 /**
  * @Author: ryner
  * @Description:
@@ -19,15 +21,17 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Autowired
     AuthUserRepository authUserRepository;
 
+    @Transactional(rollbackOn = {Exception.class})
     @Override
-    public void AddAuthUser(AuthUserBo authUserBo) {
+    public void addAuthUser(AuthUserBo authUserBo) {
         AuthUser authUser = authUserBo.copyTo(AuthUser.class);
         authUserRepository.save(authUser);
     }
 
     @Override
     public AuthUserBo findLatestAuthUser() {
-        AuthUser authUser = authUserRepository.findFirst1OrderByServerCreateTimeDesc();
+        AuthUser authUser = null;
+                //authUserRepository.findFirst1OrderByServerCreateTimeDesc();
         return authUser.copyTo(AuthUserBo.class);
     }
 }

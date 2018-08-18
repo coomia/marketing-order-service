@@ -5,6 +5,7 @@ import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import java.sql.Timestamp;
 
 /**
  * Created by Administrator on 2018/8/9 0009.
@@ -19,8 +20,8 @@ public class ParentEntity{
     private String updatorName;
     private Long updatorId;
     @Column(updatable = false)
-    private java.util.Date serverCreateTime;
-    private java.util.Date serverUpdateTime;
+    private Timestamp serverCreateTime;
+    private Timestamp serverUpdateTime;
     private Integer statusFlag=1;
 
     public <T> T copyTo(Class<T> target){

@@ -7,6 +7,7 @@ import com.meiye.system.util.WebUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -23,9 +24,9 @@ public class ParentBo{
     @JSONField(serialize=false)
     private Long updatorId;
     @JSONField(serialize=false)
-    private java.util.Date serverCreateTime;
+    private Timestamp serverCreateTime;
     @JSONField(serialize=false)
-    private java.util.Date serverUpdateTime;
+    private Timestamp serverUpdateTime;
     private Integer  statusFlag=1;
 
     public <T extends ParentEntity> T copyTo(Class<T> target){
@@ -33,13 +34,12 @@ public class ParentBo{
             T entity = target.newInstance();
             BeanUtils.copyProperties(this, entity);
             UserBo userBo= WebUtil.getCurrentUser();
-            Date now=new Date();
             if(entity.getCreatorId()==null)
                 entity.setCreatorId(userBo==null?null:userBo.getId());
             if(entity.getServerCreateTime()==null)
-                entity.setServerCreateTime(now);
+                entity.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
             entity.setCreatorName(userBo==null?null:userBo.getUsername());
-            entity.setServerUpdateTime(now);
+            entity.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
             entity.setUpdatorId(userBo==null?null:userBo.getId());
             entity.setUpdatorName(userBo==null?null:userBo.getUsername());
             return entity;

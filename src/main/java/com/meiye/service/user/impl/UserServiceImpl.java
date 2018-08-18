@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
         UserBo userBo=new UserBo();
         userBo.setUsername(userName);
         userBo.setPassword("123456");
-        userBo.setServerCreateTime(new Date());
+        userBo.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
         List<SimpleGrantedAuthority> roles=new ArrayList<SimpleGrantedAuthority>();
         roles.add(new SimpleGrantedAuthority("ROLE_Manager"));
         roles.add(new SimpleGrantedAuthority("ROLE_Skiller"));

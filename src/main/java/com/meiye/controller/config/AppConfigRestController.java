@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -28,9 +29,9 @@ public class AppConfigRestController {
             appConfigBo.setCreatorId(userBo.getId());
             Date now=new Date();
             appConfigBo.setStatusFlag(1);
-            appConfigBo.setServerCreateTime(now);
+            appConfigBo.setServerCreateTime(new Timestamp(now.getTime()));
             appConfigBo.setUpdatorId(userBo.getId());
-            appConfigBo.setServerUpdateTime(now);
+            appConfigBo.setServerUpdateTime(new Timestamp(now.getTime()));
             appConfigService.saveConfig(appConfigBo);
         }else{
             return;
