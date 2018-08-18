@@ -27,7 +27,7 @@ public class AppConfigRestController {
         if(appConfigBo!=null){
             appConfigBo.setCreatorId(userBo.getId());
             Date now=new Date();
-            appConfigBo.setStatusFlag(new Long(1));
+            appConfigBo.setStatusFlag(1);
             appConfigBo.setServerCreateTime(now);
             appConfigBo.setUpdatorId(userBo.getId());
             appConfigBo.setServerUpdateTime(now);

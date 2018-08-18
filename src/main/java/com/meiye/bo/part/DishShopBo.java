@@ -2,26 +2,30 @@ package com.meiye.bo.part;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.ParentBo;
+import com.meiye.system.util.WebUtil;
 import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class DishShopBo extends ParentBo {
   @Id
   @GeneratedValue
   private Long id;
-  private String uuid;
   @JSONField(serialize=false)
-  private Long brandDishId;
+  private String uuid = UUID.randomUUID().toString();
   @JSONField(serialize=false)
-  private String brandDishUuid;
+  private Long brandDishId= WebUtil.getCurrentStoreId();
+  @JSONField(serialize=false)
+  private String brandDishUuid=UUID.randomUUID().toString();
   private Long dishTypeId;
   private String dishCode;
-  private Long type;
+  private Long type=0l;
   private String name;
   @JSONField(serialize=false)
   private String aliasName;
@@ -30,6 +34,7 @@ public class DishShopBo extends ParentBo {
   @JSONField(serialize=false)
   private String aliasShortName;
   private String dishNameIndex;
+  @JSONField(serialize=false)
   private String barcode;
   @JSONField(serialize=false)
   private Long unitId;
@@ -37,7 +42,8 @@ public class DishShopBo extends ParentBo {
   @JSONField(serialize=false)
   private Double weight;
   private Double marketPrice;
-  private Long sort;
+  private Long sort=1l;
+  @JSONField(serialize=false)
   private String dishDesc;
   @JSONField(serialize=false)
   private String videoUrl;
@@ -46,43 +52,43 @@ public class DishShopBo extends ParentBo {
   @JSONField(serialize=false)
   private Long saleType;
   @JSONField(serialize=false)
-  private Double dishIncreaseUnit;
-  private Long isSingle;
-  private Long isDiscountAll;
-  private Long source;
+  private Double dishIncreaseUnit=0d;
+  private Long isSingle=1l;
+  private Long isDiscountAll=1l;
+  private Long source=1l;
   @JSONField(serialize=false)
-  private Long isSendOutside;
-  private Long isOrder;
+  private Long isSendOutside=1l;
+  private Long isOrder=1l;
   @JSONField(serialize=false)
-  private Long defProperty;
+  private Long defProperty=1l;
 
-  private Double stepNum;
-  private Long minNum;
-  private Long maxUum;
-  private Long clearStatus;
+  private Double stepNum=1d;
+  private Long minNum=0l;
+  private Long maxUum=0l;
+  private Long clearStatus=1l;
   private Long isManual;
-  private Double saleTotal;
+  private Double saleTotal=0d;
   @JSONField(serialize=false)
-  private Double residueTotal;
+  private Double residueTotal=0d;
   @JSONField(serialize=false)
-  private Double saleTotalWechat;
+  private Double saleTotalWechat=0d;
   @JSONField(serialize=false)
-  private Double residueTotalWechat;
+  private Double residueTotalWechat=0d;
   @JSONField(serialize=false)
-  private java.util.Date validTime;
+  private java.util.Date validTime=new Date();
   @JSONField(serialize=false)
-  private java.util.Date unvalidTime;
+  private java.util.Date unvalidTime=new Date();
   @JSONField(serialize=false)
-  private String scene;
-  private Long shopIdenty;
+  private String scene="100";
+  private Long shopIdenty=WebUtil.getCurrentStoreId();
   @JSONField(serialize=false)
-  private Long brandIdenty;
+  private Long brandIdenty=WebUtil.getCurrentStoreId();
   private Long enabledFlag;
   private String skuKey;
-  private Long hasStandard;
-  private Double dishQty;
+  private Long hasStandard=2l;
+  private Double dishQty=1d;
   @JSONField(serialize=false)
-  private Long boxQty;
+  private Long boxQty=1l;
   private Long currRemainTotal;
   @JSONField(serialize=false)
   private Long isChangePrice;

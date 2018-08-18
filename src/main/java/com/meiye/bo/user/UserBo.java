@@ -2,6 +2,7 @@ package com.meiye.bo.user;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.ParentBo;
+import com.meiye.bo.store.StoreBo;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,7 @@ public class UserBo extends ParentBo implements UserDetails {
     private boolean credentialsNonExpired;
     @JSONField(serialize=false)
     private boolean enabled;
+    private StoreBo storeBo=new StoreBo();
 
     @Override
     public String toString() {

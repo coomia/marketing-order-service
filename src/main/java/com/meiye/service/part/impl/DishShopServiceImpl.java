@@ -1,6 +1,8 @@
 package com.meiye.service.part.impl;
 
 import com.meiye.bo.part.DishPropertyBo;
+import com.meiye.bo.part.DishSetmealBo;
+import com.meiye.bo.part.DishSetmealGroupBo;
 import com.meiye.bo.part.DishShopBo;
 import com.meiye.model.part.DishProperty;
 import com.meiye.model.part.DishSetmeal;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -75,7 +78,7 @@ public class DishShopServiceImpl implements DishShopService{
 
     @Override
     public DishShopBo getDishShopById(Long id) {
-        DishShop dishShop = dishShopRepository.getOne(id);
+        DishShop dishShop = dishShopRepository.findById(id).get();
         DishShopBo dishShopBo = dishShop.copyTo(DishShopBo.class);
         //根据shopid得到加项
         if (dishShop != null && dishShop.getType() == 0) {
@@ -89,16 +92,37 @@ public class DishShopServiceImpl implements DishShopService{
                 });
                 dishShopBo.setDishPropertyBos(dishPropertyBos);
             }
+        }else if(dishShop!=null&&dishShop.getType()==1){
+            List<DishSetmealGroup> dishSetmealGroups= dishSetmealGroupRepository.findBySetmealDishIdAndStatusFlag(dishShop.getId(),1);
+            List<DishSetmealGroupBo> dishSetmealGroupBos=new ArrayList<DishSetmealGroupBo>();
+            if(dishSetmealGroups!=null&&!dishSetmealGroups.isEmpty()) {
+                dishSetmealGroups.forEach(dishSetmealGroup -> {
+                    DishSetmealGroupBo dishSetmealGroupBo = dishSetmealGroup.copyTo(DishSetmealGroupBo.class);
+                    List<DishSetmeal> dishSetmeals = dishSetmealRepository.findByDishIdAndComboDishTypeIdAndStatusFlag(dishShop.getId(), dishSetmealGroup.getId(),1);
+                    List<DishSetmealBo> dishSetmealBos=new ArrayList<DishSetmealBo>();
+                    if(dishSetmeals!=null&&!dishSetmeals.isEmpty()){
+                        dishSetmeals.forEach(dishSetmeal -> {
+                            DishSetmealBo dishSetmealBo=dishSetmeal.copyTo(DishSetmealBo.class);
+                            DishShop subDishShop=dishShopRepository.findById(dishSetmealBo.getChildDishId()).get();
+                            dishSetmealBo.setDishShopBo(subDishShop.copyTo(DishShopBo.class));
+                            dishSetmealBos.add(dishSetmealBo);
+                        });
+                    }
+                    dishSetmealGroupBo.setDishSetmealBos(dishSetmealBos);
+                    dishSetmealGroupBos.add(dishSetmealGroupBo);
+                });
+            }
+            dishShopBo.setDishSetmealGroupBos(dishSetmealGroupBos);
         }
         return dishShopBo;
     }
 
 
     @Override
+    @Transactional
     public void saveDishShop(DishShopBo dishShopBo) {
         if (dishShopBo != null) {
             DishShop dishShop = dishShopBo.copyTo(DishShop.class);
-            dishShop.setStatusFlag(1l);
             dishShopRepository.save(dishShop);
             //如果是单品
             if (dishShopBo.getType() == 0 && dishShopBo.getDishPropertyBos() != null && dishShopBo.getDishPropertyBos().size() > 0) {
@@ -128,6 +152,7 @@ public class DishShopServiceImpl implements DishShopService{
     }
 
     @Override
+    @Transactional
     public void updateDishShop(DishShopBo dishShopBo) {
         if (dishShopBo != null) {
             if (dishShopBo.getId() == null)
@@ -179,11 +204,10 @@ public class DishShopServiceImpl implements DishShopService{
     }
 
     @Override
+    @Transactional
     public void deleteDishShop(Long shopId) {
         if (shopId != null) {
-            DishShop dishShop = dishShopRepository.getOne(shopId);
-            dishShop.setEnabledFlag(2L);
-            dishShopRepository.save(dishShop);
+            dishShopRepository.deleteDishShop(shopId);
         }
     }
 }

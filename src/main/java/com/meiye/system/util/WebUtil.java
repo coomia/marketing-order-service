@@ -1,6 +1,7 @@
 package com.meiye.system.util;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.meiye.bo.store.StoreBo;
 import com.meiye.bo.user.UserBo;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -18,8 +19,22 @@ public class WebUtil {
         if (principal != null && principal instanceof UserBo) {
             UserBo user = (UserBo) principal;
             return user;
-        }else
+        }else {
             return null;
+        }
+    }
+
+    public static StoreBo getCurrentStore(){
+        UserBo userBo=getCurrentUser();
+        if(userBo!=null)
+            return userBo.getStoreBo();
+        else
+            return null;
+    }
+
+    public static Long getCurrentStoreId(){
+        StoreBo storeBo=getCurrentStore();
+        return storeBo==null?null:storeBo.getId();
     }
 
     public static SerializerFeature[] getFastJsonSerializerFeature(){
