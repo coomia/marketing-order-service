@@ -18,16 +18,34 @@ import java.sql.Timestamp;
 public class AuthUserBo extends ParentBo {
 	private long id;
 	private long roleId;
-	private String account;
 	private String name;
-	private String mobile;
-	private byte mobileStatus;
 	private byte gender;
 	private Timestamp birthday;
+	private String identityCard;
+	private String  education;
+	private String graduateSchool;
+	private String intoWorkDate;
+	private String isMarry;
+	private String mobile;
 	private String email;
 	private long QQ;
 	private String address;
 	private String icon;
+	private String ecName;
+	private String ecRelation;
+	private String ecMobile;
+	private String ecMobileReserve;
+	private String jobNumber;
+	private String jobEmployeeType;
+	private String jobEntryTime;
+	private String jobPositiveTime;
+	private String jobPosition;
+	private String jobGrade;
+	private String jobAddress;
+	private String salaryCalcMode;
+	private String salaryBase;
+	private String salaryPost;
+	private String account;
 	private String password;
 	private String passwordNum;
 	private byte sourceFlag;
@@ -37,6 +55,7 @@ public class AuthUserBo extends ParentBo {
 	private byte enabledFlag;
 	private byte assignedGroup;
 	private long assignedId;
+
 
 }
 
