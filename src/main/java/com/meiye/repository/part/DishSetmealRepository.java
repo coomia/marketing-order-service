@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2018/8/12 0012.
  */
@@ -19,6 +21,7 @@ public interface DishSetmealRepository extends JpaRepository<DishSetmeal,Long> {
     @Query("update DishSetmeal dsg set dsg.statusFlag=2 where dsg.id=?1")
     public int deleteDishSetmeal(Long id);
 
+    public List<DishSetmeal> findByDishIdAndComboDishTypeIdAndStatusFlag(Long dishId,Long comboDishTypeId,Integer statusFlag);
 
 
 }

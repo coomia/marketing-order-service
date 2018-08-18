@@ -19,6 +19,6 @@ public class AppConfig extends ParentEntity{
     private String appName;
     private String configName;
     private String configValue;
-    private Long statusFlag;
+    private Integer statusFlag;
     private Long version;
 }

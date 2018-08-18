@@ -9,8 +9,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,7 +51,10 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
         }catch (ExpiredJwtException exp){
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"登录过期，请重新登录!"), WebUtil.getFastJsonSerializerFeature()));
-        }catch (Exception exp){
+        }catch (AuthenticationCredentialsNotFoundException exp){
+            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"登录信息不存在"), WebUtil.getFastJsonSerializerFeature()));
+        } catch (Exception exp){
             httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"系统错误!"), WebUtil.getFastJsonSerializerFeature()));
         }
@@ -58,6 +63,8 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
 
     private Authentication getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(jwtConfiguration.getTokenInHeader());
+        if(token==null)
+            token=request.getParameter(jwtConfiguration.getTokenInHeader());
 
         if (token != null) {
                 Claims claims = Jwts.parser()
@@ -71,7 +78,8 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
                 return userBo != null ?
                         new UsernamePasswordAuthenticationToken(userBo, null, userBo.getAuthorities()) :
                         null;
+        }else{
+            throw new AuthenticationCredentialsNotFoundException("登录信息不存在");
         }
-        return null;
     }
 }

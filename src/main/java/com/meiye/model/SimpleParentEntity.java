@@ -7,21 +7,17 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 /**
- * Created by Administrator on 2018/8/9 0009.
+ * Created by Administrator on 2018/8/18 0018.
  */
 @Data
 @MappedSuperclass
-public class ParentEntity{
-    @Column(updatable = false)
-    private String creatorName;
+public class SimpleParentEntity {
     @Column(updatable = false)
     private Long creatorId;
-    private String updatorName;
     private Long updatorId;
     @Column(updatable = false)
     private java.util.Date serverCreateTime;
     private java.util.Date serverUpdateTime;
-    private Integer statusFlag=1;
 
     public <T> T copyTo(Class<T> target){
         try {

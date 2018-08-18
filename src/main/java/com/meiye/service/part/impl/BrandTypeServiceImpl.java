@@ -72,7 +72,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
             dishBrandTypeBo.setSort(Long.valueOf(result));
         }
         if(Objects.isNull(dishBrandTypeBo.getStatusFlag())){
-            dishBrandTypeBo.setStatusFlag(new Long(1));
+            dishBrandTypeBo.setStatusFlag(1);
         }
         if(Objects.isNull(dishBrandTypeBo.getBrandIdenty())){
             dishBrandTypeBo.setBrandIdenty(new Long(1));

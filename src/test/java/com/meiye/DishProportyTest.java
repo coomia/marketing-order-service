@@ -32,7 +32,7 @@ public class DishProportyTest {
         dishPropertyBo.setSort(1L);
         dishPropertyBo.setBrandIdenty(1L);
         dishPropertyBo.setUuid("xxxx");
-        dishPropertyBo.setStatusFlag(1L);
+        dishPropertyBo.setStatusFlag(1);
         dishPropertyBo.setEnabledFlag(1L);
         dishPropertyService.save(dishPropertyBo);
         System.out.println("保存成功！");

@@ -47,7 +47,8 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
         WebUtil.setRestResponseHeader(httpServletResponse);
         LoginBo loginBo = new LoginBo();
-        if (httpServletRequest.getParameter("username") != null && httpServletRequest.getParameter("password") != null && httpServletRequest.getParameter("storeid") != null && httpServletRequest.getParameter("verifycode") != null) {
+//        if (httpServletRequest.getParameter("username") != null && httpServletRequest.getParameter("password") != null && httpServletRequest.getParameter("storeid") != null && httpServletRequest.getParameter("verifycode") != null) {
+        if (httpServletRequest.getParameter("username") != null && httpServletRequest.getParameter("password") != null) {
             loginBo.setUserName(httpServletRequest.getParameter("username"));
             loginBo.setPassword(httpServletRequest.getParameter("password"));
             loginBo.setStoreId(httpServletRequest.getParameter("storeid"));
@@ -65,6 +66,9 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
                 }
             }catch (Exception exp){
                 exp.printStackTrace();
+                httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"用户名密码不存在!"), WebUtil.getFastJsonSerializerFeature()));
+                return null;
             }
             if (StringUtils.isEmpty(loginBody) || StringUtils.isEmpty(loginBo.getUserName())) {
                 try {
@@ -73,6 +77,8 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
                     loginBo.setPassword(creds.getPassword());
                 } catch (Exception exp) {
                     exp.printStackTrace();
+                    httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"用户名密码不存在!"), WebUtil.getFastJsonSerializerFeature()));
                     return null;
                 }
             }
