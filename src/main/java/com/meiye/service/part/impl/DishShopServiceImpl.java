@@ -161,7 +161,7 @@ public class DishShopServiceImpl implements DishShopService{
                 return saveDishShop(dishShopBo);
             else {
                 DishShop dishShop = dishShopBo.copyTo(DishShop.class);
-                dishShopRepository.updateDishShop(dishShop.getName(), dishShop.getDishCode(), dishShop.getMarketPrice(), dishShop.getUnitName(), dishShop.getDishQty(), dishShop.getId());
+                dishShopRepository.updateDishShop(dishShop.getName(), dishShop.getDishCode(), dishShop.getMarketPrice(), dishShop.getUnitName(), dishShop.getDishQty(),dishShop.getUpdatorName(),dishShop.getUpdatorId(), dishShop.getId());
                 //更新的话先把加项全部删除  然后再把新增和修改的save
                 dishPropertyRepository.deleteByShopId(dishShopBo.getId());
                 //如果是单品
