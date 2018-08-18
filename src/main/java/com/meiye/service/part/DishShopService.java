@@ -23,11 +23,11 @@ public interface DishShopService {
      */
     Page<DishShop> getDishShopPageByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo);
 
-    void saveDishShop(DishShopBo dishShopBo);
+    Long saveDishShop(DishShopBo dishShopBo);
 
     DishShopBo getDishShopById(Long id);
     
     public void deleteDishShop(Long shopId);
 
-    void updateDishShop(DishShopBo dishShopBo);
+    Long updateDishShop(DishShopBo dishShopBo);
 }
