@@ -161,19 +161,18 @@ public class DishShopServiceImpl implements DishShopService{
                 return saveDishShop(dishShopBo);
             else {
                 DishShop dishShop = dishShopBo.copyTo(DishShop.class);
-                dishShopRepository.updateDishShop(dishShop.getName(), dishShop.getDishCode(), dishShop.getMarketPrice(), dishShop.getUnitName(), dishShop.getDishQty(), dishShop.getId());
+                dishShopRepository.updateDishShop(dishShop.getName(), dishShop.getDishCode(), dishShop.getMarketPrice(), dishShop.getUnitName(), dishShop.getDishQty(),dishShop.getUpdatorName(),dishShop.getUpdatorId(), dishShop.getId());
                 //如果是单品
                 if(dishShopBo.getType() == 0){
                     //更新的话先把加项全部删除  然后再把新增和修改的save
                     dishPropertyRepository.deleteByShopId(dishShopBo.getId());
-                    if (dishShopBo.getDishPropertyBos() != null && dishShopBo.getDishPropertyBos().size() > 0) {
+                    if(dishShopBo.getDishPropertyBos() != null && dishShopBo.getDishPropertyBos().size() > 0){
                         dishShopBo.getDishPropertyBos().forEach(dishPropertyBo -> {
                             DishProperty dishProperty = dishPropertyBo.copyTo(DishProperty.class);
                             dishProperty.setDishShopId(dishShop.getId());
                             dishPropertyRepository.save(dishProperty);
                         });
                     }
-
                 } else if (dishShopBo.getType() == 1) {//套餐
                     dishSetmealGroupRepository.deleteDishSetmealGroupBySetmealDishId(dishShop.getId());
                     dishShopBo.getDishSetmealGroupBos().forEach(dishSetmealGroupBo -> {
