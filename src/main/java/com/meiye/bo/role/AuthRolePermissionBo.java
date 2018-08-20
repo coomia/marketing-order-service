@@ -2,6 +2,7 @@ package com.meiye.bo.role;
 
 import com.meiye.bo.ParentBo;
 import com.meiye.model.ParentEntity;
+import com.meiye.system.util.WebUtil;
 import lombok.Data;
 
 import javax.persistence.Entity;

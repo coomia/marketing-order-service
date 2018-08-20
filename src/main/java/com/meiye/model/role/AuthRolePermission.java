@@ -23,7 +23,7 @@ public class AuthRolePermission  extends ParentEntity {
 	private long permissionId;
 	private long brandIdenty;
 	private byte platform;
-	private byte groupFlag;
+	private Integer groupFlag;
 
 }
 
