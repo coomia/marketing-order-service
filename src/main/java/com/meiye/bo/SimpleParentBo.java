@@ -5,6 +5,7 @@ import com.meiye.bo.user.UserBo;
 import com.meiye.model.ParentEntity;
 import com.meiye.model.SimpleParentEntity;
 import com.meiye.system.util.WebUtil;
+import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Date;
 /**
  * Created by Administrator on 2018/8/18 0018.
  */
+@Data
 public class SimpleParentBo {
     @JSONField(serialize=false)
     private Long creatorId;

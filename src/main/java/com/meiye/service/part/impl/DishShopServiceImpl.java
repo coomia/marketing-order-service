@@ -120,7 +120,7 @@ public class DishShopServiceImpl implements DishShopService{
 
     @Override
     @Transactional
-    public void saveDishShop(DishShopBo dishShopBo) {
+    public Long saveDishShop(DishShopBo dishShopBo) {
         if (dishShopBo != null) {
             DishShop dishShop = dishShopBo.copyTo(DishShop.class);
             dishShopRepository.save(dishShop);
@@ -148,15 +148,17 @@ public class DishShopServiceImpl implements DishShopService{
                     }
                 });
             }
+            return dishShop.getId();
         }
+        return null;
     }
 
     @Override
     @Transactional
-    public void updateDishShop(DishShopBo dishShopBo) {
+    public Long updateDishShop(DishShopBo dishShopBo) {
         if (dishShopBo != null) {
             if (dishShopBo.getId() == null)
-                saveDishShop(dishShopBo);
+                return saveDishShop(dishShopBo);
             else {
                 DishShop dishShop = dishShopBo.copyTo(DishShop.class);
                 dishShopRepository.updateDishShop(dishShop.getName(), dishShop.getDishCode(), dishShop.getMarketPrice(), dishShop.getUnitName(), dishShop.getDishQty(), dishShop.getId());
@@ -173,37 +175,37 @@ public class DishShopServiceImpl implements DishShopService{
                     }
 
                 } else if (dishShopBo.getType() == 1) {//套餐
+                    dishSetmealGroupRepository.deleteDishSetmealGroupBySetmealDishId(dishShop.getId());
                     dishShopBo.getDishSetmealGroupBos().forEach(dishSetmealGroupBo -> {
-                        if(dishSetmealGroupBo.getStatusFlag()==1l) {
-                            DishSetmealGroup dishSetmealGroup = dishSetmealGroupBo.copyTo(DishSetmealGroup.class);
-                            dishSetmealGroup.setSetmealDishId(dishShop.getId());
-                            if (dishSetmealGroup.getId() == null)
-                                dishSetmealGroupRepository.save(dishSetmealGroup);
-                            else
-                                dishSetmealGroupRepository.updateDishSetmealGroup(dishSetmealGroup.getSetmealDishId(), dishSetmealGroup.getName(), dishSetmealGroup.getOrderMin(), dishSetmealGroup.getOrderMax(), dishSetmealGroup.getId());
-                            if (dishSetmealGroupBo.getDishSetmealBos() != null) {
-                                dishSetmealGroupBo.getDishSetmealBos().forEach(dishSetmealBo -> {
-                                    if (dishSetmealBo.getStatusFlag() == 1l) {
-                                        DishSetmeal dishSetmeal = dishSetmealBo.copyTo(DishSetmeal.class);
-                                        dishSetmeal.setDishId(dishShop.getId());
-                                        dishSetmeal.setComboDishTypeId(dishSetmealGroup.getId());
-                                        if (dishSetmeal.getId() == null) {
-                                            dishSetmealRepository.save(dishSetmeal);
-                                        } else {
-                                            dishSetmealRepository.updateDishSetmealGroup(dishSetmeal.getComboDishTypeId(),dishSetmeal.getPrice(),dishSetmeal.getLeastCellNum(),dishSetmeal.getIsReplace(),dishSetmeal.getIsDefault(),dishSetmeal.getIsMulti(),dishSetmeal.getId());
-                                        }
-                                    } else if(dishSetmealBo.getId()!=null){
-                                        dishSetmealRepository.deleteDishSetmeal(dishSetmealBo.getId());
+                        DishSetmealGroup dishSetmealGroup = dishSetmealGroupBo.copyTo(DishSetmealGroup.class);
+                        dishSetmealGroup.setSetmealDishId(dishShop.getId());
+                        if (dishSetmealGroup.getId() == null)
+                            dishSetmealGroupRepository.save(dishSetmealGroup);
+                        else
+                            dishSetmealGroupRepository.updateDishSetmealGroup(dishSetmealGroup.getSetmealDishId(), dishSetmealGroup.getName(), dishSetmealGroup.getOrderMin(), dishSetmealGroup.getOrderMax(),dishSetmealGroup.getUpdatorName(),dishSetmealGroup.getUpdatorId(), dishSetmealGroup.getId());
+                        if (dishSetmealGroupBo.getDishSetmealBos() != null) {
+                            dishSetmealRepository.deleteDishSetmealByGroupAndDishId(dishShop.getId(),dishSetmealGroup.getId());
+                            dishSetmealGroupBo.getDishSetmealBos().forEach(dishSetmealBo -> {
+                                if (dishSetmealBo.getStatusFlag() == 1l) {
+                                    DishSetmeal dishSetmeal = dishSetmealBo.copyTo(DishSetmeal.class);
+                                    dishSetmeal.setDishId(dishShop.getId());
+                                    dishSetmeal.setComboDishTypeId(dishSetmealGroup.getId());
+                                    if (dishSetmeal.getId() == null) {
+                                        dishSetmealRepository.save(dishSetmeal);
+                                    } else {
+                                        dishSetmealRepository.updateDishSetmealGroup(dishSetmeal.getComboDishTypeId(), dishSetmeal.getPrice(), dishSetmeal.getLeastCellNum(), dishSetmeal.getIsReplace(), dishSetmeal.getIsDefault(), dishSetmeal.getIsMulti(),dishSetmeal.getUpdatorName(),dishSetmeal.getUpdatorId(), dishSetmeal.getId());
                                     }
-                                });
-                            }
-                        }else if(dishSetmealGroupBo.getId()!=null){
-                            dishSetmealGroupRepository.deleteDishSetmealGroup(dishSetmealGroupBo.getId());
+                                } else if (dishSetmealBo.getId() != null) {
+                                    dishSetmealRepository.deleteDishSetmeal(dishSetmealBo.getId());
+                                }
+                            });
                         }
                     });
                 }
+                return dishShop.getId();
             }
         }
+        return null;
     }
 
     @Override

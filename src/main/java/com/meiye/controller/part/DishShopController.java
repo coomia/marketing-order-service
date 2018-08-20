@@ -45,14 +45,20 @@ public class DishShopController {
 
     @PostMapping("/group/save")
     public ResetApiResult newDishGroup(@RequestBody DishShopBo dishShopBo){
-        dishShopService.saveDishShop(dishShopBo);
-        return ResetApiResult.sucess("");
+        Long id=dishShopService.saveDishShop(dishShopBo);
+        if(id!=null)
+            return findDishShop(id);
+        else
+            return ResetApiResult.error("","保存失败");
     }
 
     @PostMapping("/group/update")
     public ResetApiResult updateDishGroup(@RequestBody DishShopBo dishShopBo){
-        dishShopService.updateDishShop(dishShopBo);
-        return ResetApiResult.sucess("");
+        Long id=dishShopService.updateDishShop(dishShopBo);
+        if(id!=null)
+            return findDishShop(id);
+        else
+            return ResetApiResult.error("","保存失败");
     }
 
     @RequestMapping("/group/{dishShopId}/find")

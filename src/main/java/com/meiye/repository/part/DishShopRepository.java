@@ -19,8 +19,8 @@ import java.util.List;
 public interface DishShopRepository extends JpaRepository<DishShop,Long>,JpaSpecificationExecutor<DishShop> {
 
     @Modifying
-    @Query("update DishShop ds set ds.name=?1,ds.dishCode=?2,ds.marketPrice=?3,ds.unitName=?4,ds.dishQty=?5 where ds.id=?6")
-    public int updateDishShop(String name,String dishCode,Double marketPrice,String unitName,Double dishQty,Long id);
+    @Query("update DishShop ds set ds.name=?1,ds.dishCode=?2,ds.marketPrice=?3,ds.unitName=?4,ds.dishQty=?5,ds.updatorName=?6,ds.updatorId=?7 where ds.id=?8")
+    public int updateDishShop(String name,String dishCode,Double marketPrice,String unitName,Double dishQty,String updatorName,Long updatorId,Long id);
 
 
     @Modifying
