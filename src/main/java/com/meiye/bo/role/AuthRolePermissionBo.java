@@ -19,6 +19,7 @@ public class AuthRolePermissionBo extends ParentBo {
 	private long id;
 	private long roleId;
 	private long permissionId;
+	private AuthPermissionBo authPermissionBo;
 	private long brandIdenty;
 	private byte platform;
 	private byte groupFlag;

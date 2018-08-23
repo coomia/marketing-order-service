@@ -18,19 +18,19 @@ import javax.persistence.Id;
 public class AuthPermission extends ParentEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	private long parentId;
+	private Long id;
+	private Long parentId;
 	private String levelId;
 	private String name;
 	private String code;
-	private byte type;
+	private Byte type;
 	private String url;
-	private int sort;
-	private byte platform;
-	private byte supportVersion;
-	private byte sourceFlag;
-	private byte groupFlag;
-	private byte checked;
+	private Integer sort;
+	private Byte platform;
+	private Byte supportVersion;
+	private Byte sourceFlag;
+	private Byte groupFlag;
+	private Byte checked;
 	private String zoneCode;
 
 }

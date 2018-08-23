@@ -23,4 +23,5 @@ public interface AuthUserService {
      */
     AuthUserBo findLatestAuthUser();
 
+    AuthUserBo getAuthUserBo(String userName);
 }

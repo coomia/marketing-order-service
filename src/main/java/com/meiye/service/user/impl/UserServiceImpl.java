@@ -1,7 +1,12 @@
 package com.meiye.service.user.impl;
 
+import com.meiye.bo.role.AuthRolePermissionBo;
+import com.meiye.bo.role.AuthUserBo;
 import com.meiye.bo.user.UserBo;
+import com.meiye.service.role.AuthUserService;
+import com.meiye.service.store.StoreService;
 import com.meiye.service.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,18 +24,31 @@ import java.util.List;
  */
 @Service
 public class UserServiceImpl implements UserService {
+    @Autowired
+    AuthUserService authUserService;
+
+    @Autowired
+    StoreService storeService;
 
     @Override
     public UserBo getUserByName(String userName) {
-        UserBo userBo=new UserBo();
-        userBo.setUsername(userName);
-        userBo.setPassword("123456");
-        userBo.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
-        List<SimpleGrantedAuthority> roles=new ArrayList<SimpleGrantedAuthority>();
-        roles.add(new SimpleGrantedAuthority("ROLE_Manager"));
-        roles.add(new SimpleGrantedAuthority("ROLE_Skiller"));
-
-        userBo.setAuthorities(roles);
-        return userBo;
+        AuthUserBo authUserBo=authUserService.getAuthUserBo(userName);
+        if(authUserBo!=null) {
+            UserBo userBo = new UserBo();
+            userBo.setUsername(authUserBo.getAccount());
+            userBo.setPassword(authUserBo.getPassword());
+            userBo.setId(authUserBo.getId());
+            userBo.setStoreBo(storeService.findStoreById(authUserBo.getShopIdenty()));
+            List<SimpleGrantedAuthority> authorities=new ArrayList<SimpleGrantedAuthority>();
+            if(authUserBo.getRoleBo()!=null&&authUserBo.getRoleBo().getAuthRolePermissions()!=null){
+                authUserBo.getRoleBo().getAuthRolePermissions().forEach(authRolePermissionBo -> {
+                    if(authRolePermissionBo.getAuthPermissionBo()!=null)
+                        authorities.add(new SimpleGrantedAuthority(authRolePermissionBo.getAuthPermissionBo().getCode()));
+                });
+            }
+            userBo.setAuthorities(authorities);
+            return userBo;
+        }else
+            return null;
     }
 }

@@ -4,6 +4,7 @@ import com.meiye.bo.user.UserBo;
 import com.meiye.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,21 +34,25 @@ public class MeiYeAuthenticationProvider implements AuthenticationProvider {
         // 获取认证的用户名 & 密码
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
-
-        UserBo userBo=userService.getUserByName(name);
-
+        UserBo userBo=null;
+        try {
+            userBo = userService.getUserByName(name);
+        } catch (Exception exp) {
+            exp.printStackTrace();
+            throw new AuthenticationServiceException("未知错误");
+        }
         // 认证逻辑
-        if(userBo==null || StringUtils.isEmpty(name) ||StringUtils.isEmpty(password)||StringUtils.isEmpty(userBo.getUsername())){
+        if (userBo == null || StringUtils.isEmpty(name) || StringUtils.isEmpty(password) || StringUtils.isEmpty(userBo.getUsername())) {
             throw new UsernameNotFoundException("用户名不存在");
-        } else if (userBo!=null&&name.equals(userBo.getUsername())&&password.equals(userBo.getPassword())) {
+        } else if (userBo != null && name.equals(userBo.getUsername()) && password.equals(userBo.getPassword())) {
             // 生成令牌
             userBo.setPassword(null);
-            Authentication auth = new UsernamePasswordAuthenticationToken(userBo,null, userBo.getAuthorities());
+            Authentication auth = new UsernamePasswordAuthenticationToken(userBo, null, userBo.getAuthorities());
             return auth;
-        }else if (userBo!=null&&name.equals(userBo.getUsername())&&!password.equals(userBo.getPassword()))  {
+        } else if (userBo != null && name.equals(userBo.getUsername()) && !password.equals(userBo.getPassword())) {
             throw new BadCredentialsException("密码错误");
-        }else {
-            throw new UnknownError("未知错误");
+        } else {
+            throw new AuthenticationServiceException("未知错误");
         }
     }
 

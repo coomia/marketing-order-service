@@ -73,7 +73,9 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
                         .getBody();
 
                 UserBo userBo=new UserBo();
-                BeanUtils.copyProperties(((LinkedHashMap)claims.get("userBo")).get("principal"),userBo);
+                String userBoJson=JSON.toJSONString(((LinkedHashMap)claims.get("userBo")).get("principal"));
+                userBo=JSON.parseObject(userBoJson,UserBo.class);
+
                 List<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
                 return userBo != null ?
                         new UsernamePasswordAuthenticationToken(userBo, null, userBo.getAuthorities()) :

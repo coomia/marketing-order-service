@@ -1,6 +1,7 @@
 package com.meiye.system.util;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.meiye.bo.store.CommercialBo;
 import com.meiye.bo.store.StoreBo;
 import com.meiye.bo.user.UserBo;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +25,7 @@ public class WebUtil {
         }
     }
 
-    public static StoreBo getCurrentStore(){
+    public static CommercialBo getCurrentStore(){
         UserBo userBo=getCurrentUser();
         if(userBo!=null)
             return userBo.getStoreBo();
@@ -33,8 +34,8 @@ public class WebUtil {
     }
 
     public static Long getCurrentStoreId(){
-        StoreBo storeBo=getCurrentStore();
-        return storeBo==null?null:storeBo.getId();
+        CommercialBo storeBo=getCurrentStore();
+        return storeBo==null?null:storeBo.getCommercialId();
     }
 
     public static SerializerFeature[] getFastJsonSerializerFeature(){

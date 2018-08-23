@@ -1,9 +1,12 @@
 package com.meiye.service.role.impl;
 
+import com.meiye.bo.role.AuthPermissionBo;
 import com.meiye.bo.role.AuthRoleBo;
 import com.meiye.bo.role.AuthRolePermissionBo;
+import com.meiye.model.role.AuthPermission;
 import com.meiye.model.role.AuthRole;
 import com.meiye.model.role.AuthRolePermission;
+import com.meiye.repository.role.AuthPermissionRepository;
 import com.meiye.repository.role.AuthRolePermissionRepository;
 import com.meiye.repository.role.AuthRoleRepository;
 import com.meiye.service.role.AuthRoleService;
@@ -22,6 +25,9 @@ public class AuthRoleServiceImpl implements AuthRoleService {
 
     @Autowired
     AuthRolePermissionRepository authRolePermissionRepository;
+
+    @Autowired
+    AuthPermissionRepository authPermissionRepository;
 
     @Transactional(rollbackOn = {Exception.class})
     @Override
@@ -93,6 +99,8 @@ public class AuthRoleServiceImpl implements AuthRoleService {
                 List<AuthRolePermissionBo> authRolePermissionBos = new ArrayList<>();
                 authRolePermissions.forEach(authRolePermission->{
                     AuthRolePermissionBo authRolePermissionBo = authRolePermission.copyTo(AuthRolePermissionBo.class);
+                    AuthPermission authPermission=authPermissionRepository.findById(authRolePermission.getPermissionId()).get();
+                    authRolePermissionBo.setAuthPermissionBo(authPermission==null?null:authPermission.copyTo(AuthPermissionBo.class));
                     authRolePermissionBos.add(authRolePermissionBo);
                 });
                 authRoleBo.setAuthRolePermissions(authRolePermissionBos);

@@ -20,4 +20,6 @@ public interface AuthUserRepository extends JpaRepository<AuthUser,Long> {
      */
     AuthUser findFirstByOrderByServerCreateTimeDesc();
 
+    AuthUser findFirstByAccount(String account);
+
 }

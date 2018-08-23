@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 public class AuthUserBo extends ParentBo {
 	private long id;
 	private long roleId;
+	private AuthRoleBo roleBo;
 	private String name;
 	private byte gender;
 	private Timestamp birthday;
