@@ -19,10 +19,10 @@ import java.sql.Timestamp;
 public class AuthUser extends ParentEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	private long roleId;
+	private Long id;
+	private Long roleId;
 	private String name;
-	private byte gender;
+	private Byte gender;
 	private Timestamp birthday;
 	private String identityCard;
 	private String  education;
@@ -31,7 +31,7 @@ public class AuthUser extends ParentEntity {
 	private String isMarry;
 	private String mobile;
 	private String email;
-	private long QQ;
+	private Long QQ;
 	private String address;
 	private String icon;
 	private String ecName;
@@ -51,13 +51,13 @@ public class AuthUser extends ParentEntity {
 	private String account;
 	private String password;
 	private String passwordNum;
-	private byte sourceFlag;
+	private Byte sourceFlag;
 	private String salt;
-	private long shopIdenty;
-	private long brandIdenty;
-	private byte enabledFlag;
-	private byte assignedGroup;
-	private long assignedId;
+	private Long shopIdenty;
+	private Long brandIdenty;
+	private Byte enabledFlag;
+	private Byte assignedGroup;
+	private Long assignedId;
 
 }
 

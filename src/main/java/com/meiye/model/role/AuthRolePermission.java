@@ -18,11 +18,11 @@ import javax.persistence.Id;
 public class AuthRolePermission  extends ParentEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	private long roleId;
-	private long permissionId;
-	private long brandIdenty;
-	private byte platform;
+	private Long id;
+	private Long roleId;
+	private Long permissionId;
+	private Long brandIdenty;
+	private Byte platform;
 	private Integer groupFlag;
 
 }
