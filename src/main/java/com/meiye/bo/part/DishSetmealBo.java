@@ -23,6 +23,6 @@ public class DishSetmealBo extends ParentBo {
   private Long isReplace;
   private Long isDefault;
   private Long isMulti;
-  private Long brandIdenty= WebUtil.getCurrentStoreId();
+  private Long brandIdenty= WebUtil.getCurrentBrandId();
   private Long sort;
 }

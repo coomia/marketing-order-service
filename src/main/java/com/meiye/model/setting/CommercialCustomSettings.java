@@ -1,4 +1,4 @@
-package com.meiye.model.role;
+package com.meiye.model.setting;
 
 import com.meiye.model.ParentEntity;
 import lombok.Data;
@@ -9,21 +9,21 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
- * table name:  auth_role_permission
+ * table name:  commercial_custom_settings
  * author name: ryne
- * create time: 2018-08-15 22:12:36
+ * create time: 2018-08-26 17:57:14
  */
 @Data
 @Entity
-public class AuthRolePermission  extends ParentEntity {
+public class CommercialCustomSettings extends ParentEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long roleId;
-	private Long permissionId;
-	private Long brandIdenty;
-	private Integer platform;
-	private Integer groupFlag;
+	private Long brandIdentity;
+	private Long shopIdentity;
+	private Long type;
+	private String key;
+	private String value;
 
 }
 

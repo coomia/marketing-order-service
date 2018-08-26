@@ -30,7 +30,7 @@ public class GenEntityMysql {
 
 
     // TODO 需要修改的地方
-    private static final String URL = "jdbc:mysql://118.113.201.139:8805/store";
+    private static final String URL = "jdbc:mysql://118.113.201.253:8805/store";
     private static final String NAME = "root";
     private static final String PASS = "Hj_1987121";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
@@ -72,8 +72,8 @@ public class GenEntityMysql {
         // 实体部分
         sb.append("public class " + getTransStr(tableName, true) + "{\r\n\r\n");
         processAllAttrs(sb);// 属性
-        sb.append("\r\n");
-        processAllMethod(sb);// get set方法
+       // sb.append("\r\n");
+        //processAllMethod(sb);// get set方法
         //processToString(sb);
         sb.append("}\r\n");
         return sb.toString();
@@ -186,21 +186,21 @@ public class GenEntityMysql {
      */
     private String sqlType2JavaType(String sqlType) {
         if (sqlType.equalsIgnoreCase("bit")) {
-            return "boolean";
+            return "Boolean";
         } else if (sqlType.equalsIgnoreCase("tinyint")) {
-            return "byte";
+            return "Integer";
         } else if (sqlType.equalsIgnoreCase("smallint")) {
-            return "short";
+            return "Integer";
         } else if (sqlType.equalsIgnoreCase("int")) {
-            return "int";
+            return "Integer";
         } else if (sqlType.equalsIgnoreCase("bigint")) {
-            return "long";
+            return "Long";
         } else if (sqlType.equalsIgnoreCase("float")) {
-            return "float";
+            return "Float";
         } else if (sqlType.equalsIgnoreCase("decimal") || sqlType.equalsIgnoreCase("numeric")
                 || sqlType.equalsIgnoreCase("real") || sqlType.equalsIgnoreCase("money")
                 || sqlType.equalsIgnoreCase("smallmoney")) {
-            return "double";
+            return "Double";
         } else if (sqlType.equalsIgnoreCase("varchar") || sqlType.equalsIgnoreCase("char")
                 || sqlType.equalsIgnoreCase("nvarchar") || sqlType.equalsIgnoreCase("nchar")
                 || sqlType.equalsIgnoreCase("text")) {
@@ -209,6 +209,8 @@ public class GenEntityMysql {
             return "Date";
         } else if (sqlType.equalsIgnoreCase("image")) {
             return "Blod";
+        } else if (sqlType.equalsIgnoreCase("timestamp")) {
+            return "Timestamp";
         }
         return null;
     }

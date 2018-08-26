@@ -38,6 +38,10 @@ public class WebUtil {
         return storeBo==null?null:storeBo.getCommercialId();
     }
 
+    public static Long getCurrentBrandId(){
+        return new Long(1);
+    }
+
     public static SerializerFeature[] getFastJsonSerializerFeature(){
         return new SerializerFeature[]{SerializerFeature.PrettyFormat,SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullListAsEmpty,SerializerFeature.WriteNullStringAsEmpty,SerializerFeature.WriteNullBooleanAsFalse,SerializerFeature.WriteNullNumberAsZero};
     }

@@ -19,7 +19,7 @@ public class DishSetmealGroupBo extends ParentBo {
   private String aliasName;
   private Double orderMin=0d;
   private Double orderMax=0d;
-  private Long brandIdenty= WebUtil.getCurrentStoreId();
+  private Long brandIdenty= WebUtil.getCurrentBrandId();
   private Long sort=0l;
   private List<DishSetmealBo> dishSetmealBos;
 }

@@ -21,7 +21,7 @@ public class DishPropertyBo extends ParentBo {
   private String aliasName;
   private Double reprice;
   private Long sort =1L;
-  private Long brandIdenty = WebUtil.getCurrentStoreId();
+  private Long brandIdenty = WebUtil.getCurrentBrandId();
   private String uuid = UUID.randomUUID().toString();
   private Long isCure;
   private Long enabledFlag ;

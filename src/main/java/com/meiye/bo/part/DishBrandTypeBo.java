@@ -1,6 +1,8 @@
 package com.meiye.bo.part;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.ParentBo;
+import com.meiye.system.util.WebUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -25,11 +28,15 @@ public class DishBrandTypeBo extends ParentBo {
   private String aliasName;
   private Long sort;
   private String dishTypeDesc;
-  private Long isOrder;
-  private String uuid;
-  private Long brandIdenty;
+  @JSONField(serialize=false)
+  private Long isOrder =  new Long(1);
+  @JSONField(serialize=false)
+  private String uuid = UUID.randomUUID().toString();
+  @JSONField(serialize=false)
+  private Long brandIdenty= WebUtil.getCurrentBrandId();
   private Long enabledFlag;
-  private Long isCure;
+  @JSONField(serialize=false)
+  private Long isCure = new Long(2);
   private List<DishBrandTypeBo> dishBrandTypeBoList;
 
 }

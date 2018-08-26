@@ -18,15 +18,15 @@ import javax.persistence.Id;
 public class AuthRole extends ParentEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	private String name;
 	private String code;
-	private int sort;
-	private long brandIdenty;
-	private byte sourceFlag;
-	private byte enableFlag;
-	private byte isCreateAccountByDealer;
-	private byte isCreateAccountByShop;
+	private Integer sort;
+	private Long brandIdenty;
+	private Integer sourceFlag;
+	private Integer enableFlag;
+	private Integer isCreateAccountByDealer;
+	private Integer isCreateAccountByShop;
 
 }
 

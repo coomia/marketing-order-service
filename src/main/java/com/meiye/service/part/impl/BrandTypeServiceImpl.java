@@ -26,12 +26,12 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     @Transactional(rollbackOn = {Exception.class})
     @Override
     public int delete(@NotNull Long id) {
-       return dishBrandTypeRepository.deleteDishBrandType(new Long(2),id);
+       return dishBrandTypeRepository.deleteDishBrandType(2,id);
     }
 
     @Override
     public List<DishBrandTypeBo> getAllDishBrandTypeList() {
-        List<DishBrandType> dishBrandTypes = dishBrandTypeRepository.findAllByEnabledFlagOrderBySortDesc(new Long(1));
+        List<DishBrandType> dishBrandTypes = dishBrandTypeRepository.findAllByStatusFlagOrderBySortDesc(1);
         List<DishBrandTypeBo> dishBrandTypeBos = this.copy(dishBrandTypes);
         return this.sortBrandTypeByParentId(dishBrandTypeBos);
     }
