@@ -1,13 +1,13 @@
 package com.meiye.bo.store;
 
-import com.meiye.bo.SimpleParentBo;
+import com.meiye.bo.ParentBo;
 import lombok.Data;
 
 /**
  * Created by Administrator on 2018/8/23 0023.
  */
 @Data
-public class CommercialBo extends SimpleParentBo {
+public class CommercialBo extends ParentBo {
     private Long commercialId;//bigint(20) NOT NULL主键id
     private String commercialName;//varchar(100) NULL
     private String commercialContact;//varchar(50) NULL联系人

@@ -1,6 +1,6 @@
 package com.meiye.model.store;
 
-import com.meiye.model.SimpleParentEntity;
+import com.meiye.model.ParentEntity;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -13,7 +13,7 @@ import javax.persistence.Id;
  */
 @Data
 @Entity
-public class Brand extends SimpleParentEntity {
+public class Brand extends ParentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;//bigint(20) unsigned NOT NULL主键id
