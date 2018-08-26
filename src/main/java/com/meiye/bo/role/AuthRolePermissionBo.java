@@ -1,5 +1,6 @@
 package com.meiye.bo.role;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.ParentBo;
 import com.meiye.model.ParentEntity;
 import com.meiye.system.util.WebUtil;
@@ -20,7 +21,8 @@ public class AuthRolePermissionBo extends ParentBo {
 	private Long roleId;
 	private Long permissionId;
 	private AuthPermissionBo authPermissionBo;
-	private Long brandIdenty;
+	@JSONField(serialize=false)
+	private Long brandIdenty=WebUtil.getCurrentBrandId();
 	private Integer platform;
 	private Integer groupFlag;
 

@@ -20,17 +20,17 @@ public interface DishBrandTypeRepository  extends JpaRepository<DishBrandType,Lo
 
     /**
      * 获取所有启用的分类
-     * @param enabledFlag
+     * @param statusFlag
      * @return
      */
-    List<DishBrandType> findAllByEnabledFlagOrderBySortDesc(Long enabledFlag);
+    List<DishBrandType> findAllByStatusFlagOrderBySortDesc(Integer statusFlag);
 
     @Modifying
     @Query("update DishBrandType bt set bt.name=?1,bt.typeCode=?2 where bt.id=?3")
     int updateDishBrandType(String name,String tyoeCode,Long id);
 
     @Modifying
-    @Query("update DishBrandType bt set bt.enabledFlag=?1 where bt.id=?2")
-    int deleteDishBrandType(Long enabledFlag,Long id);
+    @Query("update DishBrandType bt set bt.statusFlag=?1 where bt.id=?2")
+    int deleteDishBrandType(Integer statusFlag,Long id);
 
 }

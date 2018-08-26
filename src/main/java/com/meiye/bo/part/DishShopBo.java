@@ -20,7 +20,7 @@ public class DishShopBo extends ParentBo {
   @JSONField(serialize=false)
   private String uuid = UUID.randomUUID().toString();
   @JSONField(serialize=false)
-  private Long brandDishId= WebUtil.getCurrentStoreId();
+  private Long brandDishId= WebUtil.getCurrentBrandId();
   @JSONField(serialize=false)
   private String brandDishUuid=UUID.randomUUID().toString();
   private Long dishTypeId;
@@ -82,7 +82,7 @@ public class DishShopBo extends ParentBo {
   private String scene="100";
   private Long shopIdenty=WebUtil.getCurrentStoreId();
   @JSONField(serialize=false)
-  private Long brandIdenty=WebUtil.getCurrentStoreId();
+  private Long brandIdenty=WebUtil.getCurrentBrandId();
   private Long enabledFlag;
   private String skuKey;
   private Long hasStandard=2l;

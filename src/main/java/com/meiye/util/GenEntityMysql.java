@@ -30,7 +30,7 @@ public class GenEntityMysql {
 
 
     // TODO 需要修改的地方
-    private static final String URL = "jdbc:mysql://118.113.201.139:8805/store";
+    private static final String URL = "jdbc:mysql://118.113.201.253:8805/store";
     private static final String NAME = "root";
     private static final String PASS = "Hj_1987121";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
@@ -209,6 +209,8 @@ public class GenEntityMysql {
             return "Date";
         } else if (sqlType.equalsIgnoreCase("image")) {
             return "Blod";
+        } else if (sqlType.equalsIgnoreCase("timestamp")) {
+            return "Timestamp";
         }
         return null;
     }

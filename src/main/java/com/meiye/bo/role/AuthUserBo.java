@@ -1,7 +1,9 @@
 package com.meiye.bo.role;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.ParentBo;
 import com.meiye.model.ParentEntity;
+import com.meiye.system.util.WebUtil;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -51,8 +53,10 @@ public class AuthUserBo extends ParentBo {
 	private String passwordNum;
 	private Integer sourceFlag;
 	private String salt ="";
-	private Long shopIdenty;
-	private Long brandIdenty;
+	@JSONField(serialize=false)
+	private Long shopIdenty= WebUtil.getCurrentStoreId();
+	@JSONField(serialize=false)
+	private Long brandIdenty= WebUtil.getCurrentBrandId();
 	private Integer enabledFlag;
 	private Integer assignedGroup;
 	private Long assignedId;
