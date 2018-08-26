@@ -22,7 +22,7 @@ public class AuthUser extends ParentEntity {
 	private Long id;
 	private Long roleId;
 	private String name;
-	private Byte gender;
+	private Integer gender;
 	private Timestamp birthday;
 	private String identityCard;
 	private String  education;
@@ -51,12 +51,12 @@ public class AuthUser extends ParentEntity {
 	private String account;
 	private String password;
 	private String passwordNum;
-	private Byte sourceFlag;
+	private Integer sourceFlag;
 	private String salt;
 	private Long shopIdenty;
 	private Long brandIdenty;
-	private Byte enabledFlag;
-	private Byte assignedGroup;
+	private Integer enabledFlag;
+	private Integer assignedGroup;
 	private Long assignedId;
 
 }

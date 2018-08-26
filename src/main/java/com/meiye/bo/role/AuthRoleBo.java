@@ -19,15 +19,15 @@ import java.util.List;
  */
 @Data
 public class AuthRoleBo extends ParentBo {
-	private long id;
+	private Long id;
 	private String name;
 	private String code;
-	private int sort =1;
-	private long brandIdenty ;
-	private byte sourceFlag;
-	private byte enableFlag =1;
-	private byte isCreateAccountByDealer;
-	private byte isCreateAccountByShop;
+	private Integer sort =1;
+	private Long brandIdenty ;
+	private Integer sourceFlag;
+	private Integer enableFlag =1;
+	private Integer isCreateAccountByDealer;
+	private Integer isCreateAccountByShop;
 	//权限集合
 	private List<AuthRolePermissionBo> authRolePermissions = new ArrayList<>();
 

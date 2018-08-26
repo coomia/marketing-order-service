@@ -40,12 +40,12 @@ public class AuthRoleTest {
     public void save(){
         AuthRoleBo authRoleBo = new AuthRoleBo();
         authRoleBo.setName("总监");
-        authRoleBo.setBrandIdenty(1);
-        authRoleBo.setSourceFlag((byte) 1);
+        authRoleBo.setBrandIdenty(new Long(1));
+        authRoleBo.setSourceFlag(1);
 
         AuthRolePermissionBo authRolePermissionBo = new AuthRolePermissionBo();
         authRolePermissionBo.setPermissionId(1L);
-        authRolePermissionBo.setBrandIdenty(1);
+        authRolePermissionBo.setBrandIdenty(new Long(1));
         authRoleBo.getAuthRolePermissions().add(authRolePermissionBo);
         authRoleService.save(authRoleBo);
 

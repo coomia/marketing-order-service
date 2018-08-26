@@ -16,13 +16,13 @@ import javax.persistence.Id;
  */
 @Data
 public class AuthRolePermissionBo extends ParentBo {
-	private long id;
-	private long roleId;
-	private long permissionId;
+	private Long id;
+	private Long roleId;
+	private Long permissionId;
 	private AuthPermissionBo authPermissionBo;
-	private long brandIdenty;
-	private byte platform;
-	private byte groupFlag;
+	private Long brandIdenty;
+	private Integer platform;
+	private Integer groupFlag;
 
 }
 

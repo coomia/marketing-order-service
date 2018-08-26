@@ -23,10 +23,10 @@ public class AuthRole extends ParentEntity {
 	private String code;
 	private Integer sort;
 	private Long brandIdenty;
-	private Byte sourceFlag;
-	private Byte enableFlag;
-	private Byte isCreateAccountByDealer;
-	private Byte isCreateAccountByShop;
+	private Integer sourceFlag;
+	private Integer enableFlag;
+	private Integer isCreateAccountByDealer;
+	private Integer isCreateAccountByShop;
 
 }
 

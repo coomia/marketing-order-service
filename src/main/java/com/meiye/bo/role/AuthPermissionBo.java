@@ -20,14 +20,14 @@ public class AuthPermissionBo extends ParentBo {
 	private String levelId;
 	private String name;
 	private String code;
-	private Byte type;
+	private Integer type;
 	private String url;
 	private Integer sort;
-	private Byte platform;
-	private Byte supportVersion;
-	private Byte sourceFlag;
-	private Byte groupFlag;
-	private Byte checked;
+	private Integer platform;
+	private Integer supportVersion;
+	private Integer sourceFlag;
+	private Integer groupFlag;
+	private Integer checked;
 	private String zoneCode;
 
 }
