@@ -9,6 +9,7 @@ import com.meiye.service.setting.TableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -43,12 +44,14 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
+    @Transactional(rollbackOn = {Exception.class})
     public TablesBo updateTable(TablesBo tableBo) {
         tablesRepository.updateTable(tableBo.getTableName(),tableBo.getId());
         return tableBo;
     }
 
     @Override
+    @Transactional(rollbackOn = {Exception.class})
     public TablesBo addTable(TablesBo tableBo) {
         Tables tables = tableBo.copyTo(Tables.class);
         tablesRepository.save(tables);
@@ -56,6 +59,7 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
+    @Transactional(rollbackOn = {Exception.class})
     public void deleteTable(Long id) {
         tablesRepository.deleteTable(2,id);
     }

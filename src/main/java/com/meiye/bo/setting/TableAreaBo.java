@@ -22,7 +22,7 @@ public class TableAreaBo extends ParentBo {
 	private Long id;
 	private String areaName;
 	@JSONField(serialize=false)
-	private Long brandDishId= WebUtil.getCurrentBrandId();
+	private Long brandIdentity= WebUtil.getCurrentBrandId();
 	@JSONField(serialize=false)
 	private Long shopIdentity= WebUtil.getCurrentStoreId();
 	private String areaCode;

@@ -36,8 +36,8 @@ public class BrandTypeServiceTest {
 
     @Test
     public void testCreate(){
-//        DishBrandTypeBo bo = DishBrandTypeBo.builder().name("保健").typeCode("123456").build();
-        DishBrandTypeBo bo = DishBrandTypeBo.builder().parentId(new Long(11)).name("肾部保养").typeCode("123456").build();
+     //  DishBrandTypeBo bo = DishBrandTypeBo.builder().name("保健").typeCode("123456").build();
+       DishBrandTypeBo bo = DishBrandTypeBo.builder().parentId(new Long(1)).name("肾部保养").typeCode("123456").build();
         brandTypeService.saveOrUpdate(bo);
     }
 

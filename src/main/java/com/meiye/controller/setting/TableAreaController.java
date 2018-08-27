@@ -5,6 +5,7 @@ import com.meiye.bo.setting.TableAreaBo;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.model.setting.TableArea;
 import com.meiye.service.setting.TableAreaService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * @Date: Created in 18:56 2018/8/26
  * @Modified By:
  */
+@Slf4j
 @RestController
 @RequestMapping(value = "/public/api/setting/tableArea",produces="application/json;charset=UTF-8")
 public class TableAreaController {
@@ -30,7 +32,9 @@ public class TableAreaController {
 
     @PostMapping("/saveTableArea")
     public ResetApiResult saveTableArea(@RequestBody TableAreaBo tableAreaBo){
+        log.info("save table area begin:");
         tableAreaService.addTableArea(tableAreaBo);
+        log.info("save table area end:");
         return ResetApiResult.sucess("");
     }
 
