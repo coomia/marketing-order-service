@@ -4,6 +4,7 @@ import com.meiye.bo.part.DishPropertyBo;
 import com.meiye.bo.part.DishSetmealBo;
 import com.meiye.bo.part.DishSetmealGroupBo;
 import com.meiye.bo.part.DishShopBo;
+import com.meiye.exception.BusinessException;
 import com.meiye.model.part.DishProperty;
 import com.meiye.model.part.DishSetmeal;
 import com.meiye.model.part.DishSetmealGroup;
@@ -13,6 +14,7 @@ import com.meiye.repository.part.DishSetmealGroupRepository;
 import com.meiye.repository.part.DishSetmealRepository;
 import com.meiye.repository.part.DishShopRepository;
 import com.meiye.service.part.DishShopService;
+import com.meiye.system.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -79,7 +81,9 @@ public class DishShopServiceImpl implements DishShopService{
 
     @Override
     public DishShopBo getDishShopById(Long id) {
-        DishShop dishShop = dishShopRepository.findById(id).get();
+        DishShop dishShop=dishShopRepository.findByIdAndShopIdenty(id, WebUtil.getCurrentStoreId());
+        if(dishShop==null)
+            throw new BusinessException("品项不存在!");
         DishShopBo dishShopBo = dishShop.copyTo(DishShopBo.class);
         //根据shopid得到加项
         if (dishShop != null && dishShop.getType() == 0) {

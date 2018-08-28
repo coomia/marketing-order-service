@@ -22,7 +22,14 @@ public class ResetApiResult {
     public static final int STATUS_CODE_404=404;
     public static final int STATUS_CODE_403=403;
     public static final int STATUS_CODE_500=500;
+    private ResetApiResult(){}
 
+    public ResetApiResult(String message,String messageType,Integer statusCode,Object data){
+        this.setData(data==null?new Object():data);
+        this.setMessage(message);
+        this.setMessageType(messageType);
+        this.setStatusCode(statusCode==null?200:statusCode);
+    }
 
     public static ResetApiResult sucess(Object data){
         ResetApiResult resetApiResult =new ResetApiResult();
