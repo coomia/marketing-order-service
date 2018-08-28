@@ -9,8 +9,6 @@ import javax.persistence.Id;
 
 @Data
 public class DishUnitDictionaryBo extends ParentBo {
-  @Id
-  @GeneratedValue
   private Long id;
   private String name;
   private String aliasName;

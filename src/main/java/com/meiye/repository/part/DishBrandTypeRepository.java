@@ -1,6 +1,5 @@
 package com.meiye.repository.part;
 
-import com.meiye.model.config.AppConfig;
 import com.meiye.model.part.DishBrandType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

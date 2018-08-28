@@ -11,8 +11,6 @@ import java.util.List;
 
 @Data
 public class DishSetmealGroupBo extends ParentBo {
-  @Id
-  @GeneratedValue
   private Long id;
   private Long setmealDishId=1l;
   private String name;

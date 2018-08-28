@@ -14,8 +14,6 @@ import java.util.UUID;
 
 @Data
 public class DishShopBo extends ParentBo {
-  @Id
-  @GeneratedValue
   private Long id;
   @JSONField(serialize=false)
   private String uuid = UUID.randomUUID().toString();

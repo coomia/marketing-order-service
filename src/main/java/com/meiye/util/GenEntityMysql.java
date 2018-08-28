@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class GenEntityMysql {
     private String[] colNames; // 列名数组
     private String[] colTypes; // 列名类型数组
     private int[] colSizes; // 列名大小数组
-    private boolean needUtil = false; // 是否需要导入包java.util.*
+    private boolean needUtil = true; // 是否需要导入包java.util.*
     private boolean needSql = false; // 是否需要导入包java.sql.*
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String SQL = "SELECT * FROM ";
@@ -34,9 +35,18 @@ public class GenEntityMysql {
     private static final String NAME = "root";
     private static final String PASS = "Hj_1987121";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
-    private String packageOutPath = "com.meiye.mysql.entity";
+    private String packageOutPath = "com.meiye.model.trade";
+    private String repostiryPackageOutPath="com.meiye.repository.trade";
+    private String boPackageOutPath="com.meiye.bo.trade";
     private String authorName = "ryne";
     private String[] generateTables = null;
+    private String[] excludeProperty=new String[]{"statusFlag",
+            "creatorName",
+            "creatorId",
+            "updatorName",
+            "updatorId",
+            "serverCreateTime",
+            "serverUpdateTime"};
 
     /**
      * 类的构造方法
@@ -63,6 +73,15 @@ public class GenEntityMysql {
         if (needSql) {
             sb.append("import java.sql.*;\r\n");
         }
+        sb.append("import com.meiye.model.ParentEntity;\n" +
+                "import lombok.Data;\n" +
+                "\n" +
+                "import javax.persistence.Entity;\n" +
+                "import javax.persistence.GeneratedValue;\n" +
+                "import javax.persistence.GenerationType;\n" +
+                "import javax.persistence.Id;\n" +
+                "import java.io.Serializable;");
+
         // 注释部分
         sb.append("/**\r\n");
         sb.append(" * table name:  " + tableName + "\r\n");
@@ -70,9 +89,71 @@ public class GenEntityMysql {
         sb.append(" * create time: " + SDF.format(new Date()) + "\r\n");
         sb.append(" */ \r\n");
         // 实体部分
-        sb.append("public class " + getTransStr(tableName, true) + "{\r\n\r\n");
+        sb.append("@Data\n");
+        sb.append("@Entity\n");
+        sb.append("public class " + getTransStr(tableName, true) + " extends ParentEntity implements Serializable{\r\n\r\n");
         processAllAttrs(sb);// 属性
        // sb.append("\r\n");
+        //processAllMethod(sb);// get set方法
+        //processToString(sb);
+        sb.append("}\r\n");
+        return sb.toString();
+    }
+
+
+    private String parseBo() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("package " + boPackageOutPath + ";\r\n");
+        sb.append("\r\n");
+        // 判断是否导入工具包
+        if (needUtil) {
+            sb.append("import java.util.Date;\r\n");
+        }
+        if (needSql) {
+            sb.append("import java.sql.*;\r\n");
+        }
+        sb.append("import com.alibaba.fastjson.annotation.JSONField;\n" +
+                "import com.meiye.bo.ParentBo;\n" +
+                "import com.meiye.system.util.WebUtil;\n" +
+                "import lombok.Data;\n" +
+                "import java.io.Serializable;\n" );
+        // 注释部分
+        sb.append("/**\r\n");
+        sb.append(" * table name:  " + tableName + "\r\n");
+        sb.append(" * author name: " + authorName + "\r\n");
+        sb.append(" * create time: " + SDF.format(new Date()) + "\r\n");
+        sb.append(" */ \r\n");
+        // 实体部分
+        sb.append("@Data\n");
+        sb.append("public class " + getTransStr(tableName, true) + "Bo extends ParentBo implements Serializable{\r\n\r\n");
+        processAllAttrsForBo(sb);// 属性
+        // sb.append("\r\n");
+        //processAllMethod(sb);// get set方法
+        //processToString(sb);
+        sb.append("}\r\n");
+        return sb.toString();
+    }
+
+
+    private String parseRepository() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("package " + repostiryPackageOutPath + ";\r\n");
+        sb.append("\r\n");
+        sb.append("import  "+packageOutPath+"."+ getTransStr(tableName, true)+";\n"+
+                "import org.springframework.data.jpa.repository.JpaRepository;\n" +
+                "import org.springframework.data.jpa.repository.Modifying;\n" +
+                "import org.springframework.data.jpa.repository.Query;\n" +
+                "import org.springframework.stereotype.Repository;\n");
+        // 注释部分
+        sb.append("/**\r\n");
+        sb.append(" * table name:  " + tableName + "\r\n");
+        sb.append(" * author name: " + authorName + "\r\n");
+        sb.append(" * create time: " + SDF.format(new Date()) + "\r\n");
+        sb.append(" */ \r\n");
+        // 实体部分
+        sb.append("@Repository\n");
+        sb.append("public interface " + getTransStr(tableName, true) + "Repository extends JpaRepository<"+getTransStr(tableName, true) +",Long>{\r\n\r\n");
+        // sb.append("\r\n");
         //processAllMethod(sb);// get set方法
         //processToString(sb);
         sb.append("}\r\n");
@@ -89,10 +170,22 @@ public class GenEntityMysql {
      */
     private void processAllAttrs(StringBuffer sb) {
         for (int i = 0; i < colNames.length; i++) {
+            if(Arrays.asList(excludeProperty).contains(getTransStr(colNames[i], false)))
+                continue;
+            if(colNames[i].equals("id"))
+                sb.append("\t @Id\n" +
+                        "\t@GeneratedValue(strategy = GenerationType.IDENTITY)");
             sb.append("\tprivate " + sqlType2JavaType(colTypes[i]) + " " + getTransStr(colNames[i], false) + ";\r\n");
         }
     }
 
+    private void processAllAttrsForBo(StringBuffer sb) {
+        for (int i = 0; i < colNames.length; i++) {
+            if(Arrays.asList(excludeProperty).contains(getTransStr(colNames[i], false)))
+                continue;
+            sb.append("\tprivate " + sqlType2JavaType(colTypes[i]) + " " + getTransStr(colNames[i], false) + ";\r\n");
+        }
+    }
     /**
      * 重写toString()方法
      * @param sb
@@ -210,7 +303,9 @@ public class GenEntityMysql {
         } else if (sqlType.equalsIgnoreCase("image")) {
             return "Blod";
         } else if (sqlType.equalsIgnoreCase("timestamp")) {
-            return "Timestamp";
+            return "Date";
+        }else if (sqlType.equalsIgnoreCase("date")) {
+            return "Date";
         }
         return null;
     }
@@ -275,6 +370,32 @@ public class GenEntityMysql {
             pw = new PrintWriter(fw);
             pw.println(content);
             pw.flush();
+
+            String repostoryContent=parseRepository();
+            //输出生成文件
+            directory = new File("");
+            dirName = directory.getAbsolutePath() + "/src/main/java/" + repostiryPackageOutPath.replace(".", "/");
+            dir = new File(dirName);
+            if (!dir.exists() && dir.mkdirs()) System.out.println("generate dir 【" + dirName + "】");
+            javaPath = dirName + "/" + getTransStr(tableName, true) + "Repository.java";
+            fw = new FileWriter(javaPath);
+            pw = new PrintWriter(fw);
+            pw.println(repostoryContent);
+            pw.flush();
+
+
+            String boContent=parseBo();
+            //输出生成文件
+            directory = new File("");
+            dirName = directory.getAbsolutePath() + "/src/main/java/" + boPackageOutPath.replace(".", "/");
+            dir = new File(dirName);
+            if (!dir.exists() && dir.mkdirs()) System.out.println("generate dir 【" + dirName + "】");
+            javaPath = dirName + "/" + getTransStr(tableName, true) + "Bo.java";
+            fw = new FileWriter(javaPath);
+            pw = new PrintWriter(fw);
+            pw.println(boContent);
+            pw.flush();
+
             System.out.println("create class 【" + tableName + "】");
         }
         if (pw != null)
@@ -291,6 +412,10 @@ public class GenEntityMysql {
      */
     public static void main(String[] args) {
         try {
+            INSTANCE.generateTables=new String[]{"trade","trade_item","trade_item_property","trade_table","trade_privilege","customer_card_time","wx_trade_customer","trade_user","trade_customer"};
+            INSTANCE.packageOutPath = "com.meiye.model.trade";
+            INSTANCE.repostiryPackageOutPath="com.meiye.repository.trade";
+            INSTANCE.boPackageOutPath="com.meiye.bo.trade";
             INSTANCE.generate();
             System.out.println("generate classes success!");
         } catch (Exception e) {

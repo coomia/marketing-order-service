@@ -10,8 +10,6 @@ import javax.persistence.Id;
 
 @Data
 public class DishSetmealBo extends ParentBo {
-  @Id
-  @GeneratedValue
   private Long id;
   private Long childDishId;
   private Long dishId;
