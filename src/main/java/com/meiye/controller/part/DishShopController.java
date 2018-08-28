@@ -2,6 +2,7 @@ package com.meiye.controller.part;
 
 import com.meiye.bo.part.DishShopBo;
 import com.meiye.bo.system.ResetApiResult;
+import com.meiye.exception.BusinessException;
 import com.meiye.service.part.DishShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,12 @@ public class DishShopController {
 
     @PostMapping("/save")
     public ResetApiResult saveDishShop(@RequestBody DishShopBo dishShopBo){
-        dishShopService.saveDishShop(dishShopBo);
+        try{
+            dishShopService.saveDishShop(dishShopBo);
+        }catch (Exception e){
+            throw new BusinessException("品项保存失败!");
+        }
+
         return ResetApiResult.sucess("");
     }
 
@@ -33,13 +39,23 @@ public class DishShopController {
 
     @PostMapping("/update")
     public ResetApiResult updateDishShop(@RequestBody DishShopBo dishShopBo){
-        dishShopService.updateDishShop(dishShopBo);
+        try {
+            dishShopService.updateDishShop(dishShopBo);
+        }catch (Exception e){
+            throw new BusinessException("品项更新失败!");
+        }
+
         return ResetApiResult.sucess("");
     }
 
     @PostMapping("/delete")
     public ResetApiResult deleteDishShop(@RequestBody Long dishShopId){
-        dishShopService.deleteDishShop(dishShopId);
+        try {
+            dishShopService.deleteDishShop(dishShopId);
+        }catch (Exception e){
+            throw new BusinessException("品项删除失败!");
+        }
+
         return ResetApiResult.sucess("");
     }
 
