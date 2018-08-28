@@ -19,8 +19,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DishBrandTypeBo extends ParentBo {
-  @Id
-  @GeneratedValue
   private Long id;
   private Long parentId;
   private String typeCode;
