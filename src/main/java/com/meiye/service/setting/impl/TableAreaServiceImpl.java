@@ -2,6 +2,7 @@ package com.meiye.service.setting.impl;
 
 import com.meiye.bo.part.DishBrandTypeBo;
 import com.meiye.bo.setting.TableAreaBo;
+import com.meiye.exception.BusinessException;
 import com.meiye.model.part.DishBrandType;
 import com.meiye.model.setting.TableArea;
 import com.meiye.repository.setting.TablesAreaRepository;
@@ -29,7 +30,12 @@ public class TableAreaServiceImpl implements TableAreaService {
 
     @Override
     public List<TableAreaBo> getAllTableArea() {
-        List<TableArea> tableAreaList = tablesAreaRepository.findAllByStatusFlagOrderByServerCreateTimeAsc(1);
+        List<TableArea> tableAreaList = null;
+        try {
+            tableAreaList = tablesAreaRepository.findAllByStatusFlagOrderByServerCreateTimeAsc(1);
+        } catch (Exception e) {
+            throw new BusinessException("查找工作台区域失败!");
+        }
         List<TableAreaBo> tableAreaBoList = this.copy(tableAreaList);
         return tableAreaBoList;
     }
@@ -37,36 +43,47 @@ public class TableAreaServiceImpl implements TableAreaService {
     @Override
     @Transactional(rollbackOn = {Exception.class})
     public TableAreaBo updateTableArea(TableAreaBo tableAreaBo) {
-       tablesAreaRepository.updateTableArea(tableAreaBo.getAreaName(),tableAreaBo.getId());
+        if (Objects.isNull(tableAreaBo) && Objects.isNull(tableAreaBo.getAreaName())) {
+            throw new BusinessException("工作台区域名字不能为空!");
+        }
+        tablesAreaRepository.updateTableArea(tableAreaBo.getAreaName(), tableAreaBo.getId());
         return tableAreaBo;
     }
 
     @Override
     @Transactional(rollbackOn = {Exception.class})
     public TableAreaBo addTableArea(TableAreaBo tableAreaBo) {
-        TableArea tableArea = tableAreaBo.copyTo(TableArea.class);
-        tablesAreaRepository.save(tableArea);
+        try {
+            TableArea tableArea = tableAreaBo.copyTo(TableArea.class);
+            tablesAreaRepository.save(tableArea);
+        } catch (Exception e) {
+            throw new BusinessException("保存工作台区域失败!");
+        }
         return tableAreaBo;
     }
 
     @Override
     @Transactional(rollbackOn = {Exception.class})
     public void deleteTableArea(Long id) {
-        tablesAreaRepository.deleteTableArea(2,id);
+        try {
+            tablesAreaRepository.deleteTableArea(2, id);
+        } catch (Exception e) {
+            throw new BusinessException("删除工作台区域失败!");
+        }
     }
 
 
-    private List<TableAreaBo> copy(List<TableArea> tableAreas){
-        if(tableAreas!=null&&!tableAreas.isEmpty()) {
+    private List<TableAreaBo> copy(List<TableArea> tableAreas) {
+        if (tableAreas != null && !tableAreas.isEmpty()) {
             List<TableAreaBo> tableAreaBos = new ArrayList<TableAreaBo>();
-            tableAreas.stream().filter(Objects::nonNull).forEach(tableArea->{
-                        if(Objects.nonNull(tableArea)){
+            tableAreas.stream().filter(Objects::nonNull).forEach(tableArea -> {
+                        if (Objects.nonNull(tableArea)) {
                             tableAreaBos.add(tableArea.copyTo(TableAreaBo.class));
                         }
                     }
             );
             return tableAreaBos;
-        }else {
+        } else {
             return null;
         }
     }
