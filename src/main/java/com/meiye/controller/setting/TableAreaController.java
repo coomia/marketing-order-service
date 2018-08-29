@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * @Date: Created in 18:56 2018/8/26
  * @Modified By:
  */
-@Slf4j
+
 @RestController
 @RequestMapping(value = "/public/api/setting/tableArea",produces="application/json;charset=UTF-8")
 public class TableAreaController {
@@ -32,9 +32,7 @@ public class TableAreaController {
 
     @PostMapping("/saveTableArea")
     public ResetApiResult saveTableArea(@RequestBody TableAreaBo tableAreaBo){
-        log.info("save table area begin:");
         tableAreaService.addTableArea(tableAreaBo);
-        log.info("save table area end:");
         return ResetApiResult.sucess("");
     }
 

@@ -27,7 +27,6 @@ spring:
       charset: UTF-8
       enabled: true
       force: true
-
 server:
   port: 8090
   servlet:
@@ -38,7 +37,8 @@ jwt:
     time-out: 1800000000
     token-in-header: token
     valid-token-start-with: Bearer;
-
-
   mybatis:
     type-aliases-package: com.meiye.bo
+
+logging:
+  config: log4j.properties
