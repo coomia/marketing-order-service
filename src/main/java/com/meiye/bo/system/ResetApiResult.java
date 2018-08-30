@@ -7,7 +7,7 @@ import lombok.Data;
  * Created by Administrator on 2018/8/6 0006.
  */
 @Data
-public class ResetApiResult {
+public class ResetApiResult extends ApiResult {
     private Integer statusCode;
     private String message;
     private String messageType;

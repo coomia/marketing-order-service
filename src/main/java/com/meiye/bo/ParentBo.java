@@ -6,6 +6,7 @@ import com.meiye.model.ParentEntity;
 import com.meiye.system.util.WebUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -15,17 +16,13 @@ import java.util.Date;
  */
 @Data
 public class ParentBo{
-    @JSONField(serialize=false)
     private String creatorName;
-    @JSONField(serialize=false)
     private Long creatorId;
     @JSONField(serialize=false)
     private String updatorName;
     @JSONField(serialize=false)
     private Long updatorId;
-    @JSONField(serialize=false)
     private Timestamp serverCreateTime;
-    @JSONField(serialize=false)
     private Timestamp serverUpdateTime;
     private Integer  statusFlag=1;
 
