@@ -2,6 +2,7 @@ package com.meiye.service.setting.impl;
 
 import com.meiye.bo.setting.TableAreaBo;
 import com.meiye.bo.setting.TablesBo;
+import com.meiye.exception.BusinessException;
 import com.meiye.model.setting.TableArea;
 import com.meiye.model.setting.Tables;
 import com.meiye.repository.setting.TablesRepository;
@@ -29,8 +30,11 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public int getTablesCountByAreaId(Long areaId) {
+        if (Objects.isNull(areaId)) {
+            throw new BusinessException("工作台区域ID不能为空!");
+        }
         List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdOrderByTableNumAsc(1, areaId);
-        if(tablesList!= null && tablesList.size()>0){
+        if (tablesList != null && tablesList.size() > 0) {
             return tablesList.size();
         }
         return 0;
@@ -46,35 +50,43 @@ public class TableServiceImpl implements TableService {
     @Override
     @Transactional(rollbackOn = {Exception.class})
     public TablesBo updateTable(TablesBo tableBo) {
-        tablesRepository.updateTable(tableBo.getTableName(),tableBo.getId());
+        tablesRepository.updateTable(tableBo.getTableName(), tableBo.getId());
         return tableBo;
     }
 
     @Override
     @Transactional(rollbackOn = {Exception.class})
     public TablesBo addTable(TablesBo tableBo) {
-        Tables tables = tableBo.copyTo(Tables.class);
-        tablesRepository.save(tables);
+        try {
+            Tables tables = tableBo.copyTo(Tables.class);
+            tablesRepository.save(tables);
+        } catch (Exception e) {
+            throw new BusinessException("保存工作台失败!");
+        }
         return tableBo;
     }
 
     @Override
     @Transactional(rollbackOn = {Exception.class})
     public void deleteTable(Long id) {
-        tablesRepository.deleteTable(2,id);
+        try {
+            tablesRepository.deleteTable(2, id);
+        } catch (Exception e) {
+            throw new BusinessException("删除工作台失败!");
+        }
     }
 
-    private List<TablesBo> copy(List<Tables> tables){
-        if(tables!=null&&!tables.isEmpty()) {
+    private List<TablesBo> copy(List<Tables> tables) {
+        if (tables != null && !tables.isEmpty()) {
             List<TablesBo> tableBos = new ArrayList<TablesBo>();
-            tables.stream().filter(Objects::nonNull).forEach(table->{
-                        if(Objects.nonNull(table)){
+            tables.stream().filter(Objects::nonNull).forEach(table -> {
+                        if (Objects.nonNull(table)) {
                             tableBos.add(table.copyTo(TablesBo.class));
                         }
                     }
             );
             return tableBos;
-        }else {
+        } else {
             return null;
         }
     }

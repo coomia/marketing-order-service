@@ -1,6 +1,7 @@
 package com.meiye.service.part.impl;
 
 import com.meiye.bo.part.DishBrandTypeBo;
+import com.meiye.exception.BusinessException;
 import com.meiye.model.part.DishBrandType;
 import com.meiye.repository.part.DishBrandTypeRepository;
 import com.meiye.service.part.BrandTypeService;
@@ -26,12 +27,23 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     @Transactional(rollbackOn = {Exception.class})
     @Override
     public int delete(@NotNull Long id) {
-       return dishBrandTypeRepository.deleteDishBrandType(2,id);
+       int i =0;
+        try{
+           i= dishBrandTypeRepository.deleteDishBrandType(2,id);
+        }catch (Exception e){
+            throw new BusinessException("查找所有分类失败!");
+        }
+       return i;
     }
 
     @Override
     public List<DishBrandTypeBo> getAllDishBrandTypeList() {
-        List<DishBrandType> dishBrandTypes = dishBrandTypeRepository.findAllByStatusFlagOrderBySortDesc(1);
+        List<DishBrandType> dishBrandTypes = null;
+        try{
+             dishBrandTypes = dishBrandTypeRepository.findAllByStatusFlagOrderBySortDesc(1);
+        }catch (Exception e){
+            throw new BusinessException("查找所有分类失败!");
+        }
         List<DishBrandTypeBo> dishBrandTypeBos = this.copy(dishBrandTypes);
         return this.sortBrandTypeByParentId(dishBrandTypeBos);
     }
@@ -41,19 +53,33 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     public DishBrandTypeBo saveOrUpdate(@NotNull DishBrandTypeBo dishBrandTypeBo) {
         dishBrandTypeBo = this.fillDefaultInfo(dishBrandTypeBo);
         DishBrandType dishBrandType = dishBrandTypeBo.copyTo(DishBrandType.class);
-        dishBrandTypeRepository.save(dishBrandType);
+        try{
+            dishBrandTypeRepository.save(dishBrandType);
+        }catch (Exception e){
+            throw new BusinessException("保存分类失败!");
+        }
         return dishBrandTypeBo;
     }
 
     @Transactional(rollbackOn = {Exception.class})
     @Override
     public int update(DishBrandTypeBo dishBrandTypeBo) {
-        return dishBrandTypeRepository.updateDishBrandType(dishBrandTypeBo.getName(),dishBrandTypeBo.getTypeCode(),dishBrandTypeBo.getId());
+        String name = dishBrandTypeBo.getName();
+        String typeCode = dishBrandTypeBo.getTypeCode();
+        if(Objects.isNull(name)||Objects.isNull(typeCode)){
+            throw new BusinessException("分类名，分类编码不能为空！");
+        }
+        return dishBrandTypeRepository.updateDishBrandType(name,typeCode,dishBrandTypeBo.getId());
     }
 
     @Override
     public DishBrandTypeBo getDishBrandType(Long id) {
-        DishBrandType dishBrandType = dishBrandTypeRepository.findById(id).get();
+        DishBrandType dishBrandType = null;
+        try{
+             dishBrandType = dishBrandTypeRepository.findById(id).get();
+        }catch (Exception e){
+            throw new BusinessException("根据ID获取分类失败!");
+        }
         return dishBrandType.copyTo(DishBrandTypeBo.class);
     }
 
