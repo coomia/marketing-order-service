@@ -61,6 +61,8 @@ public class AuthUserBo extends ParentBo {
 	private Integer assignedGroup;
 	private Long assignedId;
 
+	Integer pageNum;
+	Integer pageSize;
 
 }
 

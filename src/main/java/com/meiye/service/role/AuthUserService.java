@@ -2,6 +2,9 @@ package com.meiye.service.role;
 
 import com.meiye.bo.role.AuthUserBo;
 import com.meiye.model.role.AuthUser;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 /**
  * @Author: ryner
@@ -24,4 +27,10 @@ public interface AuthUserService {
     AuthUserBo findLatestAuthUser();
 
     AuthUserBo getAuthUserBo(String userName);
+
+    Page<AuthUser> getUserPageByCriteria(Integer pageNum, Integer pageSize, AuthUserBo authUserBo);
+
+    AuthUserBo getOneById(Long id);
+
+    void delete(Long id);
 }

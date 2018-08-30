@@ -21,10 +21,10 @@ public class AuthRoleBo extends ParentBo {
 	private Integer sort =1;
 	@JSONField(serialize=false)
 	private Long brandIdenty=WebUtil.getCurrentBrandId();
-	private Integer sourceFlag;
+	private Integer sourceFlag = 1;
 	private Integer enableFlag =1;
-	private Integer isCreateAccountByDealer;
-	private Integer isCreateAccountByShop;
+	private Integer isCreateAccountByDealer = 2;
+	private Integer isCreateAccountByShop = 2;
 	//权限集合
 	private List<AuthRolePermissionBo> authRolePermissions = new ArrayList<>();
 
