@@ -22,7 +22,7 @@ public class CommercialCustomSettingsBo extends BusinessParentBo {
 
 	private Long id;
 	@JSONField(serialize=false)
-	private Long brandDishId= WebUtil.getCurrentBrandId();
+//	private Long brandDishId= WebUtil.getCurrentBrandId();
 //	@JSONField(serialize=false)
 //	private Long shopIdentity= WebUtil.getCurrentStoreId();
 	private Long type;
