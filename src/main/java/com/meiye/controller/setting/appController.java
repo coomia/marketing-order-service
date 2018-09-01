@@ -26,7 +26,6 @@ public class appController {
     @Autowired
     CommercialCustomerService commercialCustomerService;
 
-
     @PostMapping("/saveAppSetting")
     public ResetApiResult saveTableArea(@RequestBody String value){
         if(Objects.isNull(value)){
