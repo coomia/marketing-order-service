@@ -1,20 +1,18 @@
 package com.meiye.service.role.impl;
 
-import com.meiye.bo.role.AuthRoleBo;
 import com.meiye.bo.role.AuthUserBo;
-import com.meiye.bo.user.UserBo;
-import com.meiye.model.part.DishShop;
+import com.meiye.exception.BusinessException;
 import com.meiye.model.role.AuthUser;
 import com.meiye.repository.role.AuthUserRepository;
 import com.meiye.service.role.AuthRoleService;
 import com.meiye.service.role.AuthUserService;
+import com.meiye.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -25,6 +23,7 @@ import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author: ryner
@@ -45,6 +44,10 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public void addAuthUser(AuthUserBo authUserBo) {
         AuthUser authUser = authUserBo.copyTo(AuthUser.class);
+        authUser.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));;
+        if(Objects.nonNull(authUserRepository.findByAccountAndStatusFlag(authUser.getAccount(), Constants.DATA_ENABLE))){
+            throw new BusinessException("登录名已被注册，请输入新的登陆账户！");
+        }
         authUserRepository.save(authUser);
     }
 

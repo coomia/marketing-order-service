@@ -26,8 +26,8 @@ public class CommercialCustomSettingsBo extends BusinessParentBo {
 //	@JSONField(serialize=false)
 //	private Long shopIdentity= WebUtil.getCurrentStoreId();
 	private Long type;
-	private String key;
-	private String value;
+	private String settingKey;
+	private String settingValue;
 
 }
 

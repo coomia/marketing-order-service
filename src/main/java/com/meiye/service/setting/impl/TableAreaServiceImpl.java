@@ -1,16 +1,16 @@
 package com.meiye.service.setting.impl;
 
-import com.meiye.bo.part.DishBrandTypeBo;
 import com.meiye.bo.setting.TableAreaBo;
 import com.meiye.exception.BusinessException;
-import com.meiye.model.part.DishBrandType;
 import com.meiye.model.setting.TableArea;
 import com.meiye.repository.setting.TablesAreaRepository;
 import com.meiye.service.setting.TableAreaService;
+import com.meiye.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +32,7 @@ public class TableAreaServiceImpl implements TableAreaService {
     public List<TableAreaBo> getAllTableArea() {
         List<TableArea> tableAreaList = null;
         try {
-            tableAreaList = tablesAreaRepository.findAllByStatusFlagOrderByServerCreateTimeAsc(1);
+            tableAreaList = tablesAreaRepository.findAllByStatusFlagOrderByServerCreateTimeAsc(Constants.DATA_ENABLE);
         } catch (Exception e) {
             throw new BusinessException("查找工作台区域失败!");
         }
@@ -55,6 +55,7 @@ public class TableAreaServiceImpl implements TableAreaService {
     public TableAreaBo addTableArea(TableAreaBo tableAreaBo) {
         try {
             TableArea tableArea = tableAreaBo.copyTo(TableArea.class);
+            tableArea.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
             tablesAreaRepository.save(tableArea);
         } catch (Exception e) {
             throw new BusinessException("保存工作台区域失败!");
@@ -66,7 +67,7 @@ public class TableAreaServiceImpl implements TableAreaService {
     @Transactional(rollbackOn = {Exception.class})
     public void deleteTableArea(Long id) {
         try {
-            tablesAreaRepository.deleteTableArea(2, id);
+            tablesAreaRepository.deleteTableArea(Constants.DATA_DISABLE, id);
         } catch (Exception e) {
             throw new BusinessException("删除工作台区域失败!");
         }
