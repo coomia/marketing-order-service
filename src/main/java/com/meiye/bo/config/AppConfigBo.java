@@ -16,6 +16,9 @@ public class AppConfigBo extends ParentBo{
     private String appName;
     private String configName;
     private String configValue;
+    private Integer appendInt;
+    private String appendString;
+    private Date appendDate;
     private Long version;
 
 

@@ -1,6 +1,7 @@
 package com.meiye.bo.setting;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import com.meiye.model.ParentEntity;
 import com.meiye.system.util.WebUtil;
@@ -17,14 +18,14 @@ import javax.persistence.Id;
  * create time: 2018-08-26 17:57:14
  */
 @Data
-public class TableAreaBo extends ParentBo {
+public class TableAreaBo extends BusinessParentBo {
 
 	private Long id;
 	private String areaName;
-	@JSONField(serialize=false)
-	private Long brandIdentity= WebUtil.getCurrentBrandId();
-	@JSONField(serialize=false)
-	private Long shopIdentity= WebUtil.getCurrentStoreId();
+//	@JSONField(serialize=false)
+//	private Long brandIdentity= WebUtil.getCurrentBrandId();
+//	@JSONField(serialize=false)
+//	private Long shopIdentity= WebUtil.getCurrentStoreId();
 	private String areaCode;
 	private String memo;
 }

@@ -1,6 +1,7 @@
 package com.meiye.bo.role;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import com.meiye.model.ParentEntity;
 import com.meiye.system.util.WebUtil;
@@ -17,7 +18,7 @@ import java.sql.Timestamp;
  * create time: 2018-08-15 22:12:36
  */
 @Data
-public class AuthUserBo extends ParentBo {
+public class AuthUserBo extends BusinessParentBo {
 	private Long id;
 	private Long roleId;
 	private AuthRoleBo roleBo;
@@ -53,10 +54,10 @@ public class AuthUserBo extends ParentBo {
 	private String passwordNum;
 	private Integer sourceFlag;
 	private String salt ="";
-	@JSONField(serialize=false)
-	private Long shopIdenty= WebUtil.getCurrentStoreId();
-	@JSONField(serialize=false)
-	private Long brandIdenty= WebUtil.getCurrentBrandId();
+//	@JSONField(serialize=false)
+//	private Long shopIdenty= WebUtil.getCurrentStoreId();
+//	@JSONField(serialize=false)
+//	private Long brandIdenty= WebUtil.getCurrentBrandId();
 	private Integer enabledFlag;
 	private Integer assignedGroup;
 	private Long assignedId;

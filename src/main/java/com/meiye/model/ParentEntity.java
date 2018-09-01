@@ -14,15 +14,15 @@ import java.sql.Timestamp;
 @MappedSuperclass
 public class ParentEntity{
     @Column(updatable = false)
-    private String creatorName;
+    protected String creatorName;
     @Column(updatable = false)
-    private Long creatorId;
-    private String updatorName;
-    private Long updatorId;
+    protected Long creatorId;
+    protected String updatorName;
+    protected Long updatorId;
     @Column(updatable = false)
-    private Timestamp serverCreateTime;
-    private Timestamp serverUpdateTime;
-    private Integer statusFlag=1;
+    protected Timestamp serverCreateTime;
+    protected Timestamp serverUpdateTime;
+    protected Integer statusFlag=1;
 
     public <T> T copyTo(Class<T> target){
         try {

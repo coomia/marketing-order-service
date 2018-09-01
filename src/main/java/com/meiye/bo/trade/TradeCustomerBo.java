@@ -2,6 +2,7 @@ package com.meiye.bo.trade;
 
 import java.util.Date;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import com.meiye.system.util.WebUtil;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.io.Serializable;
  * create time: 2018-08-28 22:57:15
  */ 
 @Data
-public class TradeCustomerBo extends ParentBo implements Serializable{
+public class TradeCustomerBo extends BusinessParentBo implements Serializable{
 
 	private Long id;
 	private Long tradeId;
@@ -22,8 +23,8 @@ public class TradeCustomerBo extends ParentBo implements Serializable{
 	private String customerPhone;
 	private String customerName;
 	private Integer customerSex;
-	private Long brandIdenty;
-	private Long shopIdenty;
+//	private Long brandIdenty;
+//	private Long shopIdenty;
 	private String deviceIdenty;
 	private String uuid;
 	private Date clientCreateTime;

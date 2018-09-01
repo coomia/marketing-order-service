@@ -1,5 +1,6 @@
 package com.meiye.bo.store;
 
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import lombok.Data;
 

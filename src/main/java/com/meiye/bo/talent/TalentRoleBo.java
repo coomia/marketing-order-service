@@ -1,5 +1,6 @@
 package com.meiye.bo.talent;
 
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import com.meiye.model.ParentEntity;
 import lombok.Data;
@@ -11,10 +12,10 @@ import javax.persistence.Id;
 import java.io.Serializable;
 
 @Data
-public class TalentRoleBo extends ParentBo {
+public class TalentRoleBo extends BusinessParentBo {
     private Long id; //'自增主键ID',
     private Long roleId;
     private Long planId;
-    private Long shopIdenty;//'如果归属门店，则为门店id；如果归属品牌，则为       品牌id.\r\n新的权限体系下，全部为品牌id\r\n就是登录标示!!仅登录使用',
-    private Long brandIdenty; // '品牌标识 : 品牌标识',
+//    private Long shopIdenty;//'如果归属门店，则为门店id；如果归属品牌，则为       品牌id.\r\n新的权限体系下，全部为品牌id\r\n就是登录标示!!仅登录使用',
+//    private Long brandIdenty; // '品牌标识 : 品牌标识',
 }

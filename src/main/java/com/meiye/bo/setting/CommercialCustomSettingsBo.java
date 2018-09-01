@@ -1,6 +1,7 @@
 package com.meiye.bo.setting;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import com.meiye.model.ParentEntity;
 import com.meiye.system.util.WebUtil;
@@ -17,13 +18,13 @@ import javax.persistence.Id;
  * create time: 2018-08-26 17:57:14
  */
 @Data
-public class CommercialCustomSettingsBo extends ParentBo {
+public class CommercialCustomSettingsBo extends BusinessParentBo {
 
 	private Long id;
 	@JSONField(serialize=false)
 	private Long brandDishId= WebUtil.getCurrentBrandId();
-	@JSONField(serialize=false)
-	private Long shopIdentity= WebUtil.getCurrentStoreId();
+//	@JSONField(serialize=false)
+//	private Long shopIdentity= WebUtil.getCurrentStoreId();
 	private Long type;
 	private String key;
 	private String value;

@@ -1,5 +1,6 @@
 package com.meiye.model.role;
 
+import com.meiye.model.BusinessParentEntity;
 import com.meiye.model.ParentEntity;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ import java.sql.Timestamp;
  */
 @Data
 @Entity
-public class AuthUser extends ParentEntity {
+public class AuthUser extends BusinessParentEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -53,8 +54,8 @@ public class AuthUser extends ParentEntity {
 	private String passwordNum;
 	private Integer sourceFlag;
 	private String salt;
-	private Long shopIdenty;
-	private Long brandIdenty;
+//	private Long shopIdenty;
+//	private Long brandIdenty;
 	private Integer enabledFlag;
 	private Integer assignedGroup;
 	private Long assignedId;

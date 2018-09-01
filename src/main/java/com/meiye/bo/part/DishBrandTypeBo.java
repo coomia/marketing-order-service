@@ -1,6 +1,7 @@
 package com.meiye.bo.part;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import com.meiye.system.util.WebUtil;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DishBrandTypeBo extends ParentBo {
+public class DishBrandTypeBo extends BusinessParentBo {
   private Long id;
   private Long parentId;
   private String typeCode;
@@ -30,8 +31,8 @@ public class DishBrandTypeBo extends ParentBo {
   private Long isOrder =  new Long(1);
   @JSONField(serialize=false)
   private String uuid = UUID.randomUUID().toString();
-  @JSONField(serialize=false)
-  private Long brandIdenty= WebUtil.getCurrentBrandId();
+//  @JSONField(serialize=false)
+//  private Long brandIdenty= WebUtil.getCurrentBrandId();
   private Long enabledFlag;
   @JSONField(serialize=false)
   private Long isCure = new Long(2);

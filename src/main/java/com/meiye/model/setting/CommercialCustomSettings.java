@@ -1,5 +1,6 @@
 package com.meiye.model.setting;
 
+import com.meiye.model.BusinessParentEntity;
 import com.meiye.model.ParentEntity;
 import lombok.Data;
 
@@ -15,12 +16,12 @@ import javax.persistence.Id;
  */
 @Data
 @Entity
-public class CommercialCustomSettings extends ParentEntity{
+public class CommercialCustomSettings extends BusinessParentEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long brandIdentity;
-	private Long shopIdentity;
+//	private Long brandIdentity;
+//	private Long shopIdentity;
 	private Long type;
 	private String key;
 	private String value;

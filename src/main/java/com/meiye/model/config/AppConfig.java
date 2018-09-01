@@ -5,6 +5,7 @@ import com.meiye.model.ParentEntity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by Administrator on 2018/8/5 0005.
@@ -19,6 +20,9 @@ public class AppConfig extends ParentEntity{
     private String appName;
     private String configName;
     private String configValue;
+    private Integer appendInt;
+    private String appendString;
+    private Date appendDate;
     private Integer statusFlag;
     private Long version;
 }

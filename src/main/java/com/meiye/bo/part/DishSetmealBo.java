@@ -1,5 +1,6 @@
 package com.meiye.bo.part;
 
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import com.meiye.system.util.WebUtil;
 import lombok.Data;
@@ -9,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
-public class DishSetmealBo extends ParentBo {
+public class DishSetmealBo extends BusinessParentBo {
   private Long id;
   private Long childDishId;
   private Long dishId;
@@ -21,6 +22,6 @@ public class DishSetmealBo extends ParentBo {
   private Long isReplace;
   private Long isDefault;
   private Long isMulti;
-  private Long brandIdenty= WebUtil.getCurrentBrandId();
+//  private Long brandIdenty= WebUtil.getCurrentBrandId();
   private Long sort;
 }

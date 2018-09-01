@@ -1,5 +1,6 @@
 package com.meiye.model.part;
 
+import com.meiye.model.BusinessParentEntity;
 import com.meiye.model.ParentEntity;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import javax.persistence.Id;
 
 @Data
 @Entity
-public class DishBrandType extends ParentEntity {
+public class DishBrandType extends BusinessParentEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -22,7 +23,7 @@ public class DishBrandType extends ParentEntity {
   private String dishTypeDesc;
   private Long isOrder;
   private String uuid;
-  private Long brandIdenty;
+//  private Long brandIdenty;
   private Long enabledFlag;
   private Long isCure;
 }

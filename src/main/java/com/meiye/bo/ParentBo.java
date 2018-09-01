@@ -16,27 +16,27 @@ import java.util.Date;
  */
 @Data
 public class ParentBo{
-    private String creatorName;
-    private Long creatorId;
+    protected String creatorName;
+    protected Long creatorId;
     @JSONField(serialize=false)
-    private String updatorName;
+    protected String updatorName;
     @JSONField(serialize=false)
-    private Long updatorId;
-    private Timestamp serverCreateTime;
-    private Timestamp serverUpdateTime;
-    private Integer  statusFlag=1;
+    protected Long updatorId;
+    protected Timestamp serverCreateTime=new Timestamp(System.currentTimeMillis());
+    protected Timestamp serverUpdateTime=new Timestamp(System.currentTimeMillis());
+    protected Integer  statusFlag=1;
 
     public <T extends ParentEntity> T copyTo(Class<T> target){
         try {
             T entity = target.newInstance();
             BeanUtils.copyProperties(this, entity);
             UserBo userBo= WebUtil.getCurrentUser();
-            if(entity.getCreatorId()==null)
-                entity.setCreatorId(userBo==null?null:userBo.getId());
+            if(entity.getCreatorId()==null) {
+                entity.setCreatorId(userBo == null ? null : userBo.getId());
+                entity.setCreatorName(userBo==null?null:userBo.getUsername());
+            }
             if(entity.getServerCreateTime()==null)
                 entity.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
-            entity.setCreatorName(userBo==null?null:userBo.getUsername());
-            entity.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
             entity.setUpdatorId(userBo==null?null:userBo.getId());
             entity.setUpdatorName(userBo==null?null:userBo.getUsername());
             return entity;

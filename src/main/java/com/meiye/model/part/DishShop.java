@@ -1,5 +1,6 @@
 package com.meiye.model.part;
 
+import com.meiye.model.BusinessParentEntity;
 import com.meiye.model.ParentEntity;
 import lombok.Data;
 
@@ -11,7 +12,7 @@ import java.io.Serializable;
 
 @Data
 @Entity
-public class DishShop extends ParentEntity implements Serializable {
+public class DishShop extends BusinessParentEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -55,8 +56,8 @@ public class DishShop extends ParentEntity implements Serializable {
   private java.util.Date validTime;
   private java.util.Date unvalidTime;
   private String scene;
-  private Long shopIdenty;
-  private Long brandIdenty;
+//  private Long shopIdenty;
+//  private Long brandIdenty;
   private Long enabledFlag;
   private String skuKey;
   private Long hasStandard;

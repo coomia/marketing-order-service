@@ -1,5 +1,6 @@
 package com.meiye.model.role;
 
+import com.meiye.model.BusinessParentEntity;
 import com.meiye.model.ParentEntity;
 import lombok.Data;
 
@@ -15,14 +16,14 @@ import javax.persistence.Id;
  */
 @Data
 @Entity
-public class AuthRole extends ParentEntity {
+public class AuthRole extends BusinessParentEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
 	private String code;
 	private Integer sort;
-	private Long brandIdenty;
+//	private Long brandIdenty;
 	private Integer sourceFlag;
 	private Integer enableFlag;
 	private Integer isCreateAccountByDealer;

@@ -1,6 +1,8 @@
 package com.meiye.model.trade;
 
 import java.util.Date;
+
+import com.meiye.model.BusinessParentEntity;
 import com.meiye.model.ParentEntity;
 import lombok.Data;
 
@@ -15,7 +17,7 @@ import java.io.Serializable;/**
  */ 
 @Data
 @Entity
-public class TradeTable extends ParentEntity implements Serializable{
+public class TradeTable extends BusinessParentEntity implements Serializable{
 
 	 @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)	private Long id;
@@ -23,8 +25,8 @@ public class TradeTable extends ParentEntity implements Serializable{
 	private String tradeUuid;
 	private Long tableId;
 	private String tableName;
-	private Long brandIdenty;
-	private Long shopIdenty;
+//	private Long brandIdenty;
+//	private Long shopIdenty;
 	private String deviceIdenty;
 	private String uuid;
 	private Integer tablePeopleCount;
