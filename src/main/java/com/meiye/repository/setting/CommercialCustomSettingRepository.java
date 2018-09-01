@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommercialCustomSettingRepository extends JpaRepository<CommercialCustomSettings,Long> {
 
-    CommercialCustomSettings findByBrandIdentityAndShopIdentityAndSettingKey(Long brandIdentity,Long shopIdentity,String key);
+    CommercialCustomSettings findByBrandIdentyAndShopIdentyAndSettingKey(Long brandIdenty,Long shopIdenty,String key);
 
 }

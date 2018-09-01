@@ -36,7 +36,7 @@ public class CommercialCustomerServiceImpl implements CommercialCustomerService 
     @Transactional(rollbackOn = {Exception.class})
     public void deleteCommercialCustomSettings(CommercialCustomSettingsBo commercialCustomSettingsBo) {
         //根据表的唯一约束判断配置是否存在，存在即删除
-        CommercialCustomSettings oldSettingObj = commercialCustomSettingRepository.findByBrandIdentityAndShopIdentityAndSettingKey(commercialCustomSettingsBo.getBrandIdentity(),commercialCustomSettingsBo.getShopIdentity(),commercialCustomSettingsBo.getSettingKey());
+        CommercialCustomSettings oldSettingObj = commercialCustomSettingRepository.findByBrandIdentyAndShopIdentyAndSettingKey(commercialCustomSettingsBo.getBrandIdenty(),commercialCustomSettingsBo.getShopIdenty(),commercialCustomSettingsBo.getSettingKey());
         if(Objects.nonNull(oldSettingObj)){
             commercialCustomSettingRepository.deleteById(oldSettingObj.getId());
         }
