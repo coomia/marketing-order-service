@@ -1,16 +1,16 @@
 package com.meiye.service.setting.impl;
 
-import com.meiye.bo.setting.TableAreaBo;
 import com.meiye.bo.setting.TablesBo;
 import com.meiye.exception.BusinessException;
-import com.meiye.model.setting.TableArea;
 import com.meiye.model.setting.Tables;
 import com.meiye.repository.setting.TablesRepository;
 import com.meiye.service.setting.TableService;
+import com.meiye.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +33,7 @@ public class TableServiceImpl implements TableService {
         if (Objects.isNull(areaId)) {
             throw new BusinessException("工作台区域ID不能为空!");
         }
-        List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdOrderByTableNumAsc(1, areaId);
+        List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdOrderByTableNumAsc(Constants.DATA_ENABLE, areaId);
         if (tablesList != null && tablesList.size() > 0) {
             return tablesList.size();
         }
@@ -42,7 +42,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public List<TablesBo> getAllTablesByAreaId(Long areaId) {
-        List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdOrderByTableNumAsc(1, areaId);
+        List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdOrderByTableNumAsc(Constants.DATA_ENABLE, areaId);
         List<TablesBo> tablesBos = this.copy(tablesList);
         return tablesBos;
     }
@@ -59,6 +59,7 @@ public class TableServiceImpl implements TableService {
     public TablesBo addTable(TablesBo tableBo) {
         try {
             Tables tables = tableBo.copyTo(Tables.class);
+            tables.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
             tablesRepository.save(tables);
         } catch (Exception e) {
             throw new BusinessException("保存工作台失败!");
@@ -70,7 +71,7 @@ public class TableServiceImpl implements TableService {
     @Transactional(rollbackOn = {Exception.class})
     public void deleteTable(Long id) {
         try {
-            tablesRepository.deleteTable(2, id);
+            tablesRepository.deleteTable(Constants.DATA_DISABLE, id);
         } catch (Exception e) {
             throw new BusinessException("删除工作台失败!");
         }

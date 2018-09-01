@@ -4,12 +4,11 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.user.UserBo;
 import com.meiye.model.ParentEntity;
 import com.meiye.system.util.WebUtil;
+import com.meiye.util.Constants;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 /**
  * Created by Administrator on 2018/8/9 0009.
@@ -24,7 +23,7 @@ public class ParentBo{
     private Long updatorId;
     private Timestamp serverCreateTime;
     private Timestamp serverUpdateTime;
-    private Integer  statusFlag=1;
+    private Integer  statusFlag= Constants.DATA_ENABLE;
 
     public <T extends ParentEntity> T copyTo(Class<T> target){
         try {

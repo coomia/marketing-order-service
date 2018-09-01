@@ -21,12 +21,12 @@ public class CommercialCustomSettingsBo extends ParentBo {
 
 	private Long id;
 	@JSONField(serialize=false)
-	private Long brandDishId= WebUtil.getCurrentBrandId();
+	private Long brandIdentity= WebUtil.getCurrentBrandId();
 	@JSONField(serialize=false)
 	private Long shopIdentity= WebUtil.getCurrentStoreId();
 	private Long type;
-	private String key;
-	private String value;
+	private String settingKey;
+	private String settingValue;
 
 }
 

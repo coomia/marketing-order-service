@@ -22,8 +22,8 @@ public class CommercialCustomSettings extends ParentEntity{
 	private Long brandIdentity;
 	private Long shopIdentity;
 	private Long type;
-	private String key;
-	private String value;
+	private String settingKey;
+	private String settingValue;
 
 }
 

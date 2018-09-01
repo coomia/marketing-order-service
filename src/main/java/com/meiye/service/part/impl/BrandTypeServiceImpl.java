@@ -5,11 +5,13 @@ import com.meiye.exception.BusinessException;
 import com.meiye.model.part.DishBrandType;
 import com.meiye.repository.part.DishBrandTypeRepository;
 import com.meiye.service.part.BrandTypeService;
+import com.meiye.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -29,7 +31,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     public int delete(@NotNull Long id) {
        int i =0;
         try{
-           i= dishBrandTypeRepository.deleteDishBrandType(2,id);
+           i= dishBrandTypeRepository.deleteDishBrandType(Constants.DATA_DISABLE,id);
         }catch (Exception e){
             throw new BusinessException("查找所有分类失败!");
         }
@@ -40,7 +42,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     public List<DishBrandTypeBo> getAllDishBrandTypeList() {
         List<DishBrandType> dishBrandTypes = null;
         try{
-             dishBrandTypes = dishBrandTypeRepository.findAllByStatusFlagOrderBySortDesc(1);
+             dishBrandTypes = dishBrandTypeRepository.findAllByStatusFlagOrderBySortDesc(Constants.DATA_ENABLE);
         }catch (Exception e){
             throw new BusinessException("查找所有分类失败!");
         }
@@ -53,6 +55,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     public DishBrandTypeBo saveOrUpdate(@NotNull DishBrandTypeBo dishBrandTypeBo) {
         dishBrandTypeBo = this.fillDefaultInfo(dishBrandTypeBo);
         DishBrandType dishBrandType = dishBrandTypeBo.copyTo(DishBrandType.class);
+        dishBrandType.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
         try{
             dishBrandTypeRepository.save(dishBrandType);
         }catch (Exception e){
@@ -98,7 +101,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
             dishBrandTypeBo.setSort(Long.valueOf(result));
         }
         if(Objects.isNull(dishBrandTypeBo.getStatusFlag())){
-            dishBrandTypeBo.setStatusFlag(1);
+            dishBrandTypeBo.setStatusFlag(Constants.DATA_ENABLE);
         }
         if(Objects.isNull(dishBrandTypeBo.getBrandIdenty())){
             dishBrandTypeBo.setBrandIdenty(new Long(1));

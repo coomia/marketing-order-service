@@ -39,6 +39,6 @@ jwt:
     valid-token-start-with: Bearer;
   mybatis:
     type-aliases-package: com.meiye.bo
-
-logging:
-  config: log4j.properties
+#
+#logging:
+#  config: src/main/resources/log4j2.xml
