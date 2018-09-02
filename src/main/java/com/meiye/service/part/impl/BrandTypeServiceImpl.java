@@ -57,7 +57,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
         DishBrandType dishBrandType = dishBrandTypeBo.copyTo(DishBrandType.class);
         dishBrandType.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
         try{
-            dishBrandTypeRepository.save(dishBrandType);
+            dishBrandType = dishBrandTypeRepository.save(dishBrandType);
         }catch (Exception e){
             throw new BusinessException("保存分类失败!");
         }

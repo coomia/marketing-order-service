@@ -4,7 +4,7 @@ import java.util.Date;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
-import com.meiye.model.trade.*;
+import com.meiye.model.trade.TradeTable;
 import com.meiye.system.util.WebUtil;
 import lombok.Data;
 import java.io.Serializable;
@@ -45,11 +45,12 @@ public class TradeBo extends BusinessParentBo implements Serializable{
 	private Date clientCreateTime;
 	private Date clientUpdateTime;
 	private Integer tradePeopleCount;
-	private List<TradeCustomer> tradeCustomers;
-	private List<TradeItem> tradeItems;
-	private List<TradePrivilege> tradePrivileges;
-	private List<TradeItemProperty> tradeItemProperties;
-	private List<TradeUser> tradeUsers;
-	private List<CustomerCardTime> customerCardTimes;
+	private List<TradeCustomerBo> tradeCustomers;
+	private List<TradeItemBo> tradeItems;
+	private List<TradePrivilegeBo> tradePrivileges;
+	private List<TradeItemPropertyBo> tradeItemProperties;
+	private List<TradeUserBo> tradeUsers;
+	private List<CustomerCardTimeBo> customerCardTimes;
+	private List<TradeTableBo> tradeTables;
 }
 

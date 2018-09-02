@@ -7,11 +7,11 @@ import java.io.Serializable;
 /**
  * @Author: ryner
  * @Description:
- * @Date: Created in 15:16 2018/9/2
+ * @Date: Created in 15:20 2018/9/2
  * @Modified By:
  */
 @Data
-public class ReturnInventoryItemsDto implements Serializable {
+public class InventoryItemsDto implements Serializable {
 
     private Long dishId;
     private Double quantity;

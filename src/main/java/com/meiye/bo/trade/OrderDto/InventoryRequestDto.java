@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class InventoryRequestDto implements Serializable {
 
-    List<DeductInventoryItemsDto> deductInventoryItems;
-    List<ReturnInventoryItemsDto> returnInventoryItems;
+    List<InventoryItemsDto> deductInventoryItems;
+    List<InventoryItemsDto> returnInventoryItems;
 
 }
