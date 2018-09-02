@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface MeiYePosSyncMapper {
     @Select("<script>" +
-            "select * from #{tableName} " +
+            "select * from ${tableName} " +
             " where 1=1" +
             "<if test='isInit'>" +
             " and status_flag=1 " +
@@ -40,7 +40,7 @@ public interface MeiYePosSyncMapper {
             "</if>" +
             "order by  IFNULL(server_update_time,server_create_time),id" +
             "</script>")
-    public List<HashMap<String,Object>> selectDataByTable(@Param("brandIdenty") Long brandIdenty, @Param("shopIdenty") Long shopIdenty, @Param("id") Long id, @Param("serverUpdateTime") Date serverUpdateTime,
+    public List<HashMap<String,Object>> selectDataByTable(@Param("tableName") String tableName,@Param("brandIdenty") Long brandIdenty, @Param("shopIdenty") Long shopIdenty,@Param("isInit") boolean isInit, @Param("id") Long id, @Param("serverUpdateTime") Long serverUpdateTime,
                                                           @Param("syncConfigBo") PosSyncConfigBo syncConfigBo);
 
     @Select("select * from pos_sync_config")

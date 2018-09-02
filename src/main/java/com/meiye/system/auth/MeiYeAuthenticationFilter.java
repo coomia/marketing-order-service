@@ -2,13 +2,18 @@ package com.meiye.system.auth;
 
 import com.alibaba.fastjson.JSON;
 import com.meiye.bo.system.JWTConfiguration;
+import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.user.UserBo;
+import com.meiye.exception.BusinessException;
+import com.meiye.service.store.StoreService;
+import com.meiye.service.user.UserService;
 import com.meiye.system.util.WebUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,11 +36,16 @@ import java.util.List;
  * Created by Administrator on 2018/8/12 0012.
  */
 public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
+    UserService userService;
+
+    StoreService storeService;
 
     private  JWTConfiguration jwtConfiguration;
-    public MeiYeAuthenticationFilter (JWTConfiguration jwtConfiguration){
+    public MeiYeAuthenticationFilter (JWTConfiguration jwtConfiguration,UserService userService,StoreService storeService){
         super();
         this.jwtConfiguration=jwtConfiguration;
+        this.userService=userService;
+        this.storeService=storeService;
     }
 
     @Override
@@ -54,7 +64,18 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
         }catch (AuthenticationCredentialsNotFoundException exp){
             httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
             httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"登录信息不存在"), WebUtil.getFastJsonSerializerFeature()));
+        }catch (BusinessException exp){
+            if(WebUtil.isMsApiPath(httpServletRequest)) {
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+            }else if(WebUtil.isPosApiPath(httpServletRequest)) {
+                httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+            }else if(WebUtil.isWechatApiPath(httpServletRequest)) {
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+            }else{
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+            }
         } catch (Exception exp){
+            exp.printStackTrace();
             httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"系统错误!"), WebUtil.getFastJsonSerializerFeature()));
         }
@@ -62,26 +83,45 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
 
 
     private Authentication getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(jwtConfiguration.getTokenInHeader());
-        if(token==null)
-            token=request.getParameter(jwtConfiguration.getTokenInHeader());
+        if(WebUtil.isMsApiPath(request)) {
+            String token = request.getHeader(jwtConfiguration.getTokenInHeader());
+            if (token == null)
+                token = request.getParameter(jwtConfiguration.getTokenInHeader());
 
-        if (token != null) {
+            if (token != null) {
                 Claims claims = Jwts.parser()
                         .setSigningKey(jwtConfiguration.getSecret())
                         .parseClaimsJws(token.replace(jwtConfiguration.getValidTokenStartWith(), ""))
                         .getBody();
 
-                UserBo userBo=new UserBo();
-                String userBoJson=JSON.toJSONString(((LinkedHashMap)claims.get("userBo")).get("principal"));
-                userBo=JSON.parseObject(userBoJson,UserBo.class);
+                UserBo userBo = new UserBo();
+                String userBoJson = JSON.toJSONString(((LinkedHashMap) claims.get("userBo")).get("principal"));
+                userBo = JSON.parseObject(userBoJson, UserBo.class);
 
-                List<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
+                List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
                 return userBo != null ?
                         new UsernamePasswordAuthenticationToken(userBo, null, userBo.getAuthorities()) :
                         null;
-        }else{
-            throw new AuthenticationCredentialsNotFoundException("登录信息不存在");
+            } else {
+                throw new AuthenticationCredentialsNotFoundException("登录信息不存在");
+            }
+        }else if(WebUtil.isPosApiPath(request)){
+            try {
+                UserBo userBo = new UserBo();
+                String msgId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "_global_msg_id");
+                String deviceId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-device-id");
+                Long brandId = Long.parseLong(request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-brand-id"));
+                Long shopId = Long.parseLong(request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-shop-id"));
+                userBo.setStoreBo(storeService.findStoreById(shopId));
+                userBo.setRequestMsgId(msgId);
+                userBo.setDeviceId(deviceId);
+                return new UsernamePasswordAuthenticationToken(userBo, null,null);
+            }catch (Exception exp){
+                throw new BusinessException("参数错误");
+            }
+        }else if(WebUtil.isWechatApiPath(request)){
+
         }
+        return null;
     }
 }

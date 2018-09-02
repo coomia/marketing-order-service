@@ -6,6 +6,7 @@ import com.meiye.bo.store.StoreBo;
 import com.meiye.bo.user.UserBo;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
@@ -52,5 +53,32 @@ public class WebUtil {
         httpServletResponse.setHeader("Access-Control-Allow-Methods","POST, GET, OPTIONS");
         httpServletResponse.setHeader("Access-Control-Allow-Headers","token, Content-Type");
         httpServletResponse.setHeader("Content-Type","application/json;charset=UTF-8");
+    }
+
+    //是否后台管理系统的路径
+    public static boolean isMsApiPath(HttpServletRequest request){
+        return request.getRequestURI().startsWith(request.getContextPath()+"/public/api");
+    }
+
+    //是否Pos端API
+    public static boolean isPosApiPath(HttpServletRequest request){
+        return request.getRequestURI().startsWith(request.getContextPath()+"/pos/api");
+    }
+
+    //是否微信客户端API
+    public static boolean isWechatApiPath(HttpServletRequest request){
+        return request.getRequestURI().startsWith(request.getContextPath()+"/weichat/api");
+    }
+
+    public static String getPosRequestHeaderPrefix(){
+        return "";
+    }
+
+    public static String getPosRequestMessagId(){
+        UserBo userBo=getCurrentUser();
+        if(userBo!=null)
+            return userBo.getRequestMsgId();
+        else
+            return null;
     }
 }

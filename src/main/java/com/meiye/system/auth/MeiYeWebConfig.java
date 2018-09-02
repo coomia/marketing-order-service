@@ -4,6 +4,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.meiye.bo.system.JWTConfiguration;
+import com.meiye.service.store.StoreService;
 import com.meiye.service.user.UserService;
 import com.meiye.system.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class MeiYeWebConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserService userService;
 
+    @Autowired
+    StoreService storeService;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(new MeiYeAuthenticationProvider(userService));
@@ -52,7 +56,7 @@ public class MeiYeWebConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new MeiYeLoginFilter("/login", authenticationManager(),jwtConfiguration),
                         UsernamePasswordAuthenticationFilter.class)
                 // 添加一个过滤器验证其他请求的Token是否合法
-                .addFilterBefore(new MeiYeAuthenticationFilter(jwtConfiguration),
+                .addFilterBefore(new MeiYeAuthenticationFilter(jwtConfiguration,userService,storeService),
                         UsernamePasswordAuthenticationFilter.class);
     }
 }

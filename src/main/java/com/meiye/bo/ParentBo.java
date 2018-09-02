@@ -36,8 +36,11 @@ public class ParentBo{
             }
             if(entity.getServerCreateTime()==null)
                 entity.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
-            entity.setUpdatorId(userBo==null?null:userBo.getId());
-            entity.setUpdatorName(userBo==null?null:userBo.getUsername());
+            //Pos端会传updator Id跟Name，不需要到userBo中取
+            if(entity.getUpdatorId()==null) {
+                entity.setUpdatorId(userBo == null ? null : userBo.getId());
+                entity.setUpdatorName(userBo == null ? null : userBo.getUsername());
+            }
             return entity;
         }catch (Exception exp){
             exp.printStackTrace();
