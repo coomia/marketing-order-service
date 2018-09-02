@@ -20,8 +20,9 @@ import java.io.Serializable;/**
 public class Trade extends BusinessParentEntity implements Serializable{
 
 	 @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)	private Long id;
-	private Date bizDate;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	 private Long id;
+	private Date bizDate ;
 	private Integer domainType;
 	private Integer businessType;
 	private Integer tradeType;

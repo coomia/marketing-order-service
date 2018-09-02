@@ -1,5 +1,6 @@
 package com.meiye.bo.trade;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.BusinessParentBo;

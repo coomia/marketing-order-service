@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @Author: ryner
@@ -150,6 +147,91 @@ public class OrderServiceImpl implements OrderService {
         return modifyOrderResponseDto;
     }
 
+    /**
+     * 下单订单接口 - Ryne 2018/09/02
+     * @param addOrderRequestDto
+     * @return
+     */
+    @Override
+    @Transactional(rollbackOn = {Exception.class})
+    public ModifyOrderResponseDto addOrderData(AddOrderRequestDto addOrderRequestDto) {
+        ModifyOrderResponseDto modifyOrderResponseDto = new ModifyOrderResponseDto();
+        TradeBo tradeBo = addOrderRequestDto.getContent();
+        if(Objects.isNull(tradeBo)){
+            logger.error("下单接口-订单数据为空！");
+            throw new BusinessException("下单接口-下单数据为空！");
+        }
+        List<CustomerCardTimeBo> customerCardTimes = tradeBo.getCustomerCardTimes();
+        List<TradeCustomerBo> tradeCustomers = tradeBo.getTradeCustomers();
+        List<TradeItemPropertyBo> tradeItemProperties = tradeBo.getTradeItemProperties();
+        List<TradeItemBo> tradeItems = tradeBo.getTradeItems();
+        List<TradePrivilegeBo> tradePrivileges = tradeBo.getTradePrivileges();
+        List<TradeUserBo> tradeUsers = tradeBo.getTradeUsers();
+        List<TradeTableBo> tradeTables = tradeBo.getTradeTables();
+        Trade trade = tradeBo.copyTo(Trade.class);
+        //开单接口该数据为null需要服务器创建
+        if(Objects.isNull(trade.getBizDate())){
+            trade.setBizDate(new Date());
+        }
+
+        //1.新增 交易记录主单 数据
+        logger.info("下单接口-新增交易记录主单开始");
+        logger.info("下单接口-交易记录主单："+ JSON.toJSON(trade).toString());
+        trade = tradeRepository.save(trade);
+        modifyOrderResponseDto.setTrade(trade);
+        logger.info("下单接口-新增交易记录主单结束");
+
+        //2.新增 交易明细 数据
+        logger.info("下单接口-新增交易明细开始");
+        logger.info("下单接口-交易记录主单："+ JSON.toJSON(tradeItems).toString());
+        List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
+        modifyOrderResponseDto.setTradeItems(tradeItemList);
+        logger.info("下单接口-新增交易明细结束");
+
+        //3.新增 交易的顾客信息 数据
+        logger.info("下单接口-新增交易的顾客信息开始");
+        logger.info("下单接口-交易的顾客信息："+ JSON.toJSON(tradeCustomers).toString());
+        List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
+        modifyOrderResponseDto.setTradeCustomers(tradeCustomerList);
+        logger.info("下单接口-新增交易的顾客信息结束");
+
+        //4.新增 交易桌台 数据
+        logger.info("下单接口-新增交易桌台开始");
+        logger.info("下单接口-交易桌台信息："+ JSON.toJSON(tradeTables).toString());
+        List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
+        modifyOrderResponseDto.setTables(tradeTableList);
+        logger.info("下单接口-新增交易桌台结束");
+
+        //5.新增 优惠信息 数据
+        logger.info("下单接口-新增优惠信息开始");
+        logger.info("下单接口-优惠信息："+ JSON.toJSON(tradePrivileges).toString());
+        List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
+        modifyOrderResponseDto.setTradePrivileges(tradePrivilegeList);
+        logger.info("下单接口-新增优惠信息结束");
+
+        //6.新增 交易明细特征 数据
+        logger.info("下单接口-新增交易明细特征开始");
+        logger.info("下单接口-交易明细特征："+ JSON.toJSON(tradeItemProperties).toString());
+        List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
+        modifyOrderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
+        logger.info("下单接口-新增交易明细特征结束");
+
+        //7.新增 订单用户关联表 数据
+        logger.info("下单接口-新增订单用户关联表开始");
+        logger.info("下单接口-订单用户关联表："+ JSON.toJSON(tradeUsers).toString());
+        List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
+        modifyOrderResponseDto.setTradeUsers(tradeUserList);
+        logger.info("下单接口-新增订单用户关联表结束");
+
+        //8.新增 会员次卡表 数据
+        logger.info("下单接口-新增会员次卡表开始");
+        logger.info("下单接口-新增会员次卡表："+ JSON.toJSON(customerCardTimes).toString());
+        List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
+        modifyOrderResponseDto.setCustomerCardTimes(customerCardTimeList);
+        logger.info("下单接口-新增会员次卡表结束");
+        return modifyOrderResponseDto;
+    }
+
     private void modifyInventory(List<InventoryItemsDto> deductInventoryItems, boolean isAddQty){
         for(InventoryItemsDto dto : deductInventoryItems){
             Long dishId = dto.getDishId();
@@ -169,8 +251,8 @@ public class OrderServiceImpl implements OrderService {
                 dishQty = dishQty - quantity;
             }
             dishShop.setDishQty(dishQty);
-            dishShop.setName(dishName);
-            dishShop.setMarketPrice(price);
+//            dishShop.setName(dishName);
+//            dishShop.setMarketPrice(price);
             dishShopRepository.save(dishShop);
         }
     }
@@ -245,8 +327,8 @@ public class OrderServiceImpl implements OrderService {
             //2.维护桌台信息tables
             Optional<Tables> optional = tablesRepository.findById(bo.getTableId());
             if(Objects.isNull(optional)){
-                logger.error("改单接口- 根据ID未找到可维护桌台信息,TABLE_ID:"+bo.getTableId());
-                throw new BusinessException("改单接口-根据ID未找到可维护桌台信息,TABLE_ID:"+bo.getTableId());
+                logger.error("根据ID未找到可维护桌台信息,TABLE_ID:"+bo.getTableId());
+                throw new BusinessException("根据ID未找到可维护桌台信息,TABLE_ID:"+bo.getTableId());
             }
             Tables tables = optional.get();
             if(Constants.DATA_ENABLE.equals(bo.getStatusFlag()) && Constants.SELF_TABLE_STATUS_LOCK.equals(bo.getSelfTableStatus())){

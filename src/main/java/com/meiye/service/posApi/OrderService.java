@@ -1,5 +1,6 @@
 package com.meiye.service.posApi;
 
+import com.meiye.bo.trade.OrderDto.AddOrderRequestDto;
 import com.meiye.bo.trade.OrderDto.ModifyOrderRequestDto;
 import com.meiye.bo.trade.OrderDto.ModifyOrderResponseDto;
 
@@ -14,5 +15,7 @@ public interface OrderService {
     void testLog();
 
     ModifyOrderResponseDto modifyOrderData(ModifyOrderRequestDto modifyOrderRequestDto);
+
+    ModifyOrderResponseDto addOrderData(AddOrderRequestDto addOrderRequestDto);
 
 }

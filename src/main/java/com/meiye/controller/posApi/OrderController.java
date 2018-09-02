@@ -2,6 +2,7 @@ package com.meiye.controller.posApi;
 
 import com.alibaba.fastjson.JSON;
 import com.meiye.bo.system.ResetApiResult;
+import com.meiye.bo.trade.OrderDto.AddOrderRequestDto;
 import com.meiye.bo.trade.OrderDto.ModifyOrderRequestDto;
 import com.meiye.bo.trade.OrderDto.ModifyOrderResponseDto;
 import com.meiye.exception.BusinessException;
@@ -47,5 +48,17 @@ public class OrderController {
         ModifyOrderResponseDto modifyOrderResponseDto = orderService.modifyOrderData(modifyOrderBo);
         return ResetApiResult.sucess(modifyOrderResponseDto);
     }
+
+    @PostMapping("/addOrderData")
+    public ResetApiResult addOrderData(@RequestBody AddOrderRequestDto addOrderRequestDto){
+        if(Objects.isNull(addOrderRequestDto)){
+            logger.error("下单接口-上传数据为空");
+            throw new BusinessException("下单接口-上传数据为空，请检查！");
+        }
+        logger.info("下单接口-上传json数据："+JSON.toJSON(addOrderRequestDto).toString());
+        ModifyOrderResponseDto modifyOrderResponseDto = orderService.addOrderData(addOrderRequestDto);
+        return ResetApiResult.sucess(modifyOrderResponseDto);
+    }
+
 
 }
