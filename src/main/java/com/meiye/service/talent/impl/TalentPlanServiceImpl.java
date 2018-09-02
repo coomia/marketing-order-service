@@ -3,6 +3,7 @@ package com.meiye.service.talent.impl;
 import com.meiye.bo.talent.TalentPlanBo;
 import com.meiye.bo.talent.TalentRoleBo;
 import com.meiye.bo.talent.TalentRuleBo;
+import com.meiye.model.role.AuthUser;
 import com.meiye.model.talent.TalentPlan;
 import com.meiye.model.talent.TalentRole;
 import com.meiye.model.talent.TalentRule;
@@ -11,8 +12,18 @@ import com.meiye.repository.talent.TalentRoleRepository;
 import com.meiye.repository.talent.TalentRuleRepository;
 import com.meiye.service.talent.TalentPlanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +38,7 @@ public class TalentPlanServiceImpl implements TalentPlanService{
     @Autowired
     TalentRuleRepository talentRuleRepository;
 
+    @Transactional(rollbackOn = {Exception.class})
     @Override
     public void save(TalentPlanBo talentPlanBo) {
         if(talentPlanBo ==null){
@@ -52,6 +64,7 @@ public class TalentPlanServiceImpl implements TalentPlanService{
         }
     }
 
+    @Transactional(rollbackOn = {Exception.class})
     @Override
     public void update(TalentPlanBo talentPlanBo) {
         if(talentPlanBo ==null){
@@ -78,6 +91,7 @@ public class TalentPlanServiceImpl implements TalentPlanService{
         }
     }
 
+    @Transactional(rollbackOn = {Exception.class})
     @Override
     public void delete(Long id) {
         talentPlanRepository.delete(id);
@@ -89,7 +103,7 @@ public class TalentPlanServiceImpl implements TalentPlanService{
             return null;
         }
         //得到人效计划
-        TalentPlan talentPlan = talentPlanRepository.getOne(id);
+        TalentPlan talentPlan = talentPlanRepository.findByIdAndStatusFlag(id,1);
         if(talentPlan != null){
             TalentPlanBo talentPlanBo = talentPlan.copyTo(TalentPlanBo.class);
             //得到人效角色
@@ -111,5 +125,26 @@ public class TalentPlanServiceImpl implements TalentPlanService{
             return talentPlanBo;
         }
         return null;
+    }
+
+    @Override
+    public Page<TalentPlan> getTalentPageByCriteria(Integer pageNum, Integer pageSize, TalentPlanBo talentPlanBo) {
+        Pageable pageable = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "id");
+        Page<TalentPlan> usersPage = talentPlanRepository.findAll(new Specification<TalentPlan>() {
+            @Override
+            public Predicate toPredicate(Root<TalentPlan> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> list = new ArrayList<Predicate>();
+                if (null != talentPlanBo.getPlanType()) {
+                    list.add(criteriaBuilder.equal(root.get("planPype").as(Long.class), talentPlanBo.getPlanType()));
+                }
+                if (null != talentPlanBo.getPlanState()) {
+                    list.add(criteriaBuilder.equal(root.get("planState").as(String.class), talentPlanBo.getPlanState()));
+                }
+                list.add(criteriaBuilder.equal(root.get("statusFlag").as(Long.class), 1));
+                Predicate[] p = new Predicate[list.size()];
+                return criteriaBuilder.and(list.toArray(p));
+            }
+        }, pageable);
+        return usersPage;
     }
 }
