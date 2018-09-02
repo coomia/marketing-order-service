@@ -35,6 +35,9 @@ public class UserBo extends ParentBo implements UserDetails {
     @JSONField(serialize=false)
     private boolean enabled;
     private CommercialBo storeBo=new CommercialBo();
+    //Pos去请求专用
+    private String requestMsgId="";
+    private String deviceId="";
 
     @Override
     public String toString() {

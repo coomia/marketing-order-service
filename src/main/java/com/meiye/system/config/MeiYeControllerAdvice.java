@@ -6,6 +6,7 @@ import com.meiye.bo.system.ApiResult;
 import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.exception.BusinessException;
+import com.meiye.system.util.WebUtil;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -25,23 +26,23 @@ public class MeiYeControllerAdvice extends FastJsonViewResponseBodyAdvice {
     public ApiResult errorHandler(Exception ex, HttpServletRequest request) {
         ex.printStackTrace();
         if(ex instanceof BusinessException){
-            if(request.getRequestURI().startsWith(request.getContextPath()+"/public/api")) {
+            if(WebUtil.isMsApiPath(request)) {
                 BusinessException businessException = (BusinessException) ex;
                 return new ResetApiResult(businessException.getMessage(), businessException.getMessageType(), businessException.getStatusCode(), null);
-            }else if(request.getRequestURI().startsWith(request.getContextPath()+"/pos/api")) {
+            }else if(WebUtil.isPosApiPath(request)) {
                 BusinessException businessException = (BusinessException) ex;
                 return PosApiResult.error(null,ex.getMessage());
-            }else if(request.getRequestURI().startsWith(request.getContextPath()+"/weichat/api")) {
+            }else if(WebUtil.isWechatApiPath(request)) {
                 return ResetApiResult.error(null,"未知错误.");
             }else{
                 return ResetApiResult.error(null,"未知错误.");
             }
         }else{
-            if(request.getRequestURI().startsWith(request.getContextPath()+"/public/api")) {
+            if(WebUtil.isMsApiPath(request)) {
                 return ResetApiResult.error(null,"未知错误.");
-            }else if(request.getRequestURI().startsWith(request.getContextPath()+"/pos/api")) {
+            }else if(WebUtil.isPosApiPath(request)) {
                 return PosApiResult.error(null,"系统未知错误.");
-            }else if(request.getRequestURI().startsWith(request.getContextPath()+"/weichat/api")) {
+            }else if(WebUtil.isWechatApiPath(request)) {
                 return ResetApiResult.error(null,"未知错误.");
             }else{
                 return ResetApiResult.error(null,"未知错误.");

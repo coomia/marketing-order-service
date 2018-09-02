@@ -1,5 +1,6 @@
 package com.meiye.bo.system;
 
+import com.meiye.system.util.WebUtil;
 import lombok.Data;
 
 /**
@@ -10,12 +11,14 @@ public class PosApiResult extends ApiResult {
     private Integer status=1000;
     private String message;
     private String errors;
+    private String messageId;
     private Object content;
 
     public PosApiResult(String message,String error,Integer statusCode,Object data){
         this.setContent(data==null?new Object():data);
         this.setMessage(message);
         this.setErrors(error);
+        this.setMessageId(WebUtil.getPosRequestMessagId());
         this.setStatus(statusCode==null?1000:statusCode);
     }
 
