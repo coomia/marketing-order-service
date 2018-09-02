@@ -58,7 +58,7 @@ Configuration:
         - ref: CONSOLE
         - ref: ROLLING_FILE
     Logger: # 为订单包配置特殊的Log级别，方便调试
-      - name: com.meiye.controller.posApi,com.meiye.service.posApi
+      - name: com.meiye.controller.posApi
         level: info
         additivity: true
         AppenderRef:

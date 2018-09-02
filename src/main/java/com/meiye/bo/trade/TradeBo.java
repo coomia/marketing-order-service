@@ -7,6 +7,8 @@ import com.meiye.bo.ParentBo;
 import com.meiye.system.util.WebUtil;
 import lombok.Data;
 import java.io.Serializable;
+import java.util.List;
+
 /**
  * table name:  trade
  * author name: ryne
@@ -42,5 +44,11 @@ public class TradeBo extends BusinessParentBo implements Serializable{
 	private Date clientCreateTime;
 	private Date clientUpdateTime;
 	private Integer tradePeopleCount;
+	private List<TradeCustomerBo> tradeCustomers;
+	private List<TradeItemBo> tradeItems;
+	private List<TradePrivilegeBo> tradePrivileges;
+	private List<TradeItemPropertyBo> tradeItemProperties;
+	private List<TradeUserBo> tradeUsers;
+	private List<CustomerCardTimeBo> customerCardTimes;
 }
 
