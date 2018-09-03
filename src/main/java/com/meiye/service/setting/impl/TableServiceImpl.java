@@ -44,6 +44,7 @@ public class TableServiceImpl implements TableService {
     public List<TablesBo> getAllTablesByAreaId(Long areaId) {
         List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdOrderByTableNumAsc(Constants.DATA_ENABLE, areaId);
         List<TablesBo> tablesBos = this.copy(tablesList);
+        tablesBos= tablesBos == null ? new ArrayList<>() : tablesBos;
         return tablesBos;
     }
 

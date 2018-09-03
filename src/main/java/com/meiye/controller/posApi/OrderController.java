@@ -3,9 +3,8 @@ package com.meiye.controller.posApi;
 import com.alibaba.fastjson.JSON;
 import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
-import com.meiye.bo.trade.OrderDto.AddOrderRequestDto;
-import com.meiye.bo.trade.OrderDto.ModifyOrderRequestDto;
-import com.meiye.bo.trade.OrderDto.ModifyOrderResponseDto;
+import com.meiye.bo.trade.OrderDto.OrderRequestDto;
+import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.exception.BusinessException;
 import com.meiye.service.posApi.OrderService;
 import org.slf4j.Logger;
@@ -40,26 +39,27 @@ public class OrderController {
     }
 
     @PostMapping("/modifyOrderData")
-    public PosApiResult modifyOrderData(@RequestBody ModifyOrderRequestDto modifyOrderBo){
+    public PosApiResult modifyOrderData(@RequestBody OrderRequestDto modifyOrderBo){
         if(Objects.isNull(modifyOrderBo)){
             logger.error("改单接口-上传数据为空");
             throw new BusinessException("改单接口-上传数据为空，请检查！");
         }
         logger.info("改单接口-上传json数据："+JSON.toJSON(modifyOrderBo).toString());
-        ModifyOrderResponseDto modifyOrderResponseDto = orderService.modifyOrderData(modifyOrderBo);
-        return PosApiResult.sucess(modifyOrderResponseDto);
+        orderService.modifyOrderData(modifyOrderBo);
+        OrderResponseDto orderResponseDto =orderService.getOrderResponse(modifyOrderBo.getContent().getTradeRequest().getId());
+        return PosApiResult.sucess(orderResponseDto);
     }
 
     @PostMapping("/addOrderData")
-    public PosApiResult addOrderData(@RequestBody AddOrderRequestDto addOrderRequestDto){
+    public PosApiResult addOrderData(@RequestBody OrderRequestDto addOrderRequestDto){
         if(Objects.isNull(addOrderRequestDto)){
             logger.error("下单接口-上传数据为空");
             throw new BusinessException("下单接口-上传数据为空，请检查！");
         }
         logger.info("下单接口-上传json数据："+JSON.toJSON(addOrderRequestDto).toString());
-        ModifyOrderResponseDto modifyOrderResponseDto = orderService.addOrderData(addOrderRequestDto);
-        return PosApiResult.sucess(modifyOrderResponseDto);
+        OrderResponseDto orderResponseDto = orderService.addOrderData(addOrderRequestDto);
+        OrderResponseDto orderResponseDtoNew = orderService.getOrderResponse(orderResponseDto.getTrade().getId());
+        return PosApiResult.sucess(orderResponseDtoNew);
     }
-
 
 }

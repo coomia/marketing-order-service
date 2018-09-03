@@ -8,6 +8,8 @@ import com.meiye.service.setting.TableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @Author: ryner
  * @Description:
@@ -23,7 +25,8 @@ public class TablesController {
 
     @GetMapping("/loadTablesByAreaId/{areaId}")
     public ResetApiResult loadTablesByAreaId(@PathVariable Long areaId){
-        return ResetApiResult.sucess(tableService.getAllTablesByAreaId(areaId));
+        List<TablesBo> allTablesByAreaId = tableService.getAllTablesByAreaId(areaId);
+        return ResetApiResult.sucess(allTablesByAreaId);
     }
 
     @PostMapping("/saveTable")

@@ -1,6 +1,7 @@
 package com.meiye.bo.trade.OrderDto;
 
 import com.meiye.bo.trade.*;
+import com.meiye.model.setting.Tables;
 import com.meiye.model.trade.*;
 import lombok.Data;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * @Modified By:
  */
 @Data
-public class ModifyOrderResponseDto implements Serializable {
+public class OrderResponseDto implements Serializable {
 
     private Trade trade;
     private List<TradeCustomer> tradeCustomers;
@@ -23,6 +24,7 @@ public class ModifyOrderResponseDto implements Serializable {
     private List<TradeItemProperty> tradeItemProperties;
     private List<TradeUser> tradeUsers;
     private List<CustomerCardTime> customerCardTimes;
-    private List<TradeTable> tables;
+    private List<TradeTable> tradeTables;
+    private List<Tables> tables;
 
 }

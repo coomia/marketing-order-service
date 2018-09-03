@@ -1,6 +1,7 @@
 package com.meiye.repository.setting;
 
 import com.meiye.model.setting.Tables;
+import com.meiye.model.trade.CustomerCardTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +25,8 @@ public interface TablesRepository extends JpaRepository<Tables,Long> {
      * @return
      */
     List<Tables> findAllByStatusFlagAndAreaIdOrderByTableNumAsc(Integer statusFlag,Long areaId);
+
+    List<Tables> findAllByStatusFlag(Integer statusFlag);
 
     @Modifying
     @Query("update Tables ta set ta.tableName=?1 where ta.id=?2")
