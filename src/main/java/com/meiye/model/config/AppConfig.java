@@ -15,7 +15,7 @@ import java.util.Date;
 @Table(name = "app_config")
 public class AppConfig extends ParentEntity{
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String appName;
     private String configName;
@@ -23,6 +23,6 @@ public class AppConfig extends ParentEntity{
     private Integer appendInt;
     private String appendString;
     private Date appendDate;
-    private Integer statusFlag;
     private Long version;
+
 }

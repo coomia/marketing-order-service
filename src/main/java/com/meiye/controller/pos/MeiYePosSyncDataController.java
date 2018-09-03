@@ -50,9 +50,20 @@ public class MeiYePosSyncDataController {
                     }
                 }
             }
+            boolean completeSearch=true;
             for(Future<Map<String, Object>> tableData:allTablsData){
-                tableDatas.putAll(tableData.get());
+                Map<String,Object> result=tableData.get();
+                if(result.containsKey("completeSearch")) {
+                    if (!new Boolean(result.get("completeSearch").toString()))
+                        completeSearch = false;
+                    result.remove("completeSearch");
+                }
+                tableDatas.putAll(result);
             }
+            if(completeSearch)
+                tableDatas.put("lastSyncStatus",0);
+            else
+                tableDatas.put("lastSyncStatus",1);
         }
         return PosApiResult.sucess(tableDatas);
     }

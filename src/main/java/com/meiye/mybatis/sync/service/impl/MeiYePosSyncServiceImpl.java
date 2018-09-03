@@ -71,6 +71,7 @@ public class MeiYePosSyncServiceImpl implements MeiYePosSyncService {
 
         Map<String,Object> dataInTable=new HashMap<String,Object>();
         dataInTable.put(tableName,resultData);
+        dataInTable.put("completeSearch",completeSearch);
         Future< Map<String,Object>> syncFuture=new AsyncResult<Map<String,Object>>(dataInTable);
         return syncFuture;
     }

@@ -61,14 +61,14 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 修改订单接口 - Ryne 2018/09/02
-     * @param modifyOrderRequestDto
+     * @param orderRequestDto
      * @return
      */
     @Override
     @Transactional(rollbackOn = {Exception.class})
-    public ModifyOrderResponseDto modifyOrderData(ModifyOrderRequestDto modifyOrderRequestDto) {
-        ModifyOrderResponseDto modifyOrderResponseDto = new ModifyOrderResponseDto();
-        TradeRequestDto tradeRequestDto = modifyOrderRequestDto.getContent();
+    public OrderResponseDto modifyOrderData(OrderRequestDto orderRequestDto) {
+        OrderResponseDto orderResponseDto = new OrderResponseDto();
+        TradeRequestDto tradeRequestDto = orderRequestDto.getContent();
         TradeBo tradeBo = tradeRequestDto.getTradeRequest();
         InventoryRequestDto inventoryRequest = tradeRequestDto.getInventoryRequest();
         if(Objects.isNull(tradeBo) || Objects.isNull(inventoryRequest)){
@@ -88,56 +88,56 @@ public class OrderServiceImpl implements OrderService {
         logger.info("改单接口-修改交易记录主单开始");
         logger.info("改单接口-交易记录主单："+ JSON.toJSON(trade).toString());
         trade = tradeRepository.save(trade);
-        modifyOrderResponseDto.setTrade(trade);
+        orderResponseDto.setTrade(trade);
         logger.info("改单接口-修改交易记录主单结束");
 
         //2.修改 交易明细 数据
         logger.info("改单接口-修改交易明细开始");
         logger.info("改单接口-交易记录主单："+ JSON.toJSON(tradeItems).toString());
         List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
-        modifyOrderResponseDto.setTradeItems(tradeItemList);
+        orderResponseDto.setTradeItems(tradeItemList);
         logger.info("改单接口-修改交易明细结束");
 
         //3.修改 交易的顾客信息 数据
         logger.info("改单接口-修改交易的顾客信息开始");
         logger.info("改单接口-交易的顾客信息："+ JSON.toJSON(tradeCustomers).toString());
         List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
-        modifyOrderResponseDto.setTradeCustomers(tradeCustomerList);
+        orderResponseDto.setTradeCustomers(tradeCustomerList);
         logger.info("改单接口-修改交易的顾客信息结束");
 
         //4.修改 交易桌台 数据
         logger.info("改单接口-修改交易桌台开始");
         logger.info("改单接口-交易桌台信息："+ JSON.toJSON(tradeTables).toString());
         List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
-        modifyOrderResponseDto.setTables(tradeTableList);
+        orderResponseDto.setTradeTables(tradeTableList);
         logger.info("改单接口-修改交易桌台结束");
 
         //5.修改 优惠信息 数据
         logger.info("改单接口-修改优惠信息开始");
         logger.info("改单接口-优惠信息："+ JSON.toJSON(tradePrivileges).toString());
         List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
-        modifyOrderResponseDto.setTradePrivileges(tradePrivilegeList);
+        orderResponseDto.setTradePrivileges(tradePrivilegeList);
         logger.info("改单接口-修改优惠信息结束");
 
         //6.修改 交易明细特征 数据
         logger.info("改单接口-修改交易明细特征开始");
         logger.info("改单接口-交易明细特征："+ JSON.toJSON(tradeItemProperties).toString());
         List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
-        modifyOrderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
+        orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
         logger.info("改单接口-修改交易明细特征结束");
 
         //7.修改 订单用户关联表 数据
         logger.info("改单接口-修改订单用户关联表开始");
         logger.info("改单接口-订单用户关联表："+ JSON.toJSON(tradeUsers).toString());
         List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
-        modifyOrderResponseDto.setTradeUsers(tradeUserList);
+        orderResponseDto.setTradeUsers(tradeUserList);
         logger.info("改单接口-修改订单用户关联表结束");
 
         //8.修改 会员次卡表 数据
         logger.info("改单接口-修改会员次卡表开始");
         logger.info("改单接口-修改会员次卡表："+ JSON.toJSON(customerCardTimes).toString());
         List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
-        modifyOrderResponseDto.setCustomerCardTimes(customerCardTimeList);
+        orderResponseDto.setCustomerCardTimes(customerCardTimeList);
         logger.info("改单接口-修改会员次卡表结束");
 
         //9.修改 商品 库存信息
@@ -145,7 +145,7 @@ public class OrderServiceImpl implements OrderService {
         this.modifyInventory(deductInventoryItems,false);
         List<InventoryItemsDto> returnInventoryItems = inventoryRequest.getReturnInventoryItems();
        this.modifyInventory(returnInventoryItems,true);
-        return modifyOrderResponseDto;
+        return orderResponseDto;
     }
 
     /**
@@ -155,13 +155,16 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     @Transactional(rollbackOn = {Exception.class})
-    public ModifyOrderResponseDto addOrderData(AddOrderRequestDto addOrderRequestDto) {
-        ModifyOrderResponseDto modifyOrderResponseDto = new ModifyOrderResponseDto();
-        TradeBo tradeBo = addOrderRequestDto.getContent();
-        if(Objects.isNull(tradeBo)){
-            logger.error("下单接口-订单数据为空！");
-            throw new BusinessException("下单接口-下单数据为空！");
+    public OrderResponseDto addOrderData(OrderRequestDto addOrderRequestDto) {
+        OrderResponseDto orderResponseDto = new OrderResponseDto();
+        TradeRequestDto tradeRequestDto = addOrderRequestDto.getContent();
+        TradeBo tradeBo = tradeRequestDto.getTradeRequest();
+        InventoryRequestDto inventoryRequest = tradeRequestDto.getInventoryRequest();
+        if(Objects.isNull(tradeBo) || Objects.isNull(inventoryRequest)){
+            logger.error("改单接口-订单数据或库存数据为空！");
+            throw new BusinessException("改单接口-订单数据或库存数据为空！");
         }
+
         List<CustomerCardTimeBo> customerCardTimes = tradeBo.getCustomerCardTimes();
         List<TradeCustomerBo> tradeCustomers = tradeBo.getTradeCustomers();
         List<TradeItemPropertyBo> tradeItemProperties = tradeBo.getTradeItemProperties();
@@ -179,58 +182,101 @@ public class OrderServiceImpl implements OrderService {
         logger.info("下单接口-新增交易记录主单开始");
         logger.info("下单接口-交易记录主单："+ JSON.toJSON(trade).toString());
         trade = tradeRepository.save(trade);
-        modifyOrderResponseDto.setTrade(trade);
+        orderResponseDto.setTrade(trade);
         logger.info("下单接口-新增交易记录主单结束");
 
+        //关联trade_ID给其他订单相关表
+        Long tradeId = trade.getId();
+        customerCardTimes.stream().forEach(bo -> bo.setTradeId(tradeId));
+        tradeCustomers.stream().forEach(bo -> bo.setTradeId(tradeId));
+        tradeItemProperties.stream().forEach(bo ->bo.setTradeId(tradeId));
+        tradeItems.stream().forEach(bo -> bo.setTradeId(tradeId));
+        tradePrivileges.stream().forEach(bo -> bo.setTradeId(tradeId));
+        tradeUsers.stream().forEach(bo ->bo.setTradeId(tradeId));
+        tradeTables.stream().forEach(bo ->bo.setTradeId(tradeId));
         //2.新增 交易明细 数据
         logger.info("下单接口-新增交易明细开始");
         logger.info("下单接口-交易记录主单："+ JSON.toJSON(tradeItems).toString());
         List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
-        modifyOrderResponseDto.setTradeItems(tradeItemList);
+        orderResponseDto.setTradeItems(tradeItemList);
         logger.info("下单接口-新增交易明细结束");
 
         //3.新增 交易的顾客信息 数据
         logger.info("下单接口-新增交易的顾客信息开始");
         logger.info("下单接口-交易的顾客信息："+ JSON.toJSON(tradeCustomers).toString());
         List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
-        modifyOrderResponseDto.setTradeCustomers(tradeCustomerList);
+        orderResponseDto.setTradeCustomers(tradeCustomerList);
         logger.info("下单接口-新增交易的顾客信息结束");
 
         //4.新增 交易桌台 数据
         logger.info("下单接口-新增交易桌台开始");
         logger.info("下单接口-交易桌台信息："+ JSON.toJSON(tradeTables).toString());
         List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
-        modifyOrderResponseDto.setTables(tradeTableList);
+        orderResponseDto.setTradeTables(tradeTableList);
         logger.info("下单接口-新增交易桌台结束");
 
         //5.新增 优惠信息 数据
         logger.info("下单接口-新增优惠信息开始");
         logger.info("下单接口-优惠信息："+ JSON.toJSON(tradePrivileges).toString());
         List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
-        modifyOrderResponseDto.setTradePrivileges(tradePrivilegeList);
+        orderResponseDto.setTradePrivileges(tradePrivilegeList);
         logger.info("下单接口-新增优惠信息结束");
 
         //6.新增 交易明细特征 数据
         logger.info("下单接口-新增交易明细特征开始");
         logger.info("下单接口-交易明细特征："+ JSON.toJSON(tradeItemProperties).toString());
         List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
-        modifyOrderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
+        orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
         logger.info("下单接口-新增交易明细特征结束");
 
         //7.新增 订单用户关联表 数据
         logger.info("下单接口-新增订单用户关联表开始");
         logger.info("下单接口-订单用户关联表："+ JSON.toJSON(tradeUsers).toString());
         List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
-        modifyOrderResponseDto.setTradeUsers(tradeUserList);
+        orderResponseDto.setTradeUsers(tradeUserList);
         logger.info("下单接口-新增订单用户关联表结束");
 
         //8.新增 会员次卡表 数据
         logger.info("下单接口-新增会员次卡表开始");
         logger.info("下单接口-新增会员次卡表："+ JSON.toJSON(customerCardTimes).toString());
         List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
-        modifyOrderResponseDto.setCustomerCardTimes(customerCardTimeList);
+        orderResponseDto.setCustomerCardTimes(customerCardTimeList);
         logger.info("下单接口-新增会员次卡表结束");
-        return modifyOrderResponseDto;
+        //9.修改 商品 库存信息
+        List<InventoryItemsDto> deductInventoryItems = inventoryRequest.getDeductInventoryItems();
+        this.modifyInventory(deductInventoryItems,false);
+        List<InventoryItemsDto> returnInventoryItems = inventoryRequest.getReturnInventoryItems();
+        this.modifyInventory(returnInventoryItems,true);
+        return orderResponseDto;
+    }
+
+    @Override
+    public OrderResponseDto getOrderResponse(Long tradeId) {
+        OrderResponseDto orderResponseDto = new OrderResponseDto();
+        Optional<Trade> optional = tradeRepository.findById(tradeId);
+        if(Objects.isNull(optional)){
+            logger.error("根据ID未找到交易记录主单,ID: :"+tradeId);
+            throw new BusinessException("根据ID未找到交易记录主单 ,ID:"+tradeId);
+        }
+        Trade trade = optional.get();
+        List<TradeItem> tradeItemList = tradeItemRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
+        List<TradeCustomer> tradeCustomerList =  tradeCustomerRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
+        List<TradeTable> tradeTableList = tradeTableRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
+        List<TradePrivilege> tradePrivilegeList = tradePrivilegeRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
+        List<TradeItemProperty> tradeItemPropertiesList = tradeItemPropertyRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
+        List<TradeUser> tradeUserList =tradeUserRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
+        List<CustomerCardTime> customerCardTimeList = customerCardTimeRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
+        List<Tables> tablesList = tablesRepository.findAllByStatusFlag(Constants.DATA_ENABLE);
+        orderResponseDto.setTables(tablesList);
+        orderResponseDto.setCustomerCardTimes(customerCardTimeList);
+        orderResponseDto.setTrade(trade);
+        orderResponseDto.setTradeCustomers(tradeCustomerList);
+        orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
+        orderResponseDto.setTradeItems(tradeItemList);
+        orderResponseDto.setTradePrivileges(tradePrivilegeList);
+        orderResponseDto.setTradeUsers(tradeUserList);
+        orderResponseDto.setTradeTables(tradeTableList);
+        return orderResponseDto;
     }
 
     @Override
@@ -356,6 +402,7 @@ public class OrderServiceImpl implements OrderService {
         }
         return tradeTableList;
     }
+
 
 
 

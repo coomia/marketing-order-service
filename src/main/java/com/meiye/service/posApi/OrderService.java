@@ -1,5 +1,7 @@
 package com.meiye.service.posApi;
 
+import com.meiye.bo.trade.OrderDto.OrderRequestDto;
+import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
 import com.meiye.bo.trade.OrderDto.AddOrderRequestDto;
 import com.meiye.bo.trade.OrderDto.ModifyOrderRequestDto;

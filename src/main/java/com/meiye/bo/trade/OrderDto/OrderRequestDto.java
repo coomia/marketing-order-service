@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @Modified By:
  */
 @Data
-public class ModifyOrderRequestDto implements Serializable {
+public class OrderRequestDto implements Serializable {
 
     private Long brandID;
     private Long shopID;
