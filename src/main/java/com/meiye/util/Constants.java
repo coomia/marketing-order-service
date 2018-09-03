@@ -18,4 +18,7 @@ public class Constants {
     public static Integer DATA_ENABLE = 1;
     public static Integer DATA_DISABLE = 2;
 
+    public static Integer SELF_TABLE_STATUS_UNLOCK = 1;
+    public static Integer SELF_TABLE_STATUS_LOCK = 2;
+
 }

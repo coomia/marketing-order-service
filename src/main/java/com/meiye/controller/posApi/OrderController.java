@@ -1,13 +1,19 @@
 package com.meiye.controller.posApi;
 
+import com.alibaba.fastjson.JSON;
+import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
+import com.meiye.bo.trade.OrderDto.AddOrderRequestDto;
+import com.meiye.bo.trade.OrderDto.ModifyOrderRequestDto;
+import com.meiye.bo.trade.OrderDto.ModifyOrderResponseDto;
+import com.meiye.exception.BusinessException;
 import com.meiye.service.posApi.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 
 /**
@@ -33,6 +39,27 @@ public class OrderController {
         return ResetApiResult.sucess("");
     }
 
+    @PostMapping("/modifyOrderData")
+    public PosApiResult modifyOrderData(@RequestBody ModifyOrderRequestDto modifyOrderBo){
+        if(Objects.isNull(modifyOrderBo)){
+            logger.error("改单接口-上传数据为空");
+            throw new BusinessException("改单接口-上传数据为空，请检查！");
+        }
+        logger.info("改单接口-上传json数据："+JSON.toJSON(modifyOrderBo).toString());
+        ModifyOrderResponseDto modifyOrderResponseDto = orderService.modifyOrderData(modifyOrderBo);
+        return PosApiResult.sucess(modifyOrderResponseDto);
+    }
+
+    @PostMapping("/addOrderData")
+    public PosApiResult addOrderData(@RequestBody AddOrderRequestDto addOrderRequestDto){
+        if(Objects.isNull(addOrderRequestDto)){
+            logger.error("下单接口-上传数据为空");
+            throw new BusinessException("下单接口-上传数据为空，请检查！");
+        }
+        logger.info("下单接口-上传json数据："+JSON.toJSON(addOrderRequestDto).toString());
+        ModifyOrderResponseDto modifyOrderResponseDto = orderService.addOrderData(addOrderRequestDto);
+        return PosApiResult.sucess(modifyOrderResponseDto);
+    }
 
 
 }
