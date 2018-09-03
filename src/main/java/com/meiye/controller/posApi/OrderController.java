@@ -2,6 +2,7 @@ package com.meiye.controller.posApi;
 
 import com.alibaba.fastjson.JSON;
 import com.meiye.bo.system.ResetApiResult;
+import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
 import com.meiye.bo.trade.OrderDto.AddOrderRequestDto;
 import com.meiye.bo.trade.OrderDto.ModifyOrderRequestDto;
 import com.meiye.bo.trade.OrderDto.ModifyOrderResponseDto;
@@ -60,5 +61,9 @@ public class OrderController {
         return ResetApiResult.sucess(modifyOrderResponseDto);
     }
 
+    @PostMapping("/deleteOrderData")
+    public ResetApiResult deleteOrderData(@RequestBody CancelTradeBo cancelTradeBo){
 
+        return null;
+    }
 }

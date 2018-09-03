@@ -2,6 +2,7 @@ package com.meiye.service.posApi.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.meiye.bo.trade.*;
+import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
 import com.meiye.bo.trade.OrderDto.*;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.part.DishShop;
@@ -230,6 +231,21 @@ public class OrderServiceImpl implements OrderService {
         modifyOrderResponseDto.setCustomerCardTimes(customerCardTimeList);
         logger.info("下单接口-新增会员次卡表结束");
         return modifyOrderResponseDto;
+    }
+
+    @Override
+    public ModifyOrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo) {
+        if(cancelTradeBo != null && cancelTradeBo.getContent() != null &&
+                cancelTradeBo.getContent().getObsoleteRequest() != null &&
+                cancelTradeBo.getContent().getObsoleteRequest().getTradeId() != null){
+            tradeRepository.deleteTradeById( cancelTradeBo.getContent().getObsoleteRequest().getTradeId());
+            //下面根据trade id拿到 订单数据 然后返回。
+
+        }else {
+            throw new BusinessException("作废订单接口- tradeId数据校验不通过");
+        }
+
+        return null;
     }
 
     private void modifyInventory(List<InventoryItemsDto> deductInventoryItems, boolean isAddQty){

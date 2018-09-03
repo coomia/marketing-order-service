@@ -4,6 +4,7 @@ import  com.meiye.model.trade.Trade;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 /**
  * table name:  trade
@@ -13,5 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TradeRepository extends JpaRepository<Trade,Long>{
 
+    @Modifying
+    @Query(value = "update Trade t set t.tradeStatus = 6 where arp.id = id")
+    void deleteTradeById(@Param(value = "id")Long id);
 }
 
