@@ -280,7 +280,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ModifyOrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo) {
+    public OrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo) {
         if(cancelTradeBo != null && cancelTradeBo.getContent() != null &&
                 cancelTradeBo.getContent().getObsoleteRequest() != null &&
                 cancelTradeBo.getContent().getObsoleteRequest().getTradeId() != null){

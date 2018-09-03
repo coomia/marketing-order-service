@@ -4,9 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
-import com.meiye.bo.trade.OrderDto.AddOrderRequestDto;
-import com.meiye.bo.trade.OrderDto.ModifyOrderRequestDto;
-import com.meiye.bo.trade.OrderDto.ModifyOrderResponseDto;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.exception.BusinessException;
@@ -66,9 +63,17 @@ public class OrderController {
         return PosApiResult.sucess(orderResponseDtoNew);
     }
 
+    //作废订单
     @PostMapping("/deleteOrderData")
-    public ResetApiResult deleteOrderData(@RequestBody CancelTradeBo cancelTradeBo){
+    public PosApiResult deleteOrderData(@RequestBody CancelTradeBo cancelTradeBo){
+        OrderResponseDto orderResponseDto = orderService.deleteTrade(cancelTradeBo);
+        return PosApiResult.sucess(orderResponseDto);
+    }
 
-        return null;
+    //退换货订单
+    @PostMapping("/returnOrderData")
+    public PosApiResult returnOrderData(@RequestBody CancelTradeBo cancelTradeBo){
+        OrderResponseDto orderResponseDto = orderService.deleteTrade(cancelTradeBo);
+        return PosApiResult.sucess(orderResponseDto);
     }
 }

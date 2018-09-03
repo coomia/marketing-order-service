@@ -1,11 +1,8 @@
 package com.meiye.service.posApi;
 
+import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
-import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
-import com.meiye.bo.trade.OrderDto.AddOrderRequestDto;
-import com.meiye.bo.trade.OrderDto.ModifyOrderRequestDto;
-import com.meiye.bo.trade.OrderDto.ModifyOrderResponseDto;
 
 /**
  * @Author: ryner
@@ -17,11 +14,12 @@ public interface OrderService {
 
     void testLog();
 
-    ModifyOrderResponseDto modifyOrderData(ModifyOrderRequestDto modifyOrderRequestDto);
+    OrderResponseDto modifyOrderData(OrderRequestDto orderRequestDto);
 
-    ModifyOrderResponseDto addOrderData(AddOrderRequestDto addOrderRequestDto);
+    OrderResponseDto addOrderData(OrderRequestDto addOrderRequestDto);
 
-    ModifyOrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo);
+    OrderResponseDto getOrderResponse(Long tradeId);
 
+    OrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo);
 
 }
