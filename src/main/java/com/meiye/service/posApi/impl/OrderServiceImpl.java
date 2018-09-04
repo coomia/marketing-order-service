@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -83,6 +84,27 @@ public class OrderServiceImpl implements OrderService {
         List<TradeUserBo> tradeUsers = tradeBo.getTradeUsers();
         List<TradeTableBo> tradeTables = tradeBo.getTradeTables();
         Trade trade = tradeBo.copyTo(Trade.class);
+
+        //校验版本号
+        Long tradeId = trade.getId();
+        if(Objects.isNull(tradeId)){
+            logger.error("改单接口-交易记录主单tradeId is null！");
+            throw new BusinessException("改单接口-交易记录主单tradeId is null！");
+        }
+        Optional<Trade> tradeOptional = tradeRepository.findById(tradeId);
+        if(Objects.isNull(tradeOptional)){
+            logger.error("改单接口-未找到交易记录主单！tradeId:"+tradeId);
+            throw new BusinessException("改单接口-未找到交易记录主单！tradeId:"+tradeId);
+        }
+        Trade trade1 = tradeOptional.get();
+        Timestamp clientUpdateTime = trade.getServerUpdateTime();
+        Timestamp serverUpdateTime = trade1.getServerUpdateTime();
+        if(clientUpdateTime.equals(serverUpdateTime)){
+            trade.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
+        }else{
+            logger.error("改单接口-版本校验失败！");
+            throw new BusinessException("改单接口-版本校验失败！");
+        }
 
         //1.修改 交易记录主单 数据
         logger.info("改单接口-修改交易记录主单开始");
@@ -177,7 +199,7 @@ public class OrderServiceImpl implements OrderService {
         if(Objects.isNull(trade.getBizDate())){
             trade.setBizDate(new Date());
         }
-
+        trade.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
         //1.新增 交易记录主单 数据
         logger.info("下单接口-新增交易记录主单开始");
         logger.info("下单接口-交易记录主单："+ JSON.toJSON(trade).toString());
