@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 public interface TradeRepository extends JpaRepository<Trade,Long>{
 
     @Modifying
-    @Query(value = "update Trade t set t.tradeStatus = 6 where arp.id = id")
+    @Query(value = "update Trade t set t.tradeStatus = 6 where t.id = id")
     void deleteTradeById(@Param(value = "id")Long id);
 }
 
