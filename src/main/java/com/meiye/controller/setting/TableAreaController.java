@@ -32,8 +32,7 @@ public class TableAreaController {
 
     @PostMapping("/saveTableArea")
     public ResetApiResult saveTableArea(@RequestBody TableAreaBo tableAreaBo){
-        tableAreaService.addTableArea(tableAreaBo);
-        return ResetApiResult.sucess("");
+        return ResetApiResult.sucess(tableAreaService.addTableArea(tableAreaBo));
     }
 
     @GetMapping("/deleteTableArea/{id}")

@@ -31,8 +31,7 @@ public class TablesController {
 
     @PostMapping("/saveTable")
     public ResetApiResult saveTable(@RequestBody TablesBo tablesBo){
-        tableService.addTable(tablesBo);
-        return ResetApiResult.sucess("");
+        return ResetApiResult.sucess( tableService.addTable(tablesBo));
     }
 
     @GetMapping("/deleteTable/{id}")
