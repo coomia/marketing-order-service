@@ -108,7 +108,7 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
         }else if(WebUtil.isPosApiPath(request)){
             try {
                 UserBo userBo = new UserBo();
-                String msgId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "_global_msg_id");
+                String msgId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-msgid");
                 String deviceId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-device-id");
                 Long brandId = Long.parseLong(request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-brand-id"));
                 Long shopId = Long.parseLong(request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-shop-id"));

@@ -2,7 +2,6 @@ package com.meiye.mybatis.sync.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.meiye.bo.config.AppConfigBo;
 import com.meiye.bo.config.PosSyncConfigBo;
 import com.meiye.exception.BusinessException;
 import com.meiye.mybatis.sync.dao.MeiYePosSyncMapper;
@@ -12,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.Future;
@@ -62,7 +62,10 @@ public class MeiYePosSyncServiceImpl implements MeiYePosSyncService {
                 completeSearch=true;
             HashMap<String,Object> lastObj=result.get(result.size()-1);
             lastId=lastObj.get("id");
-            lastUpdateDate=(lastObj.get("serverUpdateTime")!=null?(Date) lastObj.get("serverUpdateTime"):(Date) lastObj.get("serverCreateTime")).getTime();
+            if(StringUtils.isEmpty(lastObj.get("serverUpdateTime"))&&StringUtils.isEmpty(lastObj.get("serverCreateTime")))
+                lastUpdateDate=0l;
+            else
+                lastUpdateDate=(!StringUtils.isEmpty(lastObj.get("serverUpdateTime"))?(Date) lastObj.get("serverUpdateTime"):(Date) lastObj.get("serverCreateTime")).getTime();
 
         }
         resultData.put("lastId",lastId);
@@ -75,6 +78,12 @@ public class MeiYePosSyncServiceImpl implements MeiYePosSyncService {
         Future< Map<String,Object>> syncFuture=new AsyncResult<Map<String,Object>>(dataInTable);
         return syncFuture;
     }
+
+    @Override
+    public HashMap<String,Object> getShopInfoByDeviceMac(String deviceMac){
+        return meiYePosSyncMapper.getShopInfoByDeviceMac(deviceMac);
+    }
+
 
 
 

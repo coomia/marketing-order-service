@@ -6,10 +6,7 @@ import com.meiye.mybatis.sync.service.MeiYePosSyncService;
 import com.meiye.system.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskRejectedException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,5 +64,16 @@ public class MeiYePosSyncDataController {
         }
         return PosApiResult.sucess(tableDatas);
     }
+
+    @GetMapping("/shop/info/{deviceMac}")
+    public PosApiResult getShopInfoByDeviceMac(@PathVariable String deviceMac){
+        HashMap<String,Object> shopInfo=meiYePosSyncService.getShopInfoByDeviceMac(deviceMac);
+        if(shopInfo!=null&&!shopInfo.isEmpty())
+            return PosApiResult.sucess(shopInfo);
+        else
+            return PosApiResult.error(null,1001,"设备配置错误,没找到门店/品牌信息!");
+
+    }
+
 
 }

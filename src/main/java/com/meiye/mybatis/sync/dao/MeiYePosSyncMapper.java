@@ -1,12 +1,10 @@
 package com.meiye.mybatis.sync.dao;
 
-import com.meiye.bo.config.AppConfigBo;
 import com.meiye.bo.config.PosSyncConfigBo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,4 +43,11 @@ public interface MeiYePosSyncMapper {
 
     @Select("select * from pos_sync_config")
     public List<PosSyncConfigBo> findAllConfigs();
+
+    @Select("SELECT a.`device_mac` deviceId,b.`commercial_id` shopId,c.`id` brandId,c.`name` brandName,b.`commercial_name` shopName,b.`commercial_phone` shopPhone,\n" +
+            "b.`commercial_adress` shopAddress,b.`commercial_logo` shopLogo,b.`longitude`,b.`latitude` \n" +
+            "FROM `shop_device` a,`commercial` b,`brand` c\n" +
+            "WHERE a.`shop_identy`=b.`commercial_id` AND a.`brand_identy`=c.`id`\n" +
+            "AND a.`device_mac`=#{deviceId}")
+    public HashMap<String,Object> getShopInfoByDeviceMac(@Param("deviceId") String deviceId);
 }

@@ -71,7 +71,7 @@ public class WebUtil {
     }
 
     public static String getPosRequestHeaderPrefix(){
-        return "";
+        return "yf";
     }
 
     public static String getPosRequestMessagId(){

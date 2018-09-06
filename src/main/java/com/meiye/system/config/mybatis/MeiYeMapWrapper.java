@@ -2,6 +2,7 @@ package com.meiye.system.config.mybatis;
 
 import com.google.common.base.CaseFormat;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.reflection.wrapper.MapWrapper;
 
 import java.util.Map;
@@ -31,5 +32,13 @@ public class MeiYeMapWrapper extends MapWrapper {
             return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,name);
         }
         return name;
+    }
+
+    @Override
+    public void set(PropertyTokenizer prop, Object value) {
+        if(value!=null)
+            super.set(prop, value);
+        else
+            super.set(prop,"");
     }
 }
