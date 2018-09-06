@@ -52,15 +52,15 @@ public class TableAreaServiceImpl implements TableAreaService {
 
     @Override
     @Transactional(rollbackOn = {Exception.class})
-    public TableAreaBo addTableArea(TableAreaBo tableAreaBo) {
+    public TableArea addTableArea(TableAreaBo tableAreaBo) {
+        TableArea tableArea = tableAreaBo.copyTo(TableArea.class);
         try {
-            TableArea tableArea = tableAreaBo.copyTo(TableArea.class);
             tableArea.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
-            tablesAreaRepository.save(tableArea);
+            tableArea =tablesAreaRepository.save(tableArea);
         } catch (Exception e) {
             throw new BusinessException("保存工作台区域失败!");
         }
-        return tableAreaBo;
+        return tableArea;
     }
 
     @Override

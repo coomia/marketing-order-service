@@ -57,15 +57,15 @@ public class TableServiceImpl implements TableService {
 
     @Override
     @Transactional(rollbackOn = {Exception.class})
-    public TablesBo addTable(TablesBo tableBo) {
+    public Tables addTable(TablesBo tableBo) {
+        Tables tables = tableBo.copyTo(Tables.class);
         try {
-            Tables tables = tableBo.copyTo(Tables.class);
             tables.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
-            tablesRepository.save(tables);
+            tables = tablesRepository.save(tables);
         } catch (Exception e) {
             throw new BusinessException("保存工作台失败!");
         }
-        return tableBo;
+        return tables;
     }
 
     @Override

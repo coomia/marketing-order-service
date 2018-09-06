@@ -21,7 +21,7 @@ public interface TableAreaService {
 
     TableAreaBo updateTableArea(TableAreaBo tableAreaBo);
 
-    TableAreaBo addTableArea(TableAreaBo tableAreaBo);
+    TableArea addTableArea(TableAreaBo tableAreaBo);
 
     void deleteTableArea(Long id);
 }

@@ -1,6 +1,7 @@
 package com.meiye.service.setting;
 
 import com.meiye.bo.setting.TablesBo;
+import com.meiye.model.setting.Tables;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface TableService {
 
     TablesBo updateTable(TablesBo tableBo);
 
-    TablesBo addTable(TablesBo tableBo);
+    Tables addTable(TablesBo tableBo);
 
     void deleteTable(Long id);
 
