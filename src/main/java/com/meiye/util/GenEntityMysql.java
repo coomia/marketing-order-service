@@ -35,9 +35,9 @@ public class GenEntityMysql {
     private static final String NAME = "root";
     private static final String PASS = "Hj_1987121";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
-    private String packageOutPath = "com.meiye.model.trade";
-    private String repostiryPackageOutPath="com.meiye.repository.trade";
-    private String boPackageOutPath="com.meiye.bo.trade";
+    private String packageOutPath = "com.meiye.model.store";
+    private String repostiryPackageOutPath="com.meiye.repository.store";
+    private String boPackageOutPath="com.meiye.bo.store";
     private String authorName = "ryne";
     private String[] generateTables = null;
     private String[] excludeProperty=new String[]{"statusFlag",
@@ -412,10 +412,10 @@ public class GenEntityMysql {
      */
     public static void main(String[] args) {
         try {
-            INSTANCE.generateTables=new String[]{"pos_sync_config"};
-            INSTANCE.packageOutPath = "com.meiye.model.config";
-            INSTANCE.repostiryPackageOutPath="com.meiye.repository.config";
-            INSTANCE.boPackageOutPath="com.meiye.bo.config";
+            INSTANCE.generateTables=new String[]{"booking","booking_trade_item","booking_trade_item_user"};
+            INSTANCE.packageOutPath = "com.meiye.model.booking";
+            INSTANCE.repostiryPackageOutPath="com.meiye.repository.booking";
+            INSTANCE.boPackageOutPath="com.meiye.bo.booking";
             INSTANCE.generate();
             System.out.println("generate classes success!");
         } catch (Exception e) {
