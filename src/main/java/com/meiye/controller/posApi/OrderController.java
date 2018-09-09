@@ -66,14 +66,29 @@ public class OrderController {
     //作废订单
     @PostMapping("/deleteOrderData")
     public PosApiResult deleteOrderData(@RequestBody CancelTradeBo cancelTradeBo){
-        OrderResponseDto orderResponseDto = orderService.deleteTrade(cancelTradeBo);
-        return PosApiResult.sucess(orderResponseDto);
+        try {
+            OrderResponseDto orderResponseDto = orderService.deleteTrade(cancelTradeBo);
+            return PosApiResult.sucess(orderResponseDto);
+        }catch (BusinessException b){
+            throw new BusinessException(b.getMessage());
+        }catch (Exception e){
+            throw new BusinessException("作废订单接口- 作废订单失败！");
+        }
+
+
     }
 
     //退换货订单
     @PostMapping("/returnOrderData")
     public PosApiResult returnOrderData(@RequestBody CancelTradeBo cancelTradeBo){
-        OrderResponseDto orderResponseDto = orderService.deleteTrade(cancelTradeBo);
-        return PosApiResult.sucess(orderResponseDto);
+        try {
+            OrderResponseDto orderResponseDto = orderService.returnTrade(cancelTradeBo);
+            return PosApiResult.sucess(orderResponseDto);
+        }catch (BusinessException b){
+            throw new BusinessException(b.getMessage());
+        }catch (Exception e){
+            throw new BusinessException("退换订单接口- 退换订单失败！");
+        }
+
     }
 }

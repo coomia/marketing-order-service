@@ -22,4 +22,5 @@ public interface OrderService {
 
     OrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo);
 
+    OrderResponseDto returnTrade(CancelTradeBo cancelTradeBo);
 }

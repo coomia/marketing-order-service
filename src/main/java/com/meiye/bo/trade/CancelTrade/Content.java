@@ -11,7 +11,9 @@ import java.util.List;
  */
 @Data
 public class Content {
+    private Long tradeId;
+    private String tradeUUid;
     private ObsoleteRequest obsoleteRequest;
     private List<ReturnInventoryItem> returnInventoryItems;
-    private boolean reviseStock;
+    private Boolean reviseStock;
 }

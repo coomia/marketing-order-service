@@ -13,4 +13,6 @@ public interface TalentPlanService{
     void delete(Long id);
     TalentPlanBo getOne(Long id);
     Page<TalentPlan> getTalentPageByCriteria(Integer pageNum, Integer pageSize, TalentPlanBo talentPlanBo);
+
+    void changeStatus(Long id,Integer enabledFlag);
 }

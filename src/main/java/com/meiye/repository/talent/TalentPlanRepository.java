@@ -17,4 +17,8 @@ public interface TalentPlanRepository extends JpaRepository<TalentPlan,Long>,Jpa
     void delete(@Param(value = "id")Long id);
 
     TalentPlan findByIdAndStatusFlag(Long id,Integer statusFlag);
+
+    @Modifying
+    @Query(value = "update TalentPlan tp set tp.enabledFlag = ?2  where tp.id = ?1")
+    void changeStatus(Long id,Integer enabledFlag);
 }

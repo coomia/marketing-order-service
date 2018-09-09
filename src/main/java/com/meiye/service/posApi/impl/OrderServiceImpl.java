@@ -3,6 +3,7 @@ package com.meiye.service.posApi.impl;
 import com.alibaba.fastjson.JSON;
 import com.meiye.bo.trade.*;
 import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
+import com.meiye.bo.trade.CancelTrade.ReturnInventoryItem;
 import com.meiye.bo.trade.OrderDto.*;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.part.DishShop;
@@ -15,6 +16,7 @@ import com.meiye.service.posApi.OrderService;
 import com.meiye.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -301,19 +303,76 @@ public class OrderServiceImpl implements OrderService {
         return orderResponseDto;
     }
 
+    @Transactional(rollbackOn = {Exception.class})
     @Override
     public OrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo) {
         if(cancelTradeBo != null && cancelTradeBo.getContent() != null &&
                 cancelTradeBo.getContent().getObsoleteRequest() != null &&
                 cancelTradeBo.getContent().getObsoleteRequest().getTradeId() != null){
-            tradeRepository.deleteTradeById( cancelTradeBo.getContent().getObsoleteRequest().getTradeId());
+            Long tradeId = cancelTradeBo.getContent().getObsoleteRequest().getTradeId();
+            Trade one = tradeRepository.getOne(tradeId);
+            if(one == null || one.getTradePayStatus() != 1){
+                throw new BusinessException("作废订单接口- trade数据校验不通过");
+            }
+            tradeRepository.deleteTradeById(cancelTradeBo.getContent().getObsoleteRequest().getTradeId(), new Timestamp(new Date().getTime()));
             //下面根据trade id拿到 订单数据 然后返回。
+            if(cancelTradeBo.getContent().getReviseStock() != null && cancelTradeBo.getContent().getReviseStock() == true) {
+                List<ReturnInventoryItem> returnInventoryItems = cancelTradeBo.getContent().getReturnInventoryItems();
+                if(returnInventoryItems != null && returnInventoryItems.size()>0){
+                    for (int i = 0; i <returnInventoryItems.size() ; i++) {
+                        ReturnInventoryItem returnInventoryItem = returnInventoryItems.get(i);
+                        if(returnInventoryItem.getQuantity() != null && returnInventoryItem.getQuantity()>0){
+                            Long dishId = returnInventoryItem.getDishId();
+                            DishShop dishShop = dishShopRepository.findByIdAndShopIdenty(dishId,cancelTradeBo.getShopID());
+                            if(dishShop !=  null){
+                                dishShop.setDishQty(dishShop.getDishQty()+returnInventoryItem.getQuantity());
+                                dishShopRepository.save(dishShop);
+                            }
+                        }
+                    }
+                    }
+                }
 
         }else {
-            throw new BusinessException("作废订单接口- tradeId数据校验不通过");
+            throw new BusinessException("作废订单接口- trade数据校验不通过");
+        }
+        return getOrderResponse(cancelTradeBo.getContent().getObsoleteRequest().getTradeId());
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    @Override
+    public OrderResponseDto returnTrade(CancelTradeBo cancelTradeBo) {
+        if(cancelTradeBo != null && cancelTradeBo.getContent()!=null
+                && cancelTradeBo.getContent().getTradeId() !=null){
+            Trade trade = tradeRepository.findByIdAndBrandIdentyAndTradeStatusIsNot(cancelTradeBo.getContent().getTradeId(), cancelTradeBo.getBrandID(), 6);
+            if(trade == null){
+                throw new BusinessException("退货订单接口- trade数据校验不通过");
+            }
+            Trade tradeNew = new Trade();
+            BeanUtils.copyProperties(trade,tradeNew);
+            tradeNew.setId(null);
+            tradeNew.setRelateTradeId(cancelTradeBo.getContent().getTradeId());
+            tradeNew.setUuid(UUID.randomUUID().toString().substring(0,32));
+            tradeRepository.save(tradeNew);
+            //归还库存
+            if(cancelTradeBo.getContent().getReturnInventoryItems() != null && cancelTradeBo.getContent().getReturnInventoryItems().size()>0){
+                List<ReturnInventoryItem> returnInventoryItems = cancelTradeBo.getContent().getReturnInventoryItems();
+                for (int i = 0; i <returnInventoryItems.size() ; i++) {
+                    ReturnInventoryItem returnInventoryItem = returnInventoryItems.get(i);
+                    if(returnInventoryItem.getQuantity() != null && returnInventoryItem.getQuantity()>0){
+                        Long dishId = returnInventoryItem.getDishId();
+                        DishShop dishShop = dishShopRepository.findByIdAndShopIdenty(dishId,cancelTradeBo.getShopID());
+                        if(dishShop !=  null){
+                            dishShop.setDishQty(dishShop.getDishQty()+returnInventoryItem.getQuantity());
+                        }
+                    }
+                }
+            }
+        }else {
+            throw new BusinessException("退货订单接口- trade数据校验不通过");
         }
 
-        return null;
+        return getOrderResponse(cancelTradeBo.getContent().getTradeId());
     }
 
     private void modifyInventory(List<InventoryItemsDto> deductInventoryItems, boolean isAddQty){

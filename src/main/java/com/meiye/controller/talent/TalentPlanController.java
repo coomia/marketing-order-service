@@ -69,4 +69,14 @@ public class TalentPlanController {
             throw new BusinessException("获取人效计划分页失败!");
         }
     }
+
+    @GetMapping("/status/{id}/{enabledFlag}")
+    public ResetApiResult changeStatus(@PathVariable Long id, @PathVariable Integer enabledFlag){
+        try {
+            talentPlanService.changeStatus(id,enabledFlag);
+        }catch (Exception e){
+            throw new BusinessException("启用/停用 人效计划失败!");
+        }
+        return ResetApiResult.sucess("");
+    }
 }
