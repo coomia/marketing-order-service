@@ -185,8 +185,8 @@ public class OrderServiceImpl implements OrderService {
         TradeBo tradeBo = tradeRequestDto.getTradeRequest();
         InventoryRequestDto inventoryRequest = tradeRequestDto.getInventoryRequest();
         if(Objects.isNull(tradeBo) || Objects.isNull(inventoryRequest)){
-            logger.error("改单接口-订单数据或库存数据为空！");
-            throw new BusinessException("改单接口-订单数据或库存数据为空！");
+            logger.error("下单接口-订单数据或库存数据为空！");
+            throw new BusinessException("下单接口-订单数据或库存数据为空！");
         }
 
         List<CustomerCardTimeBo> customerCardTimes = tradeBo.getCustomerCardTimes();

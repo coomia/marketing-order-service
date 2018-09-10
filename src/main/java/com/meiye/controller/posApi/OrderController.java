@@ -23,7 +23,7 @@ import java.util.Objects;
  * @Modified By:
  */
 @RestController
-@RequestMapping(value = "/pos/api",produces="application/json;charset=UTF-8")
+@RequestMapping(value = "/pos/api/order",produces="application/json;charset=UTF-8")
 public class OrderController {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -46,9 +46,15 @@ public class OrderController {
             throw new BusinessException("改单接口-上传数据为空，请检查！");
         }
         logger.info("改单接口-上传json数据："+JSON.toJSON(modifyOrderBo).toString());
-        orderService.modifyOrderData(modifyOrderBo);
-        OrderResponseDto orderResponseDto =orderService.getOrderResponse(modifyOrderBo.getContent().getTradeRequest().getId());
-        return PosApiResult.sucess(orderResponseDto);
+        try {
+            orderService.modifyOrderData(modifyOrderBo);
+            OrderResponseDto orderResponseDto =orderService.getOrderResponse(modifyOrderBo.getContent().getTradeRequest().getId());
+            return PosApiResult.sucess(orderResponseDto);
+        }catch (BusinessException b){
+            throw new BusinessException(b.getMessage());
+        }catch (Exception e){
+            throw new BusinessException("改单接口- 改单失败！");
+        }
     }
 
     @PostMapping("/addOrderData")
@@ -58,9 +64,15 @@ public class OrderController {
             throw new BusinessException("下单接口-上传数据为空，请检查！");
         }
         logger.info("下单接口-上传json数据："+JSON.toJSON(addOrderRequestDto).toString());
-        OrderResponseDto orderResponseDto = orderService.addOrderData(addOrderRequestDto);
-        OrderResponseDto orderResponseDtoNew = orderService.getOrderResponse(orderResponseDto.getTrade().getId());
-        return PosApiResult.sucess(orderResponseDtoNew);
+        try {
+            OrderResponseDto orderResponseDto = orderService.addOrderData(addOrderRequestDto);
+            OrderResponseDto orderResponseDtoNew = orderService.getOrderResponse(orderResponseDto.getTrade().getId());
+            return PosApiResult.sucess(orderResponseDtoNew);
+        }catch (BusinessException b){
+            throw new BusinessException(b.getMessage());
+        }catch (Exception e){
+            throw new BusinessException("下单接口- 下单失败！");
+        }
     }
 
     //作废订单
