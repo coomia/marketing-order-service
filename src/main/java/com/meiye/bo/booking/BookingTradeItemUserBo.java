@@ -2,6 +2,7 @@ package com.meiye.bo.booking;
 
 import java.util.Date;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
 import com.meiye.system.util.WebUtil;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.io.Serializable;
  * create time: 2018-09-05 21:26:39
  */ 
 @Data
-public class BookingTradeItemUserBo extends ParentBo implements Serializable{
+public class BookingTradeItemUserBo extends BusinessParentBo implements Serializable{
 
 	private Long id;
 	private Long bookingId;
@@ -22,8 +23,6 @@ public class BookingTradeItemUserBo extends ParentBo implements Serializable{
 	private String userName;
 	private Integer roleId;
 	private Integer roleName;
-	private Long brandIdenty;
-	private Long shopIdenty;
 	private Integer isAssign;
 }
 

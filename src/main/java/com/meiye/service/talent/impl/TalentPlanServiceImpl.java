@@ -147,4 +147,10 @@ public class TalentPlanServiceImpl implements TalentPlanService{
         }, pageable);
         return usersPage;
     }
+
+    @Transactional(rollbackOn = {Exception.class})
+    @Override
+    public void changeStatus(Long id, Integer enabledFlag) {
+        talentPlanRepository.changeStatus(id,enabledFlag);
+    }
 }

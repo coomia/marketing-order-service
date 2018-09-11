@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class CancelTradeBo {
     private String appType;
+    private Long shopID;
+    private Long brandID;
     private Content content;
 
 

@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.sql.Timestamp;
+
 /**
  * table name:  trade
  * author name: ryne
@@ -15,7 +18,9 @@ import org.springframework.stereotype.Repository;
 public interface TradeRepository extends JpaRepository<Trade,Long>{
 
     @Modifying
-    @Query(value = "update Trade t set t.tradeStatus = 6 where t.id = id")
-    void deleteTradeById(@Param(value = "id")Long id);
+    @Query(value = "update Trade t set t.tradeStatus = 6 , t.serverUpdateTime = ?2  where t.id = ?1")
+    void deleteTradeById(Long id, Timestamp serverUpdateTime);
+
+    Trade findByIdAndBrandIdentyAndTradeStatusIsNot(Long id,Long brandIdenty,Integer tradeStatus);
 }
 
