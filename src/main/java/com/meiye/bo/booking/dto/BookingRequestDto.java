@@ -21,6 +21,7 @@ public class BookingRequestDto implements Serializable {
     private String versionName;
     private String appType;
     private String systemType;
+    private String opVersionUUID;
     private BookingBo content;
 
 }

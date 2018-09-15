@@ -19,6 +19,7 @@ import java.util.List;
 public class BookingBo extends BusinessParentBo implements Serializable{
 
 	private Long id;
+	private String uuid;
 	private Long commercialId;
 	private Long commercialName;
 	private Long commercialGender;
