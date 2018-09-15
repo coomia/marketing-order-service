@@ -22,7 +22,7 @@ public class Booking extends ParentEntity implements Serializable{
     private Long id;
 	private String uuid;
 	private Long commercialId;
-	private Long commercialName;
+	private String commercialName;
 	private Long commercialGender;
 	private String commercialPhone;
 	private Date startTime;
