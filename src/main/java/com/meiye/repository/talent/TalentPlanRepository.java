@@ -13,8 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TalentPlanRepository extends JpaRepository<TalentPlan,Long>,JpaSpecificationExecutor<TalentPlan> {
     @Modifying
-    @Query(value = "update TalentPlan tp set tp.statusFlag = 2 where tp.id = id")
-    void delete(@Param(value = "id")Long id);
+    @Query(value = "update TalentPlan tp set tp.statusFlag = 2 where tp.id = ?1")
+    void delete(Long id);
 
     TalentPlan findByIdAndStatusFlag(Long id,Integer statusFlag);
 

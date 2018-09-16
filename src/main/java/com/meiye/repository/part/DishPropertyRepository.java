@@ -27,8 +27,8 @@ public interface DishPropertyRepository extends JpaRepository<DishProperty,Long>
     void deleteByIdS(@Param(value = "ids")List<Long> ids);
 
     @Modifying
-    @Query(value = "update DishProperty dp set dp.enabledFlag = 2 where dp.id = id")
-    void deleteById(@Param(value = "id")Long id);
+    @Query(value = "update DishProperty dp set dp.enabledFlag = 2 where dp.id = ?1")
+    void deleteById(Long id);
 
     @Modifying
     @Query(value = "update DishProperty dp set dp.enabledFlag = 2 where dp.dishShopId = dishShopId")

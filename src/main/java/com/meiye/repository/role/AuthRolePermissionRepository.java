@@ -14,8 +14,8 @@ import java.util.List;
 public interface AuthRolePermissionRepository extends JpaRepository<AuthRolePermission,Long> {
 
     @Modifying
-    @Query(value = "update AuthRolePermission arp set arp.statusFlag = 2 where arp.id = id")
-    void deleteAuthRolePermissionByRoleId(@Param(value = "id")Long id);
+    @Query(value = "update AuthRolePermission arp set arp.statusFlag = 2 where arp.id = ?1")
+    void deleteAuthRolePermissionByRoleId(Long id);
 
     List<AuthRolePermission> findByRoleIdAndStatusFlag(Long roleId,Integer statusFlag);
 }

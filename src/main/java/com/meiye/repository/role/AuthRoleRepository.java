@@ -16,7 +16,7 @@ public interface AuthRoleRepository extends JpaRepository<AuthRole,Long> {
     AuthRole findByIdAndStatusFlag(Long id,Integer statusFlag);
 
     @Modifying
-    @Query(value = "update AuthRole ar set ar.statusFlag = 2 where ar.id = id")
-    void deleteById(@Param(value = "id")Long id);
+    @Query(value = "update AuthRole ar set ar.statusFlag = 2 where ar.id = ?1")
+    void deleteById(Long id);
 }
 
