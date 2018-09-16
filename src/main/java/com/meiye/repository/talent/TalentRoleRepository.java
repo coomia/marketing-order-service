@@ -18,5 +18,5 @@ public interface TalentRoleRepository extends JpaRepository<TalentRole,Long> {
     @Query(value = "update TalentRole tp set tp.statusFlag = 2 where tp.planId = ?1")
     void deleteByPlanId(Long id);
 
-    List<TalentRole> getTalentRolesByPlanId(Long id);
+    List<TalentRole> getTalentRolesByPlanIdAndStatusFlag(Long id,Integer statusFlag);
 }

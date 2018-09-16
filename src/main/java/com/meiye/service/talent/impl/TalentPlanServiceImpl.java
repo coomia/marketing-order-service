@@ -110,7 +110,7 @@ public class TalentPlanServiceImpl implements TalentPlanService{
         if(talentPlan != null){
             TalentPlanBo talentPlanBo = talentPlan.copyTo(TalentPlanBo.class);
             //得到人效角色
-            List<TalentRole> talentRolesByPlanId = talentRoleRepository.getTalentRolesByPlanId(id);
+            List<TalentRole> talentRolesByPlanId = talentRoleRepository.getTalentRolesByPlanIdAndStatusFlag(id,1);
             if(talentRolesByPlanId != null && talentRolesByPlanId.size()>0){
                 List<TalentRoleBo> TalentRuleBos = new ArrayList<>();
                 talentRolesByPlanId.forEach(talentRole->{
@@ -120,7 +120,7 @@ public class TalentPlanServiceImpl implements TalentPlanService{
                 talentPlanBo.setTalentRoleBoList(TalentRuleBos);
             }
             //得到人效规则
-            List<TalentRule> talentRules = talentRuleRepository.getTalentRuleByPlanId(id);
+            List<TalentRule> talentRules = talentRuleRepository.getTalentRuleByPlanIdAndStatusFlag(id,1);
             if(talentRules != null && talentRules.size()>0){
                 List<TalentRuleBo> talentRuleBos = new ArrayList<TalentRuleBo>();
                 talentRules.forEach(talentRule->{
