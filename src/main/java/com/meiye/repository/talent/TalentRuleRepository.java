@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public interface TalentRuleRepository extends JpaRepository<TalentRule,Long> {
     @Modifying
-    @Query(value = "update TalentRule tr set tr.statusFlag = 2 where tr.planId = id")
-    void deleteByPlanId(@Param(value = "id")Long id);
+    @Query(value = "update TalentRule tr set tr.statusFlag = 2 where tr.planId = ?1")
+    void deleteByPlanId(Long id);
 
-    TalentRule getTalentRuleByPlanId(Long id);
+    List<TalentRule> getTalentRuleByPlanId(Long id);
 }

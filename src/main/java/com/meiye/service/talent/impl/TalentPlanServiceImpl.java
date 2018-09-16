@@ -56,11 +56,12 @@ public class TalentPlanServiceImpl implements TalentPlanService{
             });
         }
         //存提成规则
-        if(talentPlanBo.getTalentRuleBo() != null){
-            TalentRuleBo talentRuleBo = talentPlanBo.getTalentRuleBo();
-            TalentRule talentRule = talentRuleBo.copyTo(TalentRule.class);
-            talentRule.setPlanId(talentPlan.getId());
-            talentRuleRepository.save(talentRule);
+        if(talentPlanBo.getTalentRuleBos() != null && talentPlanBo.getTalentRuleBos().size()>0){
+            talentPlanBo.getTalentRuleBos().forEach(talentRuleBo->{
+                TalentRule talentRule = talentRuleBo.copyTo(TalentRule.class);
+                talentRule.setPlanId(talentPlan.getId());
+                talentRuleRepository.save(talentRule);
+            });
         }
     }
 
@@ -74,7 +75,7 @@ public class TalentPlanServiceImpl implements TalentPlanService{
         TalentPlan talentPlan = talentPlanBo.copyTo(TalentPlan.class);
         talentPlanRepository.save(talentPlan);
         //更新效角色 -- 先全部删除再save
-        talentRuleRepository.deleteByPlanId(talentPlanBo.getId());
+        talentRoleRepository.deleteByPlanId(talentPlanBo.getId());
         if( talentPlanBo.getTalentRoleBoList().size()>0){
             talentPlanBo.getTalentRoleBoList().forEach(talentRoleBo->{
                 TalentRole talentRole = talentRoleBo.copyTo(TalentRole.class);
@@ -82,12 +83,14 @@ public class TalentPlanServiceImpl implements TalentPlanService{
                 talentRoleRepository.save(talentRole);
             });
         }
-        //更新提成规则
-        if(talentPlanBo.getTalentRuleBo() != null){
-            TalentRuleBo talentRuleBo = talentPlanBo.getTalentRuleBo();
-            TalentRule talentRule = talentRuleBo.copyTo(TalentRule.class);
-            talentRule.setPlanId(talentPlan.getId());
-            talentRuleRepository.save(talentRule);
+        //更新提成规则  -- 先全部删除再save
+        talentRuleRepository.deleteByPlanId(talentPlanBo.getId());
+        if(talentPlanBo.getTalentRuleBos() != null && talentPlanBo.getTalentRuleBos().size()>0){
+            talentPlanBo.getTalentRuleBos().forEach(talentRuleBo->{
+                TalentRule talentRule = talentRuleBo.copyTo(TalentRule.class);
+                talentRule.setPlanId(talentPlan.getId());
+                talentRuleRepository.save(talentRule);
+            });
         }
     }
 
@@ -117,10 +120,14 @@ public class TalentPlanServiceImpl implements TalentPlanService{
                 talentPlanBo.setTalentRoleBoList(TalentRuleBos);
             }
             //得到人效规则
-            TalentRule talentRule = talentRuleRepository.getTalentRuleByPlanId(id);
-            if(talentRule != null){
-                TalentRuleBo talentRuleBo = talentRule.copyTo(TalentRuleBo.class);
-                talentPlanBo.setTalentRuleBo(talentRuleBo);
+            List<TalentRule> talentRules = talentRuleRepository.getTalentRuleByPlanId(id);
+            if(talentRules != null && talentRules.size()>0){
+                List<TalentRuleBo> talentRuleBos = new ArrayList<TalentRuleBo>();
+                talentRules.forEach(talentRule->{
+                    TalentRuleBo talentRuleBo = talentRule.copyTo(TalentRuleBo.class);
+                    talentRuleBos.add(talentRuleBo);
+                });
+                talentPlanBo.setTalentRuleBos(talentRuleBos);
             }
             return talentPlanBo;
         }

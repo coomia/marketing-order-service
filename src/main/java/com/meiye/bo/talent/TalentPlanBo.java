@@ -28,7 +28,7 @@ public class TalentPlanBo extends BusinessParentBo {
     //存放人效角色
     private List<TalentRoleBo> talentRoleBoList = new ArrayList<>();
     //存放提成规则
-    private TalentRuleBo talentRuleBo;
+    private List<TalentRuleBo> talentRuleBos = new ArrayList<>();
 
     Integer pageNum;
     Integer pageSize;
