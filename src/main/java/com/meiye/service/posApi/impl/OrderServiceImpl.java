@@ -240,7 +240,16 @@ public class OrderServiceImpl implements OrderService {
 
         //2.新增 交易明细 数据
         if (Objects.nonNull(tradeItems) && tradeItems.size() > 0) {
-            tradeItems.stream().forEach(bo -> bo.setTradeId(tradeId));
+            tradeItems.stream().forEach(bo -> {
+                bo.setTradeId(tradeId);
+                if(Objects.isNull(bo.getRecycleStatus())){
+                    bo.setRecycleStatus(1);
+                }
+                if(Objects.isNull(bo.getBatchNo())){
+                    bo.setBatchNo("");
+                }
+            }
+            );
             logger.info("下单接口-新增交易明细开始");
             logger.info("下单接口-交易记录主单：" + JSON.toJSON(tradeItems).toString());
             List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
