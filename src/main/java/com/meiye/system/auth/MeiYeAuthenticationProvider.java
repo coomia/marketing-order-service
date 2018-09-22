@@ -2,6 +2,9 @@ package com.meiye.system.auth;
 
 import com.meiye.bo.user.UserBo;
 import com.meiye.service.user.UserService;
+import org.apache.shiro.crypto.hash.Sha1Hash;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -9,13 +12,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
 
 /**
  * Created by Administrator on 2018/8/12 0012.
@@ -23,6 +21,7 @@ import java.util.ArrayList;
 public class MeiYeAuthenticationProvider implements AuthenticationProvider {
     @Autowired
     UserService userService;
+    Logger logger= LoggerFactory.getLogger(MeiYeAuthenticationProvider.class);
 
 
     public MeiYeAuthenticationProvider(UserService userService){
@@ -34,11 +33,14 @@ public class MeiYeAuthenticationProvider implements AuthenticationProvider {
         // 获取认证的用户名 & 密码
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
+
+//        password=new Sha1Hash(password, name, 100).toHex();
+
         UserBo userBo=null;
         try {
             userBo = userService.getUserByName(name);
         } catch (Exception exp) {
-            exp.printStackTrace();
+            logger.error(exp.getMessage(),exp);
             throw new AuthenticationServiceException("未知错误");
         }
         // 认证逻辑

@@ -121,7 +121,7 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
             objectHashMap.put("token",JWT);
             response.getWriter().println(JSON.toJSONString(ResetApiResult.sucess(objectHashMap), WebUtil.getFastJsonSerializerFeature()));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
     }
 
