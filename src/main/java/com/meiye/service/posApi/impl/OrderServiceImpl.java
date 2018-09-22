@@ -64,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 修改订单接口 - Ryne 2018/09/02
+     *
      * @param orderRequestDto
      * @return
      */
@@ -74,9 +75,9 @@ public class OrderServiceImpl implements OrderService {
         TradeRequestDto tradeRequestDto = orderRequestDto.getContent();
         TradeBo tradeBo = tradeRequestDto.getTradeRequest();
         InventoryRequestDto inventoryRequest = tradeRequestDto.getInventoryRequest();
-        if(Objects.isNull(tradeBo) || Objects.isNull(inventoryRequest)){
-            logger.error("改单接口-订单数据或库存数据为空！");
-            throw new BusinessException("改单接口-订单数据或库存数据为空！");
+        if (Objects.isNull(tradeBo)) {
+            logger.error("改单接口-订单数据为空！");
+            throw new BusinessException("改单接口-订单数据为空！");
         }
         List<CustomerCardTimeBo> customerCardTimes = tradeBo.getCustomerCardTimes();
         List<TradeCustomerBo> tradeCustomers = tradeBo.getTradeCustomers();
@@ -89,91 +90,113 @@ public class OrderServiceImpl implements OrderService {
 
         //校验版本号
         Long tradeId = trade.getId();
-        if(Objects.isNull(tradeId)){
+        if (Objects.isNull(tradeId)) {
             logger.error("改单接口-交易记录主单tradeId is null！");
             throw new BusinessException("改单接口-交易记录主单tradeId is null！");
         }
         Optional<Trade> tradeOptional = tradeRepository.findById(tradeId);
-        if(Objects.isNull(tradeOptional)){
-            logger.error("改单接口-未找到交易记录主单！tradeId:"+tradeId);
-            throw new BusinessException("改单接口-未找到交易记录主单！tradeId:"+tradeId);
+        if (Objects.isNull(tradeOptional)) {
+            logger.error("改单接口-未找到交易记录主单！tradeId:" + tradeId);
+            throw new BusinessException("改单接口-未找到交易记录主单！tradeId:" + tradeId);
         }
         Trade trade1 = tradeOptional.get();
         Timestamp clientUpdateTime = trade.getServerUpdateTime();
         Timestamp serverUpdateTime = trade1.getServerUpdateTime();
-        if(clientUpdateTime.equals(serverUpdateTime)){
+        if (clientUpdateTime.equals(serverUpdateTime)) {
             trade.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
-        }else{
+        } else {
             logger.error("改单接口-版本校验失败！");
             throw new BusinessException("改单接口-版本校验失败！");
         }
 
         //1.修改 交易记录主单 数据
         logger.info("改单接口-修改交易记录主单开始");
-        logger.info("改单接口-交易记录主单："+ JSON.toJSON(trade).toString());
+        logger.info("改单接口-交易记录主单：" + JSON.toJSON(trade).toString());
         trade = tradeRepository.save(trade);
         orderResponseDto.setTrade(trade);
         logger.info("改单接口-修改交易记录主单结束");
 
         //2.修改 交易明细 数据
-        logger.info("改单接口-修改交易明细开始");
-        logger.info("改单接口-交易记录主单："+ JSON.toJSON(tradeItems).toString());
-        List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
-        orderResponseDto.setTradeItems(tradeItemList);
-        logger.info("改单接口-修改交易明细结束");
+        if (Objects.nonNull(tradeItems) && tradeItems.size() > 0) {
+            logger.info("改单接口-修改交易明细开始");
+            logger.info("改单接口-交易记录主单：" + JSON.toJSON(tradeItems).toString());
+            List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
+            orderResponseDto.setTradeItems(tradeItemList);
+            logger.info("改单接口-修改交易明细结束");
+        }
 
         //3.修改 交易的顾客信息 数据
-        logger.info("改单接口-修改交易的顾客信息开始");
-        logger.info("改单接口-交易的顾客信息："+ JSON.toJSON(tradeCustomers).toString());
-        List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
-        orderResponseDto.setTradeCustomers(tradeCustomerList);
-        logger.info("改单接口-修改交易的顾客信息结束");
+        if (Objects.nonNull(tradeCustomers) && tradeCustomers.size() > 0) {
+            logger.info("改单接口-修改交易的顾客信息开始");
+            logger.info("改单接口-交易的顾客信息：" + JSON.toJSON(tradeCustomers).toString());
+            List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
+            orderResponseDto.setTradeCustomers(tradeCustomerList);
+            logger.info("改单接口-修改交易的顾客信息结束");
+        }
 
         //4.修改 交易桌台 数据
-        logger.info("改单接口-修改交易桌台开始");
-        logger.info("改单接口-交易桌台信息："+ JSON.toJSON(tradeTables).toString());
-        List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
-        orderResponseDto.setTradeTables(tradeTableList);
-        logger.info("改单接口-修改交易桌台结束");
+        if (Objects.nonNull(tradeTables) && tradeTables.size() > 0) {
+            logger.info("改单接口-修改交易桌台开始");
+            logger.info("改单接口-交易桌台信息：" + JSON.toJSON(tradeTables).toString());
+            List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
+            orderResponseDto.setTradeTables(tradeTableList);
+            logger.info("改单接口-修改交易桌台结束");
+        }
 
         //5.修改 优惠信息 数据
-        logger.info("改单接口-修改优惠信息开始");
-        logger.info("改单接口-优惠信息："+ JSON.toJSON(tradePrivileges).toString());
-        List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
-        orderResponseDto.setTradePrivileges(tradePrivilegeList);
-        logger.info("改单接口-修改优惠信息结束");
+        if (Objects.nonNull(tradePrivileges) && tradePrivileges.size() > 0) {
+            logger.info("改单接口-修改优惠信息开始");
+            logger.info("改单接口-优惠信息：" + JSON.toJSON(tradePrivileges).toString());
+            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
+            orderResponseDto.setTradePrivileges(tradePrivilegeList);
+            logger.info("改单接口-修改优惠信息结束");
+        }
 
         //6.修改 交易明细特征 数据
-        logger.info("改单接口-修改交易明细特征开始");
-        logger.info("改单接口-交易明细特征："+ JSON.toJSON(tradeItemProperties).toString());
-        List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
-        orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
-        logger.info("改单接口-修改交易明细特征结束");
+        if (Objects.nonNull(tradeItemProperties) && tradeItemProperties.size() > 0) {
+            logger.info("改单接口-修改交易明细特征开始");
+            logger.info("改单接口-交易明细特征：" + JSON.toJSON(tradeItemProperties).toString());
+            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
+            orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
+            logger.info("改单接口-修改交易明细特征结束");
+        }
 
         //7.修改 订单用户关联表 数据
-        logger.info("改单接口-修改订单用户关联表开始");
-        logger.info("改单接口-订单用户关联表："+ JSON.toJSON(tradeUsers).toString());
-        List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
-        orderResponseDto.setTradeUsers(tradeUserList);
-        logger.info("改单接口-修改订单用户关联表结束");
+        if (Objects.nonNull(tradeUsers) && tradeUsers.size() > 0) {
+            logger.info("改单接口-修改订单用户关联表开始");
+            logger.info("改单接口-订单用户关联表：" + JSON.toJSON(tradeUsers).toString());
+            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
+            orderResponseDto.setTradeUsers(tradeUserList);
+            logger.info("改单接口-修改订单用户关联表结束");
+        }
+
 
         //8.修改 会员次卡表 数据
-        logger.info("改单接口-修改会员次卡表开始");
-        logger.info("改单接口-修改会员次卡表："+ JSON.toJSON(customerCardTimes).toString());
-        List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
-        orderResponseDto.setCustomerCardTimes(customerCardTimeList);
-        logger.info("改单接口-修改会员次卡表结束");
+        if (Objects.nonNull(customerCardTimes) && customerCardTimes.size() > 0) {
+            logger.info("改单接口-修改会员次卡表开始");
+            logger.info("改单接口-修改会员次卡表：" + JSON.toJSON(customerCardTimes).toString());
+            List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
+            orderResponseDto.setCustomerCardTimes(customerCardTimeList);
+            logger.info("改单接口-修改会员次卡表结束");
+        }
 
         //9.修改 商品 库存信息
-        List<InventoryItemsDto> deductInventoryItems = inventoryRequest.getDeductInventoryItems();
-        this.modifyInventory(deductInventoryItems,false);
-        List<InventoryItemsDto> returnInventoryItems = inventoryRequest.getReturnInventoryItems();
-       this.modifyInventory(returnInventoryItems,true);
+        if (Objects.nonNull(inventoryRequest)) {
+            List<InventoryItemsDto> deductInventoryItems = inventoryRequest.getDeductInventoryItems();
+            if (Objects.nonNull(deductInventoryItems) && deductInventoryItems.size() > 0) {
+                this.modifyInventory(deductInventoryItems, false);
+            }
+            List<InventoryItemsDto> returnInventoryItems = inventoryRequest.getReturnInventoryItems();
+            if (Objects.nonNull(returnInventoryItems) && returnInventoryItems.size() > 0) {
+                this.modifyInventory(returnInventoryItems, true);
+            }
+        }
         return orderResponseDto;
     }
 
     /**
      * 下单订单接口 - Ryne 2018/09/02
+     *
      * @param addOrderRequestDto
      * @return
      */
@@ -184,9 +207,9 @@ public class OrderServiceImpl implements OrderService {
         TradeRequestDto tradeRequestDto = addOrderRequestDto.getContent();
         TradeBo tradeBo = tradeRequestDto.getTradeRequest();
         InventoryRequestDto inventoryRequest = tradeRequestDto.getInventoryRequest();
-        if(Objects.isNull(tradeBo) || Objects.isNull(inventoryRequest)){
-            logger.error("下单接口-订单数据或库存数据为空！");
-            throw new BusinessException("下单接口-订单数据或库存数据为空！");
+        if (Objects.isNull(tradeBo)) {
+            logger.error("下单接口-订单数据为空！");
+            throw new BusinessException("下单接口-订单数据为空！");
         }
 
         List<CustomerCardTimeBo> customerCardTimes = tradeBo.getCustomerCardTimes();
@@ -198,79 +221,104 @@ public class OrderServiceImpl implements OrderService {
         List<TradeTableBo> tradeTables = tradeBo.getTradeTables();
         Trade trade = tradeBo.copyTo(Trade.class);
         //开单接口该数据为null需要服务器创建
-        if(Objects.isNull(trade.getBizDate())){
+        if (Objects.isNull(trade.getBizDate())) {
             trade.setBizDate(new Date());
         }
         trade.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
         //1.新增 交易记录主单 数据
         logger.info("下单接口-新增交易记录主单开始");
-        logger.info("下单接口-交易记录主单："+ JSON.toJSON(trade).toString());
+        logger.info("下单接口-交易记录主单：" + JSON.toJSON(trade).toString());
+        //流水号从1自增
+        long count = tradeRepository.count();
+        long serialNumber = count + 1;
+        trade.setSerialNumber(Long.toString(serialNumber));
         trade = tradeRepository.save(trade);
         orderResponseDto.setTrade(trade);
         logger.info("下单接口-新增交易记录主单结束");
-
         //关联trade_ID给其他订单相关表
         Long tradeId = trade.getId();
-        customerCardTimes.stream().forEach(bo -> bo.setTradeId(tradeId));
-        tradeCustomers.stream().forEach(bo -> bo.setTradeId(tradeId));
-        tradeItemProperties.stream().forEach(bo ->bo.setTradeId(tradeId));
-        tradeItems.stream().forEach(bo -> bo.setTradeId(tradeId));
-        tradePrivileges.stream().forEach(bo -> bo.setTradeId(tradeId));
-        tradeUsers.stream().forEach(bo ->bo.setTradeId(tradeId));
-        tradeTables.stream().forEach(bo ->bo.setTradeId(tradeId));
+
         //2.新增 交易明细 数据
-        logger.info("下单接口-新增交易明细开始");
-        logger.info("下单接口-交易记录主单："+ JSON.toJSON(tradeItems).toString());
-        List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
-        orderResponseDto.setTradeItems(tradeItemList);
-        logger.info("下单接口-新增交易明细结束");
+        if (Objects.nonNull(tradeItems) && tradeItems.size() > 0) {
+            tradeItems.stream().forEach(bo -> bo.setTradeId(tradeId));
+            logger.info("下单接口-新增交易明细开始");
+            logger.info("下单接口-交易记录主单：" + JSON.toJSON(tradeItems).toString());
+            List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
+            orderResponseDto.setTradeItems(tradeItemList);
+            logger.info("下单接口-新增交易明细结束");
+        }
 
         //3.新增 交易的顾客信息 数据
-        logger.info("下单接口-新增交易的顾客信息开始");
-        logger.info("下单接口-交易的顾客信息："+ JSON.toJSON(tradeCustomers).toString());
-        List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
-        orderResponseDto.setTradeCustomers(tradeCustomerList);
-        logger.info("下单接口-新增交易的顾客信息结束");
+        if (Objects.nonNull(tradeCustomers) && tradeCustomers.size() > 0) {
+            tradeCustomers.stream().forEach(bo -> bo.setTradeId(tradeId));
+            logger.info("下单接口-新增交易的顾客信息开始");
+            logger.info("下单接口-交易的顾客信息：" + JSON.toJSON(tradeCustomers).toString());
+            List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
+            orderResponseDto.setTradeCustomers(tradeCustomerList);
+            logger.info("下单接口-新增交易的顾客信息结束");
+        }
 
         //4.新增 交易桌台 数据
-        logger.info("下单接口-新增交易桌台开始");
-        logger.info("下单接口-交易桌台信息："+ JSON.toJSON(tradeTables).toString());
-        List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
-        orderResponseDto.setTradeTables(tradeTableList);
-        logger.info("下单接口-新增交易桌台结束");
+        if (Objects.nonNull(tradeTables) && tradeTables.size() > 0) {
+            tradeTables.stream().forEach(bo -> bo.setTradeId(tradeId));
+            logger.info("下单接口-新增交易桌台开始");
+            logger.info("下单接口-交易桌台信息：" + JSON.toJSON(tradeTables).toString());
+            List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
+            orderResponseDto.setTradeTables(tradeTableList);
+            logger.info("下单接口-新增交易桌台结束");
+        }
 
         //5.新增 优惠信息 数据
-        logger.info("下单接口-新增优惠信息开始");
-        logger.info("下单接口-优惠信息："+ JSON.toJSON(tradePrivileges).toString());
-        List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
-        orderResponseDto.setTradePrivileges(tradePrivilegeList);
-        logger.info("下单接口-新增优惠信息结束");
+        if (Objects.nonNull(tradePrivileges) && tradePrivileges.size() > 0) {
+            tradePrivileges.stream().forEach(bo -> bo.setTradeId(tradeId));
+            logger.info("下单接口-新增优惠信息开始");
+            logger.info("下单接口-优惠信息：" + JSON.toJSON(tradePrivileges).toString());
+            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
+            orderResponseDto.setTradePrivileges(tradePrivilegeList);
+            logger.info("下单接口-新增优惠信息结束");
+        }
 
         //6.新增 交易明细特征 数据
-        logger.info("下单接口-新增交易明细特征开始");
-        logger.info("下单接口-交易明细特征："+ JSON.toJSON(tradeItemProperties).toString());
-        List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
-        orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
-        logger.info("下单接口-新增交易明细特征结束");
+        if (Objects.nonNull(tradeItemProperties) && tradeItemProperties.size() > 0) {
+            tradeItemProperties.stream().forEach(bo -> bo.setTradeId(tradeId));
+            logger.info("下单接口-新增交易明细特征开始");
+            logger.info("下单接口-交易明细特征：" + JSON.toJSON(tradeItemProperties).toString());
+            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
+            orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
+            logger.info("下单接口-新增交易明细特征结束");
+        }
 
         //7.新增 订单用户关联表 数据
-        logger.info("下单接口-新增订单用户关联表开始");
-        logger.info("下单接口-订单用户关联表："+ JSON.toJSON(tradeUsers).toString());
-        List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
-        orderResponseDto.setTradeUsers(tradeUserList);
-        logger.info("下单接口-新增订单用户关联表结束");
+        if (Objects.nonNull(tradeUsers) && tradeUsers.size() > 0) {
+            tradeUsers.stream().forEach(bo -> bo.setTradeId(tradeId));
+            logger.info("下单接口-新增订单用户关联表开始");
+            logger.info("下单接口-订单用户关联表：" + JSON.toJSON(tradeUsers).toString());
+            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
+            orderResponseDto.setTradeUsers(tradeUserList);
+            logger.info("下单接口-新增订单用户关联表结束");
+        }
 
         //8.新增 会员次卡表 数据
-        logger.info("下单接口-新增会员次卡表开始");
-        logger.info("下单接口-新增会员次卡表："+ JSON.toJSON(customerCardTimes).toString());
-        List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
-        orderResponseDto.setCustomerCardTimes(customerCardTimeList);
-        logger.info("下单接口-新增会员次卡表结束");
+        if (Objects.nonNull(customerCardTimes) && customerCardTimes.size() > 0) {
+            customerCardTimes.stream().forEach(bo -> bo.setTradeId(tradeId));
+            logger.info("下单接口-新增会员次卡表开始");
+            logger.info("下单接口-新增会员次卡表：" + JSON.toJSON(customerCardTimes).toString());
+            List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
+            orderResponseDto.setCustomerCardTimes(customerCardTimeList);
+            logger.info("下单接口-新增会员次卡表结束");
+        }
+
         //9.修改 商品 库存信息
-        List<InventoryItemsDto> deductInventoryItems = inventoryRequest.getDeductInventoryItems();
-        this.modifyInventory(deductInventoryItems,false);
-        List<InventoryItemsDto> returnInventoryItems = inventoryRequest.getReturnInventoryItems();
-        this.modifyInventory(returnInventoryItems,true);
+        if (Objects.nonNull(inventoryRequest)) {
+            List<InventoryItemsDto> deductInventoryItems = inventoryRequest.getDeductInventoryItems();
+            if (Objects.nonNull(deductInventoryItems) && deductInventoryItems.size() > 0) {
+                this.modifyInventory(deductInventoryItems, false);
+            }
+            List<InventoryItemsDto> returnInventoryItems = inventoryRequest.getReturnInventoryItems();
+            if (Objects.nonNull(returnInventoryItems) && returnInventoryItems.size() > 0) {
+                this.modifyInventory(returnInventoryItems, true);
+            }
+        }
         return orderResponseDto;
     }
 
@@ -278,18 +326,18 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto getOrderResponse(Long tradeId) {
         OrderResponseDto orderResponseDto = new OrderResponseDto();
         Optional<Trade> optional = tradeRepository.findById(tradeId);
-        if(Objects.isNull(optional)){
-            logger.error("根据ID未找到交易记录主单,ID: :"+tradeId);
-            throw new BusinessException("根据ID未找到交易记录主单 ,ID:"+tradeId);
+        if (Objects.isNull(optional)) {
+            logger.error("根据ID未找到交易记录主单,ID: :" + tradeId);
+            throw new BusinessException("根据ID未找到交易记录主单 ,ID:" + tradeId);
         }
         Trade trade = optional.get();
-        List<TradeItem> tradeItemList = tradeItemRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
-        List<TradeCustomer> tradeCustomerList =  tradeCustomerRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
-        List<TradeTable> tradeTableList = tradeTableRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
-        List<TradePrivilege> tradePrivilegeList = tradePrivilegeRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
-        List<TradeItemProperty> tradeItemPropertiesList = tradeItemPropertyRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
-        List<TradeUser> tradeUserList =tradeUserRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
-        List<CustomerCardTime> customerCardTimeList = customerCardTimeRepository.findAllByTradeIdAndStatusFlag(tradeId,Constants.DATA_ENABLE);
+        List<TradeItem> tradeItemList = tradeItemRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+        List<TradeCustomer> tradeCustomerList = tradeCustomerRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+        List<TradeTable> tradeTableList = tradeTableRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+        List<TradePrivilege> tradePrivilegeList = tradePrivilegeRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+        List<TradeItemProperty> tradeItemPropertiesList = tradeItemPropertyRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+        List<TradeUser> tradeUserList = tradeUserRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+        List<CustomerCardTime> customerCardTimeList = customerCardTimeRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
         List<Tables> tablesList = tablesRepository.findAllByStatusFlag(Constants.DATA_ENABLE);
         orderResponseDto.setTables(tablesList);
         orderResponseDto.setCustomerCardTimes(customerCardTimeList);
@@ -306,34 +354,34 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackOn = {Exception.class})
     @Override
     public OrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo) {
-        if(cancelTradeBo != null && cancelTradeBo.getContent() != null &&
+        if (cancelTradeBo != null && cancelTradeBo.getContent() != null &&
                 cancelTradeBo.getContent().getObsoleteRequest() != null &&
-                cancelTradeBo.getContent().getObsoleteRequest().getTradeId() != null){
+                cancelTradeBo.getContent().getObsoleteRequest().getTradeId() != null) {
             Long tradeId = cancelTradeBo.getContent().getObsoleteRequest().getTradeId();
             Trade one = tradeRepository.getOne(tradeId);
-            if(one == null || one.getTradePayStatus() != 1){
+            if (one == null || one.getTradePayStatus() != 1) {
                 throw new BusinessException("作废订单接口- trade数据校验不通过");
             }
             tradeRepository.deleteTradeById(cancelTradeBo.getContent().getObsoleteRequest().getTradeId(), new Timestamp(new Date().getTime()));
             //下面根据trade id拿到 订单数据 然后返回。
-            if(cancelTradeBo.getContent().getReviseStock() != null && cancelTradeBo.getContent().getReviseStock() == true) {
+            if (cancelTradeBo.getContent().getReviseStock() != null && cancelTradeBo.getContent().getReviseStock() == true) {
                 List<ReturnInventoryItem> returnInventoryItems = cancelTradeBo.getContent().getReturnInventoryItems();
-                if(returnInventoryItems != null && returnInventoryItems.size()>0){
-                    for (int i = 0; i <returnInventoryItems.size() ; i++) {
+                if (returnInventoryItems != null && returnInventoryItems.size() > 0) {
+                    for (int i = 0; i < returnInventoryItems.size(); i++) {
                         ReturnInventoryItem returnInventoryItem = returnInventoryItems.get(i);
-                        if(returnInventoryItem.getQuantity() != null && returnInventoryItem.getQuantity()>0){
+                        if (returnInventoryItem.getQuantity() != null && returnInventoryItem.getQuantity() > 0) {
                             Long dishId = returnInventoryItem.getDishId();
-                            DishShop dishShop = dishShopRepository.findByIdAndShopIdenty(dishId,cancelTradeBo.getShopID());
-                            if(dishShop !=  null){
-                                dishShop.setDishQty(dishShop.getDishQty()+returnInventoryItem.getQuantity());
+                            DishShop dishShop = dishShopRepository.findByIdAndShopIdenty(dishId, cancelTradeBo.getShopID());
+                            if (dishShop != null) {
+                                dishShop.setDishQty(dishShop.getDishQty() + returnInventoryItem.getQuantity());
                                 dishShopRepository.save(dishShop);
                             }
                         }
                     }
-                    }
                 }
+            }
 
-        }else {
+        } else {
             throw new BusinessException("作废订单接口- trade数据校验不通过");
         }
         return getOrderResponse(cancelTradeBo.getContent().getObsoleteRequest().getTradeId());
@@ -342,55 +390,55 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackOn = {Exception.class})
     @Override
     public OrderResponseDto returnTrade(CancelTradeBo cancelTradeBo) {
-        if(cancelTradeBo != null && cancelTradeBo.getContent()!=null
-                && cancelTradeBo.getContent().getTradeId() !=null){
+        if (cancelTradeBo != null && cancelTradeBo.getContent() != null
+                && cancelTradeBo.getContent().getTradeId() != null) {
             Trade trade = tradeRepository.findByIdAndBrandIdentyAndTradeStatusIsNot(cancelTradeBo.getContent().getTradeId(), cancelTradeBo.getBrandID(), 6);
-            if(trade == null){
+            if (trade == null) {
                 throw new BusinessException("退货订单接口- trade数据校验不通过");
             }
             Trade tradeNew = new Trade();
-            BeanUtils.copyProperties(trade,tradeNew);
+            BeanUtils.copyProperties(trade, tradeNew);
             tradeNew.setId(null);
             tradeNew.setRelateTradeId(cancelTradeBo.getContent().getTradeId());
-            tradeNew.setUuid(UUID.randomUUID().toString().substring(0,32));
+            tradeNew.setUuid(UUID.randomUUID().toString().substring(0, 32));
             tradeRepository.save(tradeNew);
             //归还库存
-            if(cancelTradeBo.getContent().getReturnInventoryItems() != null && cancelTradeBo.getContent().getReturnInventoryItems().size()>0){
+            if (cancelTradeBo.getContent().getReturnInventoryItems() != null && cancelTradeBo.getContent().getReturnInventoryItems().size() > 0) {
                 List<ReturnInventoryItem> returnInventoryItems = cancelTradeBo.getContent().getReturnInventoryItems();
-                for (int i = 0; i <returnInventoryItems.size() ; i++) {
+                for (int i = 0; i < returnInventoryItems.size(); i++) {
                     ReturnInventoryItem returnInventoryItem = returnInventoryItems.get(i);
-                    if(returnInventoryItem.getQuantity() != null && returnInventoryItem.getQuantity()>0){
+                    if (returnInventoryItem.getQuantity() != null && returnInventoryItem.getQuantity() > 0) {
                         Long dishId = returnInventoryItem.getDishId();
-                        DishShop dishShop = dishShopRepository.findByIdAndShopIdenty(dishId,cancelTradeBo.getShopID());
-                        if(dishShop !=  null){
-                            dishShop.setDishQty(dishShop.getDishQty()+returnInventoryItem.getQuantity());
+                        DishShop dishShop = dishShopRepository.findByIdAndShopIdenty(dishId, cancelTradeBo.getShopID());
+                        if (dishShop != null) {
+                            dishShop.setDishQty(dishShop.getDishQty() + returnInventoryItem.getQuantity());
                         }
                     }
                 }
             }
-        }else {
+        } else {
             throw new BusinessException("退货订单接口- trade数据校验不通过");
         }
 
         return getOrderResponse(cancelTradeBo.getContent().getTradeId());
     }
 
-    private void modifyInventory(List<InventoryItemsDto> deductInventoryItems, boolean isAddQty){
-        for(InventoryItemsDto dto : deductInventoryItems){
+    private void modifyInventory(List<InventoryItemsDto> deductInventoryItems, boolean isAddQty) {
+        for (InventoryItemsDto dto : deductInventoryItems) {
             Long dishId = dto.getDishId();
             String dishName = dto.getDishName();
             Double price = dto.getPrice();
             Double quantity = dto.getQuantity();
             Optional<DishShop> optional = dishShopRepository.findById(dishId);
-            if(Objects.isNull(optional)){
-                logger.error("改单接口- 根据ID未找到商品,Dish_ID:"+dishId);
-                throw new BusinessException("改单接口- 根据ID未找到商品,Dish_ID:"+dishId);
+            if (Objects.isNull(optional)) {
+                logger.error("改单接口- 根据ID未找到商品,Dish_ID:" + dishId);
+                throw new BusinessException("改单接口- 根据ID未找到商品,Dish_ID:" + dishId);
             }
             DishShop dishShop = optional.get();
             Double dishQty = dishShop.getDishQty();
-            if(isAddQty){
+            if (isAddQty) {
                 dishQty = dishQty + quantity;
-            }else{
+            } else {
                 dishQty = dishQty - quantity;
             }
             dishShop.setDishQty(dishQty);
@@ -400,9 +448,9 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    private List<CustomerCardTime> modifyCustomerCardTimeBo(List<CustomerCardTimeBo> customerCardTimes){
+    private List<CustomerCardTime> modifyCustomerCardTimeBo(List<CustomerCardTimeBo> customerCardTimes) {
         List<CustomerCardTime> customerCardTimeList = new ArrayList<CustomerCardTime>();
-        for(CustomerCardTimeBo bo:customerCardTimes){
+        for (CustomerCardTimeBo bo : customerCardTimes) {
             CustomerCardTime customerCardTime = bo.copyTo(CustomerCardTime.class);
             customerCardTime = customerCardTimeRepository.save(customerCardTime);
             customerCardTimeList.add(customerCardTime);
@@ -410,9 +458,9 @@ public class OrderServiceImpl implements OrderService {
         return customerCardTimeList;
     }
 
-    private List<TradeUser> modifyTradeUser(List<TradeUserBo> tradeUserBos){
+    private List<TradeUser> modifyTradeUser(List<TradeUserBo> tradeUserBos) {
         List<TradeUser> tradeUsers = new ArrayList<TradeUser>();
-        for(TradeUserBo bo:tradeUserBos){
+        for (TradeUserBo bo : tradeUserBos) {
             TradeUser tradeUser = bo.copyTo(TradeUser.class);
             tradeUser = tradeUserRepository.save(tradeUser);
             tradeUsers.add(tradeUser);
@@ -420,9 +468,9 @@ public class OrderServiceImpl implements OrderService {
         return tradeUsers;
     }
 
-    private List<TradeItemProperty> modifyTradeItemProperties(List<TradeItemPropertyBo> tradeItemPropertieBos){
+    private List<TradeItemProperty> modifyTradeItemProperties(List<TradeItemPropertyBo> tradeItemPropertieBos) {
         List<TradeItemProperty> tradeItemPropertiesList = new ArrayList<TradeItemProperty>();
-        for(TradeItemPropertyBo bo:tradeItemPropertieBos){
+        for (TradeItemPropertyBo bo : tradeItemPropertieBos) {
             TradeItemProperty tradeItemProperty = bo.copyTo(TradeItemProperty.class);
             tradeItemProperty = tradeItemPropertyRepository.save(tradeItemProperty);
             tradeItemPropertiesList.add(tradeItemProperty);
@@ -430,9 +478,9 @@ public class OrderServiceImpl implements OrderService {
         return tradeItemPropertiesList;
     }
 
-    private List<TradeItem> modifyTradeItem(List<TradeItemBo> tradeItemBoList){
+    private List<TradeItem> modifyTradeItem(List<TradeItemBo> tradeItemBoList) {
         List<TradeItem> tradeItemList = new ArrayList<TradeItem>();
-        for(TradeItemBo bo:tradeItemBoList){
+        for (TradeItemBo bo : tradeItemBoList) {
             TradeItem tradeItem = bo.copyTo(TradeItem.class);
             tradeItem = tradeItemRepository.save(tradeItem);
             tradeItemList.add(tradeItem);
@@ -440,9 +488,9 @@ public class OrderServiceImpl implements OrderService {
         return tradeItemList;
     }
 
-    private List<TradeCustomer> modifyTradeCustomer(List<TradeCustomerBo> tradeCustomers){
+    private List<TradeCustomer> modifyTradeCustomer(List<TradeCustomerBo> tradeCustomers) {
         List<TradeCustomer> tradeCustomerList = new ArrayList<TradeCustomer>();
-        for(TradeCustomerBo bo:tradeCustomers){
+        for (TradeCustomerBo bo : tradeCustomers) {
             TradeCustomer tradeCustomer = bo.copyTo(TradeCustomer.class);
             tradeCustomer = tradeCustomerRepository.save(tradeCustomer);
             tradeCustomerList.add(tradeCustomer);
@@ -450,9 +498,9 @@ public class OrderServiceImpl implements OrderService {
         return tradeCustomerList;
     }
 
-    private List<TradePrivilege> modifyTradePrivileges(List<TradePrivilegeBo> tradePrivilegeBos){
+    private List<TradePrivilege> modifyTradePrivileges(List<TradePrivilegeBo> tradePrivilegeBos) {
         List<TradePrivilege> tradePrivileges = new ArrayList<TradePrivilege>();
-        for(TradePrivilegeBo bo:tradePrivilegeBos){
+        for (TradePrivilegeBo bo : tradePrivilegeBos) {
             TradePrivilege tradePrivilege = bo.copyTo(TradePrivilege.class);
             tradePrivilege = tradePrivilegeRepository.save(tradePrivilege);
             tradePrivileges.add(tradePrivilege);
@@ -460,31 +508,29 @@ public class OrderServiceImpl implements OrderService {
         return tradePrivileges;
     }
 
-    private List<TradeTable> modifyTradeTable(List<TradeTableBo> tradeTableBos){
+    private List<TradeTable> modifyTradeTable(List<TradeTableBo> tradeTableBos) {
         List<TradeTable> tradeTableList = new ArrayList<TradeTable>();
-        for(TradeTableBo bo:tradeTableBos){
+        for (TradeTableBo bo : tradeTableBos) {
             //1.修改桌台信息trade_table
             TradeTable tradeTable = bo.copyTo(TradeTable.class);
             tradeTable = tradeTableRepository.save(tradeTable);
             tradeTableList.add(tradeTable);
             //2.维护桌台信息tables
             Optional<Tables> optional = tablesRepository.findById(bo.getTableId());
-            if(Objects.isNull(optional)){
-                logger.error("根据ID未找到可维护桌台信息,TABLE_ID:"+bo.getTableId());
-                throw new BusinessException("根据ID未找到可维护桌台信息,TABLE_ID:"+bo.getTableId());
+            if (Objects.isNull(optional)) {
+                logger.error("根据ID未找到可维护桌台信息,TABLE_ID:" + bo.getTableId());
+                throw new BusinessException("根据ID未找到可维护桌台信息,TABLE_ID:" + bo.getTableId());
             }
             Tables tables = optional.get();
-            if(Constants.DATA_ENABLE.equals(bo.getStatusFlag()) && Constants.SELF_TABLE_STATUS_LOCK.equals(bo.getSelfTableStatus())){
+            if (Constants.DATA_ENABLE.equals(bo.getStatusFlag()) && Constants.SELF_TABLE_STATUS_LOCK.equals(bo.getSelfTableStatus())) {
                 tables.setTableStatus(Constants.SELF_TABLE_STATUS_LOCK);
-            }else{
+            } else {
                 tables.setTableStatus(Constants.SELF_TABLE_STATUS_UNLOCK);
             }
             tablesRepository.save(tables);
         }
         return tradeTableList;
     }
-
-
 
 
 }
