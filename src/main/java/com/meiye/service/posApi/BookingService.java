@@ -1,7 +1,12 @@
 package com.meiye.service.posApi;
 
+import com.meiye.bo.booking.dto.BookToOrderResponseDto;
 import com.meiye.bo.booking.dto.BookingRequestDto;
 import com.meiye.bo.booking.dto.BookingResponseDto;
+import com.meiye.bo.booking.dto.CacelBookingDto;
+import com.meiye.bo.trade.OrderDto.OrderRequestDto;
+import com.meiye.bo.trade.OrderDto.OrderResponseDto;
+import com.meiye.model.booking.Booking;
 
 /**
  * @Author: ryner
@@ -23,5 +28,19 @@ public interface BookingService {
      * @return
      */
     BookingResponseDto updateBooking(BookingRequestDto bookingRequestDto);
+
+    /**
+     * 删除预定单
+     * @param cacelBookingDto
+     * @return
+     */
+    Booking delBooking(CacelBookingDto cacelBookingDto);
+
+    /**
+     * 预定转订单
+     * @param addOrderRequestDto
+     * @return
+     */
+    BookToOrderResponseDto updateBookingToOrder(OrderRequestDto addOrderRequestDto);
 
 }

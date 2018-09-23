@@ -1,5 +1,6 @@
 package com.meiye.bo.trade.OrderDto;
 
+import com.meiye.bo.booking.dto.BookingInfoDto;
 import com.meiye.bo.trade.TradeBo;
 import lombok.Data;
 
@@ -15,4 +16,6 @@ import java.io.Serializable;
 public class TradeRequestDto implements Serializable {
     private TradeBo tradeRequest;
     private InventoryRequestDto inventoryRequest;
+    //预订单转订单 BookingInfoDto
+    private BookingInfoDto bookingInfo;
 }

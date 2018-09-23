@@ -18,7 +18,7 @@ public interface OrderService {
 
     OrderResponseDto addOrderData(OrderRequestDto addOrderRequestDto);
 
-    OrderResponseDto getOrderResponse(Long tradeId);
+    OrderResponseDto getOrderResponse(Long tradeId,boolean needDelData);
 
     OrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo);
 

@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.meiye.bo.booking.BookingBo;
 import com.meiye.bo.booking.BookingTradeItemBo;
 import com.meiye.bo.booking.BookingTradeItemUserBo;
-import com.meiye.bo.booking.dto.BookingRequestDto;
-import com.meiye.bo.booking.dto.BookingResponseDto;
+import com.meiye.bo.booking.dto.*;
+import com.meiye.bo.trade.CancelTrade.Content;
+import com.meiye.bo.trade.OrderDto.OrderRequestDto;
+import com.meiye.bo.trade.OrderDto.OrderResponseDto;
+import com.meiye.bo.trade.OrderDto.TradeRequestDto;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.booking.Booking;
 import com.meiye.model.booking.BookingTradeItem;
@@ -14,8 +17,11 @@ import com.meiye.repository.booking.BookingRepository;
 import com.meiye.repository.booking.BookingTradeItemRepository;
 import com.meiye.repository.booking.BookingTradeItemUserRepository;
 import com.meiye.service.posApi.BookingService;
+import com.meiye.service.posApi.OrderService;
+import com.meiye.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +49,8 @@ public class BookingServiceImpl implements BookingService {
     BookingTradeItemUserRepository bookingTradeItemUserRepository;
     @Autowired
     BookingTradeItemRepository bookingTradeItemRepository;
+    @Autowired
+    OrderService orderService;
 
     @Override
     @Transactional(rollbackOn = {Exception.class})
@@ -62,26 +70,33 @@ public class BookingServiceImpl implements BookingService {
         booking = bookingRepository.save(booking);
         bookingResponseDto.setBooking(booking);
         logger.info("创建预定接口-新增预定记录主单结束");
-        //2.booking trade item
         Long bookingId = booking.getId();
-        bookingTradeItemBos.stream().forEach(bo->bo.setBookingId(bookingId));
-        logger.info("创建预定接口-新增预定记录明细开始");
-        logger.info("创建预定接口-预定交易明细数据："+ JSON.toJSON(bookingTradeItemBos).toString());
-        List<BookingTradeItem> bookingTradeItems = this.modifyBookingTradeItemBos(bookingTradeItemBos);
-        bookingResponseDto.setBookingTradeItems(bookingTradeItems);
-        logger.info("创建预定接口-新增预定记录明细结束");
+        List<BookingTradeItem>  bookingTradeItems = null;
+        //2.booking trade item
+        if(bookingTradeItemBos!=null &&bookingTradeItemBos.size()>0){
+            bookingTradeItemBos.stream().forEach(bo->bo.setBookingId(bookingId));
+            logger.info("创建预定接口-新增预定记录明细开始");
+            logger.info("创建预定接口-预定交易明细数据："+ JSON.toJSON(bookingTradeItemBos).toString());
+            bookingTradeItems = this.modifyBookingTradeItemBos(bookingTradeItemBos);
+            bookingResponseDto.setBookingTradeItems(bookingTradeItems);
+            logger.info("创建预定接口-新增预定记录明细结束");
+        }
+
         //3.booking trade item user
-        bookingTradeItemUserBos.stream().forEach(bo->{
-            bo.setBookingId(bookingId);
-            String bookingTradeItemUuid = bo.getBookingTradeItemUuid();
-            BookingTradeItem bookIngTradeItemByUuid = findBookIngTradeItemByUuid(bookingTradeItems, bookingTradeItemUuid);
-            bo.setBookingTradeItemId(bookIngTradeItemByUuid.getId());
-        });
-        logger.info("创建预定接口-新增预定订单销售员与订单商品关系开始");
-        logger.info("创建预定接口-预定订单销售员与订单商品关系数据："+ JSON.toJSON(bookingTradeItemUserBos).toString());
-        List<BookingTradeItemUser> bookingTradeItemUserList = this.modifyBookingTradeItemUserBos(bookingTradeItemUserBos);
-        bookingResponseDto.setBookingTradeItemUsers(bookingTradeItemUserList);
-        logger.info("创建预定接口-新增预定订单销售员与订单商品关系结束");
+        if(bookingTradeItemUserBos!=null &&bookingTradeItemUserBos.size()>0&&bookingTradeItemBos!=null &&bookingTradeItemBos.size()>0){
+            List<BookingTradeItem> finalBookingTradeItems = bookingTradeItems;
+            bookingTradeItemUserBos.stream().forEach(bo->{
+                bo.setBookingId(bookingId);
+                String bookingTradeItemUuid = bo.getBookingTradeItemUuid();
+                BookingTradeItem bookIngTradeItemByUuid = findBookIngTradeItemByUuid(finalBookingTradeItems, bookingTradeItemUuid);
+                bo.setBookingTradeItemId(bookIngTradeItemByUuid.getId());
+            });
+            logger.info("创建预定接口-新增预定订单销售员与订单商品关系开始");
+            logger.info("创建预定接口-预定订单销售员与订单商品关系数据："+ JSON.toJSON(bookingTradeItemUserBos).toString());
+            List<BookingTradeItemUser> bookingTradeItemUserList = this.modifyBookingTradeItemUserBos(bookingTradeItemUserBos);
+            bookingResponseDto.setBookingTradeItemUsers(bookingTradeItemUserList);
+            logger.info("创建预定接口-新增预定订单销售员与订单商品关系结束");
+        }
 
         return bookingResponseDto;
     }
@@ -126,19 +141,95 @@ public class BookingServiceImpl implements BookingService {
         bookingResponseDto.setBooking(booking);
         logger.info("修改预定接口-修改预定记录主单结束");
         //2.booking trade item
-        logger.info("修改预定接口-修改预定交易明细开始");
-        logger.info("修改预定接口-预定交易明细数据："+ JSON.toJSON(bookingTradeItemBos).toString());
-        List<BookingTradeItem> bookingTradeItems = this.modifyBookingTradeItemBos(bookingTradeItemBos);
-        bookingResponseDto.setBookingTradeItems(bookingTradeItems);
-        logger.info("修改预定接口-修改预定记录明细结束");
+        if(bookingTradeItemBos!=null &&bookingTradeItemBos.size()>0){
+            logger.info("修改预定接口-修改预定交易明细开始");
+            logger.info("修改预定接口-预定交易明细数据："+ JSON.toJSON(bookingTradeItemBos).toString());
+            List<BookingTradeItem> bookingTradeItems = this.modifyBookingTradeItemBos(bookingTradeItemBos);
+            bookingResponseDto.setBookingTradeItems(bookingTradeItems);
+            logger.info("修改预定接口-修改预定记录明细结束");
+        }
         //3.booking trade item user
-        logger.info("修改预定接口-修改预定订单销售员与订单商品关系开始");
-        logger.info("修改预定接口-预定订单销售员与订单商品关系数据："+ JSON.toJSON(bookingTradeItemUserBos).toString());
-        List<BookingTradeItemUser> bookingTradeItemUserList = this.modifyBookingTradeItemUserBos(bookingTradeItemUserBos);
-        bookingResponseDto.setBookingTradeItemUsers(bookingTradeItemUserList);
-        logger.info("修改预定接口-修改预定订单销售员与订单商品关系结束");
+        if(bookingTradeItemUserBos!=null &&bookingTradeItemUserBos.size()>0){
+            logger.info("修改预定接口-修改预定订单销售员与订单商品关系开始");
+            logger.info("修改预定接口-预定订单销售员与订单商品关系数据："+ JSON.toJSON(bookingTradeItemUserBos).toString());
+            List<BookingTradeItemUser> bookingTradeItemUserList = this.modifyBookingTradeItemUserBos(bookingTradeItemUserBos);
+            bookingResponseDto.setBookingTradeItemUsers(bookingTradeItemUserList);
+            logger.info("修改预定接口-修改预定订单销售员与订单商品关系结束");
+        }
 
         return bookingResponseDto;
+    }
+
+    @Override
+    @Transactional(rollbackOn = {Exception.class})
+    public Booking delBooking(CacelBookingDto cacelBookingDto) {
+        CacelDetailDto content = cacelBookingDto.getContent();
+        if(Objects.isNull(content.getBookingId())){
+            logger.error("删除预定接口-删除预定接口数据为空！");
+            throw new BusinessException("删除预定接口-booking Id为空，请检查！");
+        }
+        Optional<Booking> byId = bookingRepository.findById(content.getBookingId());
+        if(!byId.isPresent()){
+            logger.error("删除预定接口-数据库未找到需要删除的预订单！");
+            throw new BusinessException("删除预定接口-数据库未找到需要删除的预订单！");
+        }
+        Booking booking = byId.get();
+        booking.setStatusFlag(Constants.DATA_DISABLE);
+        if(Objects.nonNull(content.getReason())){
+            booking.setRemark(content.getReason());
+        }
+        if(Objects.nonNull(content.getBrandIdenty())){
+            booking.setBrandIdenty(content.getBrandIdenty());
+        }
+        if(Objects.nonNull(content.getShopIdenty())){
+            booking.setShopIdenty(content.getShopIdenty());
+        }
+        if(Objects.nonNull(content.getCancelOrderUser())){
+            booking.setUpdatorId(content.getCancelOrderUser());
+        }
+        Booking booking1 = bookingRepository.save(booking);
+        return booking1;
+    }
+
+    @Override
+    @Transactional(rollbackOn = {Exception.class})
+    public BookToOrderResponseDto updateBookingToOrder(OrderRequestDto orderRequestDto) {
+        BookToOrderResponseDto bookToOrderResponseDto = new BookToOrderResponseDto();
+        TradeRequestDto content = orderRequestDto.getContent();
+        BookingInfoDto bookingInfoDto = content.getBookingInfo();
+        if(Objects.isNull(bookingInfoDto)){
+            logger.error("预订转订单接口-预订单数据为空！");
+            throw new BusinessException("预订转订单接口-预订单数据为空，请检查！");
+        }
+
+        //校验版本号
+        Long bookingId = bookingInfoDto.getBookingId();
+        if(Objects.isNull(bookingId)){
+            logger.error("预订转订单接口-预订单booking_Id is null！");
+            throw new BusinessException("预订转订单接口-预订单booking_Id is null！");
+        }
+        Optional<Booking> Optional = bookingRepository.findById(bookingId);
+        if(!Optional.isPresent()){
+            logger.error("预订转订单接口-未找到需要修改的预订单！booking_id:"+bookingId);
+            throw new BusinessException("预订转订单接口-未找到需要修改的预订单！booking_id:"+bookingId);
+        }
+        Booking booking1 = Optional.get();
+        Timestamp clientUpdateTime = new Timestamp(bookingInfoDto.getBookingServerUpdateTime());
+        Timestamp serverUpdateTime = booking1.getServerUpdateTime();
+        if(clientUpdateTime.equals(serverUpdateTime)){
+            booking1.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
+        }else{
+            logger.error("预订转订单接口-版本校验失败！");
+            throw new BusinessException("预订转订单接口-版本校验失败！");
+        }
+        //修改预订单状态
+        booking1.setConfirmed(Constants.DATA_ENABLE);
+        booking1 = bookingRepository.save(booking1);
+        //插入新订单信息
+        OrderResponseDto orderResponseDto = orderService.addOrderData(orderRequestDto);
+        BeanUtils.copyProperties(orderResponseDto, bookToOrderResponseDto);
+        bookToOrderResponseDto.setBooking(booking1);
+        return bookToOrderResponseDto;
     }
 
     private List<BookingTradeItem> modifyBookingTradeItemBos(List<BookingTradeItemBo> bookingTradeItemBos){

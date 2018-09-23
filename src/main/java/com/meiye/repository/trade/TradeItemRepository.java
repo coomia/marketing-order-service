@@ -18,5 +18,7 @@ public interface TradeItemRepository extends JpaRepository<TradeItem,Long>{
 
     List<TradeItem> findAllByTradeIdAndStatusFlag(Long tradeId,Integer statusFlag);
 
+    List<TradeItem> findAllByTradeId(Long tradeId);
+
 }
 

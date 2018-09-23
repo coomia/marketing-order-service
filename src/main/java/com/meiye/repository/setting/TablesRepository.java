@@ -30,6 +30,8 @@ public interface TablesRepository extends JpaRepository<Tables,Long> {
 
     List<Tables> findAllByIdInAndStatusFlag(List<Long> idList,Integer statusFlag);
 
+    List<Tables> findAllByIdIn(List<Long> idList);
+
     @Modifying
     @Query("update Tables ta set ta.tableName=?1 where ta.id=?2")
     int updateTable(String tableName,Long id);

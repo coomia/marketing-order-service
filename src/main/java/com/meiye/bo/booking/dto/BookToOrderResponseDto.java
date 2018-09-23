@@ -1,6 +1,5 @@
-package com.meiye.bo.trade.OrderDto;
+package com.meiye.bo.booking.dto;
 
-import com.meiye.bo.trade.*;
 import com.meiye.model.booking.Booking;
 import com.meiye.model.setting.Tables;
 import com.meiye.model.trade.*;
@@ -16,7 +15,7 @@ import java.util.List;
  * @Modified By:
  */
 @Data
-public class OrderResponseDto implements Serializable {
+public class BookToOrderResponseDto implements Serializable {
 
     private Trade trade;
     private List<TradeCustomer> tradeCustomers;
@@ -27,5 +26,6 @@ public class OrderResponseDto implements Serializable {
     private List<CustomerCardTime> customerCardTimes;
     private List<TradeTable> tradeTables;
     private List<Tables> tables;
+    private Booking booking;
 
 }

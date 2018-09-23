@@ -19,5 +19,6 @@ public interface CustomerCardTimeRepository extends JpaRepository<CustomerCardTi
 
     List<CustomerCardTime> findAllByTradeIdAndStatusFlag(Long tradeId, Integer statusFlag);
 
+    List<CustomerCardTime> findAllByTradeId(Long tradeId);
 }
 
