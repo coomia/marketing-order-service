@@ -29,7 +29,7 @@ public interface MeiYePosSyncMapper {
             "<if test='syncConfigBo.filterBrandIdenty!=\"N\"'>" +
             " and brand_identy = #{brandIdenty}" +
             "</if>" +
-            "<if test='syncConfigBo.syncRecentDays>0'>" +
+            "<if test='syncConfigBo.syncRecentDays!=0'>" +
             " and IFNULL(server_update_time,server_create_time) > DATE_ADD(NOW(),INTERVAL #{syncConfigBo.syncRecentDays} DAY) " +
             "</if>" +
             "</if>" +

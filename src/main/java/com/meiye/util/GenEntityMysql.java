@@ -31,7 +31,7 @@ public class GenEntityMysql {
 
 
     // TODO 需要修改的地方
-    private static final String URL = "jdbc:mysql://118.113.201.253:8805/store";
+    private static final String URL = "jdbc:mysql://192.168.31.172:8805/store";
     private static final String NAME = "root";
     private static final String PASS = "Hj_1987121";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
@@ -412,10 +412,10 @@ public class GenEntityMysql {
      */
     public static void main(String[] args) {
         try {
-            INSTANCE.generateTables=new String[]{"booking","booking_trade_item","booking_trade_item_user"};
-            INSTANCE.packageOutPath = "com.meiye.model.booking";
-            INSTANCE.repostiryPackageOutPath="com.meiye.repository.booking";
-            INSTANCE.boPackageOutPath="com.meiye.bo.booking";
+            INSTANCE.generateTables=new String[]{"payment","payment_item","payment_mode"};
+            INSTANCE.packageOutPath = "com.meiye.model.pay";
+            INSTANCE.repostiryPackageOutPath="com.meiye.repository.pay";
+            INSTANCE.boPackageOutPath="com.meiye.bo.pay";
             INSTANCE.generate();
             System.out.println("generate classes success!");
         } catch (Exception e) {

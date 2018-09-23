@@ -541,5 +541,10 @@ public class OrderServiceImpl implements OrderService {
         return tradeTableList;
     }
 
+    @Override
+    public Trade getTradeByTradeNo(String tradeNo){
+        return tradeRepository.findByTradeNo(tradeNo);
+    }
+
 
 }

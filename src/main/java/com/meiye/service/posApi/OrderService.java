@@ -3,6 +3,7 @@ package com.meiye.service.posApi;
 import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
+import com.meiye.model.trade.Trade;
 
 /**
  * @Author: ryner
@@ -23,4 +24,6 @@ public interface OrderService {
     OrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo);
 
     OrderResponseDto returnTrade(CancelTradeBo cancelTradeBo);
+
+    Trade getTradeByTradeNo(String tradeNo);
 }

@@ -22,5 +22,7 @@ public interface TradeRepository extends JpaRepository<Trade,Long>{
     void deleteTradeById(Long id, Timestamp serverUpdateTime);
 
     Trade findByIdAndBrandIdentyAndTradeStatusIsNot(Long id,Long brandIdenty,Integer tradeStatus);
+
+    Trade findByTradeNo(String tradeNo);
 }
 
