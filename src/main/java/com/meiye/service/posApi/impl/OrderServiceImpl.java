@@ -347,7 +347,7 @@ public class OrderServiceImpl implements OrderService {
         List<TradeItemProperty> tradeItemPropertiesList = tradeItemPropertyRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
         List<TradeUser> tradeUserList = tradeUserRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
         List<CustomerCardTime> customerCardTimeList = customerCardTimeRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
-        List<Tables> tablesList = tablesRepository.findAllByStatusFlag(Constants.DATA_ENABLE);
+        List<Tables> tablesList = this.getRelatedTablesByTrade(tradeTableList);
         orderResponseDto.setTables(tablesList);
         orderResponseDto.setCustomerCardTimes(customerCardTimeList);
         orderResponseDto.setTrade(trade);
@@ -430,6 +430,19 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return getOrderResponse(cancelTradeBo.getContent().getTradeId());
+    }
+
+    private  List<Tables> getRelatedTablesByTrade( List<TradeTable> tradeTables){
+        List<Tables> tablesList= null;
+        List<Long> tableIds = null;
+        for(TradeTable tradeTable : tradeTables){
+            tableIds = new ArrayList<>();
+            tableIds.add(tradeTable.getTableId());
+        }
+        if(tableIds!=null &&tableIds.size()>0){
+            tablesList = tablesRepository.findAllByIdInAndStatusFlag(tableIds,Constants.DATA_ENABLE);
+        }
+        return  tablesList;
     }
 
     private void modifyInventory(List<InventoryItemsDto> deductInventoryItems, boolean isAddQty) {
