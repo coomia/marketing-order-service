@@ -23,10 +23,10 @@ public interface MeiYePosSyncMapper {
             " and id>#{id} and IFNULL(server_update_time,server_create_time)>=#{serverUpdateTime} " +
             "</if> " +
             "<if test='syncConfigBo!=null'>" +
-            " <if test='syncConfigBo.filterShopIdenty=Y'>" +
+            " <if test='syncConfigBo.filterShopIdenty!=\"N\"'>" +
             "  and brand_identy=#{shopIdenty}" +
             "</if>" +
-            "<if test='syncConfigBo.filterBrandIdenty=Y'>" +
+            "<if test='syncConfigBo.filterBrandIdenty!=\"N\"'>" +
             " and brand_identy = #{brandIdenty}" +
             "</if>" +
             "<if test='syncConfigBo.syncRecentDays>0'>" +
@@ -44,8 +44,8 @@ public interface MeiYePosSyncMapper {
     @Select("select * from pos_sync_config")
     public List<PosSyncConfigBo> findAllConfigs();
 
-    @Select("SELECT a.`device_mac` deviceId,b.`commercial_id` shopId,c.`id` brandId,c.`name` brandName,b.`commercial_name` shopName,b.`commercial_phone` shopPhone,\n" +
-            "b.`commercial_adress` shopAddress,b.`commercial_logo` shopLogo,b.`longitude`,b.`latitude` \n" +
+    @Select("SELECT a.`device_mac` device_id,b.`commercial_id` shop_id,c.`id` brand_id,c.`name` brand_name,b.`commercial_name` shop_name,b.`commercial_phone` shop_phone,\n" +
+            "b.`commercial_adress` shop_address,b.`commercial_logo` shop_logo,b.`longitude`,b.`latitude` \n" +
             "FROM `shop_device` a,`commercial` b,`brand` c\n" +
             "WHERE a.`shop_identy`=b.`commercial_id` AND a.`brand_identy`=c.`id`\n" +
             "AND a.`device_mac`=#{deviceId}")

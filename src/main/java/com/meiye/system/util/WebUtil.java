@@ -70,6 +70,10 @@ public class WebUtil {
         return request.getRequestURI().startsWith(request.getContextPath()+"/weichat/api");
     }
 
+    //是否微信客户端API
+    public static boolean isPayCallBackPath(HttpServletRequest request){
+        return request.getRequestURI().startsWith(request.getContextPath()+"/pay/callback");
+    }
     public static String getPosRequestHeaderPrefix(){
         return "yf";
     }

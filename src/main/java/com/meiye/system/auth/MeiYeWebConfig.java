@@ -49,6 +49,7 @@ public class MeiYeWebConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // 所有 /login 的POST请求 都放行
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
+                .antMatchers(HttpMethod.POST,"/pay/callback/**").permitAll()
                 // 所有请求需要身份认证
                 .anyRequest().authenticated()
                 .and()
