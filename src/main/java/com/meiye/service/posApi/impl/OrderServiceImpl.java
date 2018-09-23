@@ -95,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("改单接口-交易记录主单tradeId is null！");
         }
         Optional<Trade> tradeOptional = tradeRepository.findById(tradeId);
-        if (Objects.isNull(tradeOptional)) {
+        if (!tradeOptional.isPresent()) {
             logger.error("改单接口-未找到交易记录主单！tradeId:" + tradeId);
             throw new BusinessException("改单接口-未找到交易记录主单！tradeId:" + tradeId);
         }
@@ -138,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
         if (Objects.nonNull(tradeTables) && tradeTables.size() > 0) {
             logger.info("改单接口-修改交易桌台开始");
             logger.info("改单接口-交易桌台信息：" + JSON.toJSON(tradeTables).toString());
-            List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
+            List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables,orderResponseDto);
             orderResponseDto.setTradeTables(tradeTableList);
             logger.info("改单接口-修改交易桌台结束");
         }
@@ -241,14 +241,14 @@ public class OrderServiceImpl implements OrderService {
         //2.新增 交易明细 数据
         if (Objects.nonNull(tradeItems) && tradeItems.size() > 0) {
             tradeItems.stream().forEach(bo -> {
-                bo.setTradeId(tradeId);
-                if(Objects.isNull(bo.getRecycleStatus())){
-                    bo.setRecycleStatus(1);
-                }
-                if(Objects.isNull(bo.getBatchNo())){
-                    bo.setBatchNo("");
-                }
-            }
+                        bo.setTradeId(tradeId);
+                        if (Objects.isNull(bo.getRecycleStatus())) {
+                            bo.setRecycleStatus(1);
+                        }
+                        if (Objects.isNull(bo.getBatchNo())) {
+                            bo.setBatchNo("");
+                        }
+                    }
             );
             logger.info("下单接口-新增交易明细开始");
             logger.info("下单接口-交易记录主单：" + JSON.toJSON(tradeItems).toString());
@@ -272,7 +272,7 @@ public class OrderServiceImpl implements OrderService {
             tradeTables.stream().forEach(bo -> bo.setTradeId(tradeId));
             logger.info("下单接口-新增交易桌台开始");
             logger.info("下单接口-交易桌台信息：" + JSON.toJSON(tradeTables).toString());
-            List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables);
+            List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables,orderResponseDto);
             orderResponseDto.setTradeTables(tradeTableList);
             logger.info("下单接口-新增交易桌台结束");
         }
@@ -332,22 +332,39 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponseDto getOrderResponse(Long tradeId) {
+    public OrderResponseDto getOrderResponse(Long tradeId, boolean needDelData) {
         OrderResponseDto orderResponseDto = new OrderResponseDto();
         Optional<Trade> optional = tradeRepository.findById(tradeId);
-        if (Objects.isNull(optional)) {
+        if (!optional.isPresent()) {
             logger.error("根据ID未找到交易记录主单,ID: :" + tradeId);
             throw new BusinessException("根据ID未找到交易记录主单 ,ID:" + tradeId);
         }
         Trade trade = optional.get();
-        List<TradeItem> tradeItemList = tradeItemRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
-        List<TradeCustomer> tradeCustomerList = tradeCustomerRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
-        List<TradeTable> tradeTableList = tradeTableRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
-        List<TradePrivilege> tradePrivilegeList = tradePrivilegeRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
-        List<TradeItemProperty> tradeItemPropertiesList = tradeItemPropertyRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
-        List<TradeUser> tradeUserList = tradeUserRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
-        List<CustomerCardTime> customerCardTimeList = customerCardTimeRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
-        List<Tables> tablesList = this.getRelatedTablesByTrade(tradeTableList);
+        List<TradeItem> tradeItemList = null;
+        List<TradeCustomer> tradeCustomerList = null;
+        List<TradeTable> tradeTableList = null;
+        List<TradePrivilege> tradePrivilegeList = null;
+        List<TradeItemProperty> tradeItemPropertiesList = null;
+        List<TradeUser> tradeUserList = null;
+        List<CustomerCardTime> customerCardTimeList = null;
+        if (needDelData) {
+            tradeItemList = tradeItemRepository.findAllByTradeId(tradeId);
+            tradeCustomerList = tradeCustomerRepository.findAllByTradeId(tradeId);
+            tradeTableList = tradeTableRepository.findAllByTradeId(tradeId);
+            tradePrivilegeList = tradePrivilegeRepository.findAllByTradeId(tradeId);
+            tradeItemPropertiesList = tradeItemPropertyRepository.findAllByTradeId(tradeId);
+            tradeUserList = tradeUserRepository.findAllByTradeId(tradeId);
+            customerCardTimeList = customerCardTimeRepository.findAllByTradeId(tradeId);
+        } else {
+            tradeItemList = tradeItemRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+            tradeCustomerList = tradeCustomerRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+            tradeTableList = tradeTableRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+            tradePrivilegeList = tradePrivilegeRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+            tradeItemPropertiesList = tradeItemPropertyRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+            tradeUserList = tradeUserRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+            customerCardTimeList = customerCardTimeRepository.findAllByTradeIdAndStatusFlag(tradeId, Constants.DATA_ENABLE);
+        }
+        List<Tables> tablesList = this.getRelatedTablesByTrade(tradeTableList, needDelData);
         orderResponseDto.setTables(tablesList);
         orderResponseDto.setCustomerCardTimes(customerCardTimeList);
         orderResponseDto.setTrade(trade);
@@ -393,7 +410,7 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new BusinessException("作废订单接口- trade数据校验不通过");
         }
-        return getOrderResponse(cancelTradeBo.getContent().getObsoleteRequest().getTradeId());
+        return getOrderResponse(cancelTradeBo.getContent().getObsoleteRequest().getTradeId(), false);
     }
 
     @Transactional(rollbackOn = {Exception.class})
@@ -429,20 +446,24 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("退货订单接口- trade数据校验不通过");
         }
 
-        return getOrderResponse(cancelTradeBo.getContent().getTradeId());
+        return getOrderResponse(cancelTradeBo.getContent().getTradeId(), false);
     }
 
-    private  List<Tables> getRelatedTablesByTrade( List<TradeTable> tradeTables){
-        List<Tables> tablesList= null;
+    private List<Tables> getRelatedTablesByTrade(List<TradeTable> tradeTables, boolean needDelData) {
+        List<Tables> tablesList = null;
         List<Long> tableIds = null;
-        for(TradeTable tradeTable : tradeTables){
+        for (TradeTable tradeTable : tradeTables) {
             tableIds = new ArrayList<>();
             tableIds.add(tradeTable.getTableId());
         }
-        if(tableIds!=null &&tableIds.size()>0){
-            tablesList = tablesRepository.findAllByIdInAndStatusFlag(tableIds,Constants.DATA_ENABLE);
+        if (tableIds != null && tableIds.size() > 0) {
+            if(needDelData){
+                tablesList = tablesRepository.findAllById(tableIds);
+            }else{
+                tablesList = tablesRepository.findAllByIdInAndStatusFlag(tableIds, Constants.DATA_ENABLE);
+            }
         }
-        return  tablesList;
+        return tablesList;
     }
 
     private void modifyInventory(List<InventoryItemsDto> deductInventoryItems, boolean isAddQty) {
@@ -452,7 +473,7 @@ public class OrderServiceImpl implements OrderService {
             Double price = dto.getPrice();
             Double quantity = dto.getQuantity();
             Optional<DishShop> optional = dishShopRepository.findById(dishId);
-            if (Objects.isNull(optional)) {
+            if (!optional.isPresent()) {
                 logger.error("改单接口- 根据ID未找到商品,Dish_ID:" + dishId);
                 throw new BusinessException("改单接口- 根据ID未找到商品,Dish_ID:" + dishId);
             }
@@ -530,8 +551,9 @@ public class OrderServiceImpl implements OrderService {
         return tradePrivileges;
     }
 
-    private List<TradeTable> modifyTradeTable(List<TradeTableBo> tradeTableBos) {
+    private List<TradeTable> modifyTradeTable(List<TradeTableBo> tradeTableBos,OrderResponseDto orderResponseDto) {
         List<TradeTable> tradeTableList = new ArrayList<TradeTable>();
+        List<Tables> tablesList = new ArrayList<>();
         for (TradeTableBo bo : tradeTableBos) {
             //1.修改桌台信息trade_table
             TradeTable tradeTable = bo.copyTo(TradeTable.class);
@@ -539,7 +561,7 @@ public class OrderServiceImpl implements OrderService {
             tradeTableList.add(tradeTable);
             //2.维护桌台信息tables
             Optional<Tables> optional = tablesRepository.findById(bo.getTableId());
-            if (Objects.isNull(optional)) {
+            if (!optional.isPresent()) {
                 logger.error("根据ID未找到可维护桌台信息,TABLE_ID:" + bo.getTableId());
                 throw new BusinessException("根据ID未找到可维护桌台信息,TABLE_ID:" + bo.getTableId());
             }
@@ -549,8 +571,10 @@ public class OrderServiceImpl implements OrderService {
             } else {
                 tables.setTableStatus(Constants.SELF_TABLE_STATUS_UNLOCK);
             }
-            tablesRepository.save(tables);
+            Tables tables1 = tablesRepository.save(tables);
+            tablesList.add(tables1);
         }
+        orderResponseDto.setTables(tablesList);
         return tradeTableList;
     }
 

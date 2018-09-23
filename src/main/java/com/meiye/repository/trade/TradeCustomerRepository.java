@@ -19,5 +19,7 @@ public interface TradeCustomerRepository extends JpaRepository<TradeCustomer,Lon
 
     List<TradeCustomer> findAllByTradeIdAndStatusFlag(Long tradeId, Integer statusFlag);
 
+    List<TradeCustomer> findAllByTradeId(Long tradeId);
+
 }
 

@@ -48,7 +48,7 @@ public class OrderController {
         logger.info("改单接口-上传json数据："+JSON.toJSON(modifyOrderBo).toString());
         try {
             orderService.modifyOrderData(modifyOrderBo);
-            OrderResponseDto orderResponseDto =orderService.getOrderResponse(modifyOrderBo.getContent().getTradeRequest().getId());
+            OrderResponseDto orderResponseDto =orderService.getOrderResponse(modifyOrderBo.getContent().getTradeRequest().getId(),true);
             return PosApiResult.sucess(orderResponseDto);
         }catch (BusinessException b){
             throw new BusinessException(b.getMessage());
@@ -66,7 +66,7 @@ public class OrderController {
         logger.info("下单接口-上传json数据："+JSON.toJSON(addOrderRequestDto).toString());
         try {
             OrderResponseDto orderResponseDto = orderService.addOrderData(addOrderRequestDto);
-            OrderResponseDto orderResponseDtoNew = orderService.getOrderResponse(orderResponseDto.getTrade().getId());
+            OrderResponseDto orderResponseDtoNew = orderService.getOrderResponse(orderResponseDto.getTrade().getId(),false);
             return PosApiResult.sucess(orderResponseDtoNew);
         }catch (BusinessException b){
             throw new BusinessException(b.getMessage());

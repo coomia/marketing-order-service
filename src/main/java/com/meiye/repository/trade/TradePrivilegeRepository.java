@@ -19,5 +19,7 @@ public interface TradePrivilegeRepository extends JpaRepository<TradePrivilege,L
 
     List<TradePrivilege> findAllByTradeIdAndStatusFlag(Long tradeId, Integer statusFlag);
 
+    List<TradePrivilege> findAllByTradeId(Long tradeId);
+
 }
 

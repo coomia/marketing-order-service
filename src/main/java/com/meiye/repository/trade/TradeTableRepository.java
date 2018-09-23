@@ -18,5 +18,7 @@ import java.util.List;
 public interface TradeTableRepository extends JpaRepository<TradeTable,Long>{
 
     List<TradeTable> findAllByTradeIdAndStatusFlag(Long tradeId, Integer statusFlag);
+
+    List<TradeTable> findAllByTradeId(Long tradeId);
 }
 
