@@ -1,12 +1,12 @@
 package com.meiye.service.posApi;
 
-import com.meiye.bo.booking.dto.BookToOrderResponseDto;
-import com.meiye.bo.booking.dto.BookingRequestDto;
-import com.meiye.bo.booking.dto.BookingResponseDto;
-import com.meiye.bo.booking.dto.CacelBookingDto;
+import com.meiye.bo.booking.dto.*;
+import com.meiye.bo.talent.TalentPlanBo;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.model.booking.Booking;
+import com.meiye.model.talent.TalentPlan;
+import org.springframework.data.domain.Page;
 
 /**
  * @Author: ryner
@@ -43,4 +43,11 @@ public interface BookingService {
      */
     BookToOrderResponseDto updateBookingToOrder(OrderRequestDto addOrderRequestDto);
 
+    ReadyBookedUserResponseDto getAllAlreadyBookedUser(ReadyBookedUserRequestDto readyBookedUserRequestDto);
+
+    Page<Booking> getBookPageByCriteria(Integer pageNum, Integer pageSize, BookingPageRequestDto bookingPageRequestDto);
+
+
+    BookingPageResponseDto getPageBooking(Integer page, Integer pageCount, BookingPageRequestDto bookingPageRequestDto);
 }
+

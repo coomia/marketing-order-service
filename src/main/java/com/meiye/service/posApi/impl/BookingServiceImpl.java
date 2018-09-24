@@ -13,6 +13,7 @@ import com.meiye.exception.BusinessException;
 import com.meiye.model.booking.Booking;
 import com.meiye.model.booking.BookingTradeItem;
 import com.meiye.model.booking.BookingTradeItemUser;
+import com.meiye.model.talent.TalentPlan;
 import com.meiye.repository.booking.BookingRepository;
 import com.meiye.repository.booking.BookingTradeItemRepository;
 import com.meiye.repository.booking.BookingTradeItemUserRepository;
@@ -23,14 +24,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @Author: ryner
@@ -270,5 +277,91 @@ public class BookingServiceImpl implements BookingService {
         }
         return bookingTradeItemByUuid;
     }
+
+    @Override
+    public ReadyBookedUserResponseDto getAllAlreadyBookedUser(ReadyBookedUserRequestDto readyBookedUserRequestDto) {
+        if(readyBookedUserRequestDto.getBrandID() == null || readyBookedUserRequestDto.getShopID() ==null
+                || readyBookedUserRequestDto.getContent() == null || readyBookedUserRequestDto.getContent().getStartTime() ==null
+                || readyBookedUserRequestDto.getContent().getEndTime() == null || readyBookedUserRequestDto.getDeviceID() ==null){
+            logger.error("检查技师列表接口-接口数据验证失败");
+            throw new BusinessException("检查技师列表接口-接口数据验证失败");
+        }
+
+        Set<Long> userIDs = bookingTradeItemUserRepository.getAllAlreadyBookedUser(readyBookedUserRequestDto.getShopID(), readyBookedUserRequestDto.getBrandID()
+                , readyBookedUserRequestDto.getContent().getStartTime(), readyBookedUserRequestDto.getContent().getEndTime(),readyBookedUserRequestDto.getDeviceID());
+
+        ReadyBookedUserResponseDto readyBookedUserResponseDto= new ReadyBookedUserResponseDto();
+        readyBookedUserResponseDto.setStartTime(readyBookedUserRequestDto.getContent().getStartTime());
+        readyBookedUserResponseDto.setEndTime(readyBookedUserRequestDto.getContent().getEndTime());
+        readyBookedUserResponseDto.setUserIds(userIDs);
+        return readyBookedUserResponseDto;
+    }
+
+    @Override
+    public Page<Booking> getBookPageByCriteria(Integer pageNum, Integer pageSize, BookingPageRequestDto bookingPageRequestDto) {
+        Pageable pageable = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "id");
+        Page<Booking> usersPage = bookingRepository.findAll(new Specification<Booking>() {
+            @Override
+            public Predicate toPredicate(Root<Booking> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> list = new ArrayList<Predicate>();
+                if (null != bookingPageRequestDto.getBrandID()) {
+                    list.add(criteriaBuilder.equal(root.get("brandIdenty").as(Long.class), bookingPageRequestDto.getBrandID()));
+                }
+                if (null != bookingPageRequestDto.getShopID()) {
+                    list.add(criteriaBuilder.equal(root.get("shopIdenty").as(Long.class), bookingPageRequestDto.getShopID()));
+                }
+
+                if (null != bookingPageRequestDto.getContent().getStartTime()) {
+                    list.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startTime").as(Date.class),bookingPageRequestDto.getContent().getStartTime()));
+                }
+                if (null != bookingPageRequestDto.getContent().getEndTime()) {
+                    list.add(criteriaBuilder.lessThanOrEqualTo(root.get("endTime").as(Date.class),bookingPageRequestDto.getContent().getEndTime()));
+                }
+
+
+                list.add(criteriaBuilder.equal(root.get("statusFlag").as(Long.class), 1));
+                Predicate[] p = new Predicate[list.size()];
+                return criteriaBuilder.and(list.toArray(p));
+            }
+        }, pageable);
+        return usersPage;
+    }
+
+    @Override
+    public BookingPageResponseDto getPageBooking(Integer page, Integer pageCount, BookingPageRequestDto bookingPageRequestDto) {
+        if(page-1<= 0){
+            page=0;
+        }else {
+            page = page -1;
+        }
+        Page<Booking> pageByCriteria = getBookPageByCriteria(page, pageCount, bookingPageRequestDto);
+        BookingPageResponseDto bookingPageResponseDto = new BookingPageResponseDto();
+        List<Booking> content = pageByCriteria.getContent();
+        if(content != null && content.size()>0){
+            List<BookingTradeItem> bookingTradeItems = new ArrayList<>();
+            List<BookingTradeItemUser> bookingTradeItemUsers = new ArrayList<>();
+            for (int i = 0; i < content.size(); i++) {
+                Long id = content.get(i).getId();
+                //得到TradeItem
+                List<BookingTradeItem> byBookingId = bookingTradeItemRepository.findByBookingIdAndStatusFlag(id,1);
+                if(byBookingId!=null && byBookingId.size()>0){
+                    bookingTradeItems.addAll(byBookingId);
+                }
+                //得到User
+                List<BookingTradeItemUser> byBookingIdAndStatusFlag = bookingTradeItemUserRepository.findByBookingIdAndStatusFlag(id, 1);
+                if (byBookingIdAndStatusFlag != null && byBookingIdAndStatusFlag.size()>0){
+                    bookingTradeItemUsers.addAll(byBookingIdAndStatusFlag);
+                }
+            }
+            bookingPageResponseDto.setBookings(content);
+            bookingPageResponseDto.setBookingTradeItems(bookingTradeItems);
+            bookingPageResponseDto.setBookingTradeItemUsers(bookingTradeItemUsers);
+        }
+
+
+
+        return bookingPageResponseDto;
+    }
+
 
 }

@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
 /**
  * table name:  booking_trade_item
  * author name: ryne
@@ -12,6 +15,8 @@ import org.springframework.stereotype.Repository;
  */ 
 @Repository
 public interface BookingTradeItemRepository extends JpaRepository<BookingTradeItem,Long>{
+
+    List<BookingTradeItem> findByBookingIdAndStatusFlag(Long BookId, Integer stuatsFlage);
 
 }
 
