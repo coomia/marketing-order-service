@@ -34,7 +34,7 @@ public class BookingBo extends BusinessParentBo implements Serializable{
 	private Date cancelOrderTime;
 	private Integer bookingSource;
 	private Integer bookingType;
-	private Integer confirmed;
+	private Boolean confirmed;
 	private String deviceIdenty;
 	private Date clientCreateTime;
 	private Date clientUpdateTime;

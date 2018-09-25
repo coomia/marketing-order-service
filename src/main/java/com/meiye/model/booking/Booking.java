@@ -35,7 +35,7 @@ public class Booking extends ParentEntity implements Serializable{
 	private Date cancelOrderTime;
 	private Integer bookingSource;
 	private Integer bookingType;
-	private Integer confirmed;
+	private Boolean confirmed;
 	private Long brandIdenty;
 	private Long shopIdenty;
 	private String deviceIdenty;
