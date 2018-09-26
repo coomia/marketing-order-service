@@ -5,6 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * table name:  payment_item
  * author name: ryne
@@ -12,6 +16,9 @@ import org.springframework.stereotype.Repository;
  */ 
 @Repository
 public interface PaymentItemRepository extends JpaRepository<PaymentItem,Long>{
+
+    public List<PaymentItem> findByPaymentIdIn(List<Long>  paymentId);
+    public List<PaymentItem> findByPaymentIdInAndStatusFlag(List<Long> paymentId, Integer statusFlag);
 
 }
 

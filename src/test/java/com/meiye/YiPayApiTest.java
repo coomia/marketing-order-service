@@ -21,15 +21,15 @@ public class YiPayApiTest {
     private final String callbackContextPath="http://118.113.202.4:7090/MeiYe";
 
 
-    private final String appid="hf163356826045OA";
-    private final String appsecret="MgAtKIRKPMMbbfycOw5b87U6NP024kWA";
+    private final String appid="hf19102035480OVA";
+    private final String appsecret="nfePmU6VhhCPmEZzuyySvFc0xhEEUWiA";
     @Test
     public void testScanPay(){
         StorePaymentParamBo paymentParamBo=new StorePaymentParamBo();
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(paymentParamBo,1,"sdssdsdsd","11111111112222332");
+        ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(paymentParamBo,1,"sdssdsdsd","11111111112222332","0");
         System.out.println(scanPayResponseBo.toString());
     }
 

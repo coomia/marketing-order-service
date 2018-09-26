@@ -23,4 +23,15 @@ public class SyncPayStatusResponseBo {
     private String attach;
     private String note;
 
+    public boolean isSuccess(){
+        return "0".equalsIgnoreCase(code);
+    }
+
+    public boolean isPaySuccess(){
+        return isSuccess()&&"1".equalsIgnoreCase(trade_state);
+    }
+
+    public boolean isRefundSuccess(){
+        return isSuccess()&&"3".equalsIgnoreCase(trade_state);
+    }
 }

@@ -15,4 +15,12 @@ public class YiPayCallBackRequestBo {
     private String pay_time;
     private String attach;
     private String pay_type;
+
+    public boolean isSuccess(){
+        return "0".equalsIgnoreCase(code);
+    }
+
+    public boolean isPaySuccess(){
+        return  isSuccess()&&"1".equalsIgnoreCase(trade_state);
+    }
 }

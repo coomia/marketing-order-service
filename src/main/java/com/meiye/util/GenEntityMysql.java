@@ -412,7 +412,7 @@ public class GenEntityMysql {
      */
     public static void main(String[] args) {
         try {
-            INSTANCE.generateTables=new String[]{"payment","payment_item","payment_mode"};
+            INSTANCE.generateTables=new String[]{"payment_item_extra"};
             INSTANCE.packageOutPath = "com.meiye.model.pay";
             INSTANCE.repostiryPackageOutPath="com.meiye.repository.pay";
             INSTANCE.boPackageOutPath="com.meiye.bo.pay";

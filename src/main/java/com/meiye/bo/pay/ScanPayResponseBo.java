@@ -13,4 +13,11 @@ public class ScanPayResponseBo {
     private String err_msg;//错误提示
     private String pay_time;//支付时间
 
+    public boolean isSuccess(){
+        return "0".equalsIgnoreCase(code);
+    }
+
+    public boolean isPaySuccess(){
+        return isSuccess()&&"1".equalsIgnoreCase(trade_state);
+    }
 }

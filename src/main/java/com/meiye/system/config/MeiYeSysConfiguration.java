@@ -71,6 +71,7 @@ public class MeiYeSysConfiguration extends WebMvcConfigurationSupport {
         supportedMediaTypes.add(MediaType.TEXT_XML);
         converter.setSupportedMediaTypes(supportedMediaTypes);
         converter.setFastJsonConfig(fastJsonConfig);
+        converter.addSerializeFilter(new FastJsonDateValueFilter());
         converters.add(converter);
     }
 

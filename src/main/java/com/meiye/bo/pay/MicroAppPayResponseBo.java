@@ -13,4 +13,8 @@ public class MicroAppPayResponseBo {
     private String nonce_str;
     private String prepay_id;
     private String sign_type;
+
+    public boolean isSuccess(){
+        return "0".equalsIgnoreCase(code);
+    }
 }

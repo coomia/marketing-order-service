@@ -21,7 +21,7 @@ public class YiPayApi {
     private final static String YIPAY_VERSION="V1.0";
 
 
-    public static ScanPayResponseBo scanPay(StorePaymentParamBo paymentParamBo, Integer totalAmount, String authCode, String outTradeNo){
+    public static ScanPayResponseBo scanPay(StorePaymentParamBo paymentParamBo, Integer totalAmount, String authCode, String outTradeNo,String pay_type){
         logger.info("Start scan pay for order:"+outTradeNo);
         try {
             ScanPayRequestBo scanPayRequestBo = new ScanPayRequestBo();
@@ -30,6 +30,7 @@ public class YiPayApi {
             scanPayRequestBo.setAuth_code(authCode);
             scanPayRequestBo.setOut_trade_no(outTradeNo);
             scanPayRequestBo.setNonce_str(UUIDUtil.randomUUID());
+            scanPayRequestBo.setPay_type(pay_type);
             scanPayRequestBo.setVersion(YIPAY_VERSION);
             String sortString = SortObjectUtil.getSortString(scanPayRequestBo, new String[]{"sign"},true);
             sortString += "&appsecret=" + paymentParamBo.getAppsecret();

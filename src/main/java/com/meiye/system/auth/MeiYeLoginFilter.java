@@ -48,11 +48,11 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
         WebUtil.setRestResponseHeader(httpServletResponse);
         LoginBo loginBo = new LoginBo();
 //        if (httpServletRequest.getParameter("username") != null && httpServletRequest.getParameter("password") != null && httpServletRequest.getParameter("storeid") != null && httpServletRequest.getParameter("verifycode") != null) {
-        if (httpServletRequest.getParameter("username") != null && httpServletRequest.getParameter("password") != null) {
-            loginBo.setUserName(httpServletRequest.getParameter("username"));
+        if (httpServletRequest.getParameter("userName") != null && httpServletRequest.getParameter("password") != null) {
+            loginBo.setUserName(httpServletRequest.getParameter("userName"));
             loginBo.setPassword(httpServletRequest.getParameter("password"));
-            loginBo.setStoreId(httpServletRequest.getParameter("storeid"));
-            loginBo.setVerifyCode(httpServletRequest.getParameter("verifycode"));
+            loginBo.setStoreId(httpServletRequest.getParameter("storeId"));
+            loginBo.setVerifyCode(httpServletRequest.getParameter("verifyCode"));
         } else {
             String loginBody = "";
             try {

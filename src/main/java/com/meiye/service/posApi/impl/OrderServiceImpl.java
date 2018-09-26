@@ -583,5 +583,13 @@ public class OrderServiceImpl implements OrderService {
         return tradeRepository.findByTradeNo(tradeNo);
     }
 
+    @Override
+    public TradeBo getTradeByTradeId(Long tradeId){
+        Optional<Trade> trade=tradeRepository.findById(tradeId);
+        if(!trade.isPresent())
+            return null;
+        else
+            return trade.get().copyTo(TradeBo.class);
+    }
 
 }
