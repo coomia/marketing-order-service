@@ -60,10 +60,10 @@ public class DishShopServiceImpl implements DishShopService{
             public Predicate toPredicate(Root<DishShop> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> list = new ArrayList<Predicate>();
                 if (null != dishShopBo.getName() && !"".equals(dishShopBo.getName())) {
-                    list.add(criteriaBuilder.like(root.get("name").as(String.class), dishShopBo.getName()));
+                    list.add(criteriaBuilder.like(root.get("name").as(String.class),  dishShopBo.getName() + "%"));
                 }
                 if (null != dishShopBo.getDishCode() && !"".equals(dishShopBo.getDishCode())) {
-                    list.add(criteriaBuilder.like(root.get("dishCode").as(String.class), dishShopBo.getDishCode()));
+                    list.add(criteriaBuilder.like(root.get("dishCode").as(String.class),  dishShopBo.getName() + "%"));
                 }
                 if (null != dishShopBo.getType()) {
                     list.add(criteriaBuilder.equal(root.get("type").as(Long.class), dishShopBo.getType()));
