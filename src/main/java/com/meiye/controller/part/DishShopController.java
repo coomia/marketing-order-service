@@ -48,8 +48,8 @@ public class DishShopController {
         return ResetApiResult.sucess("");
     }
 
-    @PostMapping("/delete")
-    public ResetApiResult deleteDishShop(@RequestBody Long dishShopId){
+    @RequestMapping("/delete/{dishShopId}")
+    public ResetApiResult deleteDishShop(@PathVariable Long dishShopId){
         try {
             dishShopService.deleteDishShop(dishShopId);
         }catch (Exception e){
