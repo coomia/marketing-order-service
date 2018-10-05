@@ -142,10 +142,10 @@ public class TalentPlanServiceImpl implements TalentPlanService{
             public Predicate toPredicate(Root<TalentPlan> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> list = new ArrayList<Predicate>();
                 if (null != talentPlanBo.getPlanType()) {
-                    list.add(criteriaBuilder.equal(root.get("planPype").as(Long.class), talentPlanBo.getPlanType()));
+                    list.add(criteriaBuilder.equal(root.get("planType").as(Long.class), talentPlanBo.getPlanType()));
                 }
-                if (null != talentPlanBo.getPlanState()) {
-                    list.add(criteriaBuilder.equal(root.get("planState").as(String.class), talentPlanBo.getPlanState()));
+                if (null != talentPlanBo.getEnabledFlag()) {
+                    list.add(criteriaBuilder.equal(root.get("enabledFlag").as(String.class), talentPlanBo.getEnabledFlag()));
                 }
                 list.add(criteriaBuilder.equal(root.get("statusFlag").as(Long.class), 1));
                 Predicate[] p = new Predicate[list.size()];
