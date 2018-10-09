@@ -118,6 +118,18 @@ public class OrderServiceImpl implements OrderService {
 
         //2.修改 交易明细 数据
         if (Objects.nonNull(tradeItems) && tradeItems.size() > 0) {
+            tradeItems.stream().forEach(bo -> {
+                        if(Objects.isNull(bo.getTradeId())){
+                            bo.setTradeId(tradeId);
+                            if (Objects.isNull(bo.getRecycleStatus())) {
+                                bo.setRecycleStatus(1);
+                            }
+                            if (Objects.isNull(bo.getBatchNo())) {
+                                bo.setBatchNo("");
+                            }
+                        }
+                    }
+            );
             logger.info("改单接口-修改交易明细开始");
             logger.info("改单接口-交易记录主单：" + JSON.toJSON(tradeItems).toString());
             List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
@@ -127,6 +139,11 @@ public class OrderServiceImpl implements OrderService {
 
         //3.修改 交易的顾客信息 数据
         if (Objects.nonNull(tradeCustomers) && tradeCustomers.size() > 0) {
+            tradeCustomers.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改交易的顾客信息开始");
             logger.info("改单接口-交易的顾客信息：" + JSON.toJSON(tradeCustomers).toString());
             List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
@@ -136,6 +153,11 @@ public class OrderServiceImpl implements OrderService {
 
         //4.修改 交易桌台 数据
         if (Objects.nonNull(tradeTables) && tradeTables.size() > 0) {
+            tradeTables.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改交易桌台开始");
             logger.info("改单接口-交易桌台信息：" + JSON.toJSON(tradeTables).toString());
             List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables,orderResponseDto);
@@ -145,24 +167,39 @@ public class OrderServiceImpl implements OrderService {
 
         //5.修改 优惠信息 数据
         if (Objects.nonNull(tradePrivileges) && tradePrivileges.size() > 0) {
+            tradePrivileges.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改优惠信息开始");
             logger.info("改单接口-优惠信息：" + JSON.toJSON(tradePrivileges).toString());
-            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
+            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradeItems,tradePrivileges);
             orderResponseDto.setTradePrivileges(tradePrivilegeList);
             logger.info("改单接口-修改优惠信息结束");
         }
 
         //6.修改 交易明细特征 数据
         if (Objects.nonNull(tradeItemProperties) && tradeItemProperties.size() > 0) {
+            tradeItemProperties.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改交易明细特征开始");
             logger.info("改单接口-交易明细特征：" + JSON.toJSON(tradeItemProperties).toString());
-            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
+            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItems,tradeItemProperties);
             orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
             logger.info("改单接口-修改交易明细特征结束");
         }
 
         //7.修改 订单用户关联表 数据
         if (Objects.nonNull(tradeUsers) && tradeUsers.size() > 0) {
+            tradeUsers.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改订单用户关联表开始");
             logger.info("改单接口-订单用户关联表：" + JSON.toJSON(tradeUsers).toString());
             List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
@@ -173,6 +210,11 @@ public class OrderServiceImpl implements OrderService {
 
         //8.修改 会员次卡表 数据
         if (Objects.nonNull(customerCardTimes) && customerCardTimes.size() > 0) {
+            customerCardTimes.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改会员次卡表开始");
             logger.info("改单接口-修改会员次卡表：" + JSON.toJSON(customerCardTimes).toString());
             List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
@@ -282,7 +324,7 @@ public class OrderServiceImpl implements OrderService {
             tradePrivileges.stream().forEach(bo -> bo.setTradeId(tradeId));
             logger.info("下单接口-新增优惠信息开始");
             logger.info("下单接口-优惠信息：" + JSON.toJSON(tradePrivileges).toString());
-            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
+            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradeItems,tradePrivileges);
             orderResponseDto.setTradePrivileges(tradePrivilegeList);
             logger.info("下单接口-新增优惠信息结束");
         }
@@ -292,7 +334,7 @@ public class OrderServiceImpl implements OrderService {
             tradeItemProperties.stream().forEach(bo -> bo.setTradeId(tradeId));
             logger.info("下单接口-新增交易明细特征开始");
             logger.info("下单接口-交易明细特征：" + JSON.toJSON(tradeItemProperties).toString());
-            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
+            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItems,tradeItemProperties);
             orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
             logger.info("下单接口-新增交易明细特征结束");
         }
@@ -511,10 +553,19 @@ public class OrderServiceImpl implements OrderService {
         return tradeUsers;
     }
 
-    private List<TradeItemProperty> modifyTradeItemProperties(List<TradeItemPropertyBo> tradeItemPropertieBos) {
+    private List<TradeItemProperty> modifyTradeItemProperties(List<TradeItemBo> tradeItemBoList,List<TradeItemPropertyBo> tradeItemPropertieBos) {
         List<TradeItemProperty> tradeItemPropertiesList = new ArrayList<TradeItemProperty>();
         for (TradeItemPropertyBo bo : tradeItemPropertieBos) {
             TradeItemProperty tradeItemProperty = bo.copyTo(TradeItemProperty.class);
+            for (TradeItemBo itemBo : tradeItemBoList) {
+                String uuid = itemBo.getUuid();
+                String tradeItemUuid = tradeItemProperty.getTradeItemUuid();
+                if(Objects.nonNull(tradeItemUuid)&&Objects.nonNull(uuid)
+                        &&tradeItemUuid.equals(uuid)){
+                    tradeItemProperty.setTradeItemId(itemBo.getId());
+                    break;
+                }
+            }
             tradeItemProperty = tradeItemPropertyRepository.save(tradeItemProperty);
             tradeItemPropertiesList.add(tradeItemProperty);
         }
@@ -541,10 +592,19 @@ public class OrderServiceImpl implements OrderService {
         return tradeCustomerList;
     }
 
-    private List<TradePrivilege> modifyTradePrivileges(List<TradePrivilegeBo> tradePrivilegeBos) {
+    private List<TradePrivilege> modifyTradePrivileges(List<TradeItemBo> tradeItemBoList,List<TradePrivilegeBo> tradePrivilegeBos) {
         List<TradePrivilege> tradePrivileges = new ArrayList<TradePrivilege>();
         for (TradePrivilegeBo bo : tradePrivilegeBos) {
             TradePrivilege tradePrivilege = bo.copyTo(TradePrivilege.class);
+            for (TradeItemBo itemBo : tradeItemBoList) {
+                String uuid = itemBo.getUuid();
+                String tradeItemUuid = tradePrivilege.getTradeItemUuid();
+                if(Objects.nonNull(tradeItemUuid)&&Objects.nonNull(uuid)
+                        &&tradeItemUuid.equals(uuid)){
+                    tradePrivilege.setTradeItemId(itemBo.getId());
+                    break;
+                }
+            }
             tradePrivilege = tradePrivilegeRepository.save(tradePrivilege);
             tradePrivileges.add(tradePrivilege);
         }
