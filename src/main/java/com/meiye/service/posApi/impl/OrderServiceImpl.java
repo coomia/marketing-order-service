@@ -460,16 +460,29 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto returnTrade(CancelTradeBo cancelTradeBo) {
         if (cancelTradeBo != null && cancelTradeBo.getContent() != null
                 && cancelTradeBo.getContent().getTradeId() != null) {
-            Trade trade = tradeRepository.findByIdAndBrandIdentyAndTradeStatusIsNot(cancelTradeBo.getContent().getTradeId(), cancelTradeBo.getBrandID(), 6);
-            if (trade == null) {
-                throw new BusinessException("退货订单接口- trade数据校验不通过");
+
+            OrderResponseDto order = getOrderResponse(cancelTradeBo.getContent().getTradeId(), false);
+            if (order == null || order.getTrade() == null){
+                throw new BusinessException("退货订单接口- 未找到退货订单");
             }
-            Trade tradeNew = new Trade();
-            BeanUtils.copyProperties(trade, tradeNew);
-            tradeNew.setId(null);
-            tradeNew.setRelateTradeId(cancelTradeBo.getContent().getTradeId());
-            tradeNew.setUuid(UUID.randomUUID().toString().substring(0, 32));
-            tradeRepository.save(tradeNew);
+            //copy trade and save trade
+            Trade trade = order.getTrade();
+            Trade tradeNew = returnTradeByCopyAndSave(cancelTradeBo, trade);
+            Long tradeNewId = tradeNew.getId();
+            String tradeUuid = tradeNew.getUuid();
+
+            //copy tradeCustomers and save
+            returnTradeCustomerByCopyAndSave(order, tradeNewId, tradeUuid);
+
+            //copy tradeTables and save
+            returnTradeTableByCopyAndSave(order, tradeNewId, tradeUuid);
+
+            //copy tradeItems and save
+            returnTradeItemsByCopyAndSave(order, tradeNewId, tradeUuid);
+
+            // copy customerCardTime
+            returnCustomerCardTimeByCopyAndSave(order, tradeNewId, tradeUuid);
+
             //归还库存
             if (cancelTradeBo.getContent().getReturnInventoryItems() != null && cancelTradeBo.getContent().getReturnInventoryItems().size() > 0) {
                 List<ReturnInventoryItem> returnInventoryItems = cancelTradeBo.getContent().getReturnInventoryItems();
@@ -489,6 +502,125 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return getOrderResponse(cancelTradeBo.getContent().getTradeId(), false);
+    }
+
+    private void returnCustomerCardTimeByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
+        List<CustomerCardTime> customerCardTimes = order.getCustomerCardTimes();
+        if(customerCardTimes != null && customerCardTimes.size()>0){
+            customerCardTimes.forEach(customerCardTime ->{
+                CustomerCardTime newCustomerCardTime = new CustomerCardTime();
+                BeanUtils.copyProperties(customerCardTime, newCustomerCardTime);
+                newCustomerCardTime.setId(null);
+                newCustomerCardTime.setTradeId(tradeNewId);
+                newCustomerCardTime.setTradeUuid(tradeUuid);
+                customerCardTimeRepository.save(newCustomerCardTime);
+            });
+        }
+    }
+
+    private void returnTradeItemsByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
+        List<TradeItem> tradeItems = order.getTradeItems();
+        if(tradeItems != null && tradeItems.size()>0){
+            tradeItems.forEach(tradeItem->{
+                TradeItem newTradeItem = new TradeItem();
+                BeanUtils.copyProperties(tradeItem, newTradeItem);
+                newTradeItem.setId(null);
+                newTradeItem.setTradeId(tradeNewId);
+                newTradeItem.setTradeUuid(tradeUuid);
+                newTradeItem.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                tradeItemRepository.save(newTradeItem);
+                    //copy tradeItemProperties
+                List<TradeItemProperty> tradeItemProperties = order.getTradeItemProperties();
+                if (tradeItemProperties != null && tradeItemProperties.size()>0){
+                    tradeItemProperties.forEach(tradeItemPropertie->{
+                        if (tradeItemPropertie.getTradeItemId() == tradeItem.getId()){
+                            TradeItemProperty newTradeItemProperty = new TradeItemProperty();
+                            BeanUtils.copyProperties(tradeItem, newTradeItem);
+                            newTradeItemProperty.setId(null);
+                            newTradeItemProperty.setTradeId(tradeNewId);
+                            newTradeItemProperty.setTradeUuid(tradeUuid);
+                            newTradeItemProperty.setTradeItemId(newTradeItem.getId());
+                            newTradeItemProperty.setTradeItemUuid(newTradeItem.getUuid());
+                            newTradeItemProperty.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                            tradeItemPropertyRepository.save(newTradeItemProperty);
+                        }
+                    });
+                }
+
+                //copy tradePrivileges and save
+                List<TradePrivilege> tradePrivileges = order.getTradePrivileges();
+                if (tradePrivileges != null && tradePrivileges.size()>0){
+                    tradePrivileges.forEach(tradePrivilege ->{
+                        TradePrivilege newTradePrivilege =  new TradePrivilege();
+                        BeanUtils.copyProperties(tradePrivilege, newTradePrivilege);
+                        newTradePrivilege.setId(null);
+                        newTradePrivilege.setTradeId(tradeNewId);
+                        newTradePrivilege.setTradeUuid(tradeUuid);
+                        newTradePrivilege.setTradeItemId(newTradeItem.getId());
+                        newTradePrivilege.setTradeItemUuid(newTradeItem.getUuid());
+                        newTradePrivilege.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                        tradePrivilegeRepository.save(newTradePrivilege);
+                    });
+                }
+
+                // copy tradeUsers and save
+                List<TradeUser> tradeUsers = order.getTradeUsers();
+                if (tradeUsers != null && tradeUsers.size()>0){
+                    tradeUsers.forEach(tradeUser ->{
+                        TradeUser newTradeUser = new TradeUser();
+                        BeanUtils.copyProperties(tradeUser, newTradeUser);
+                        newTradeUser.setId(null);
+                        newTradeUser.setTradeId(tradeNewId);
+                        newTradeUser.setTradeItemId(newTradeItem.getId());
+                        newTradeUser.setTradeItemUuid(newTradeItem.getUuid());
+                        tradeUserRepository.save(newTradeUser);
+                    });
+
+                }
+
+            });
+        }
+    }
+
+    private void returnTradeTableByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
+        List<TradeTable> tradeTables = order.getTradeTables();
+        if(tradeTables != null && tradeTables.size()>0){
+            tradeTables.forEach(tradeTable->{
+                TradeTable newTradeTable = new TradeTable();
+                BeanUtils.copyProperties(tradeTable, newTradeTable);
+                newTradeTable.setId(null);
+                newTradeTable.setTradeId(tradeNewId);
+                newTradeTable.setTradeUuid(tradeUuid );
+                newTradeTable.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                tradeTableRepository.save(newTradeTable);
+            });
+        }
+    }
+
+    private void returnTradeCustomerByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
+        List<TradeCustomer> tradeCustomers = order.getTradeCustomers();
+        if (tradeCustomers != null && tradeCustomers.size()>0){
+            tradeCustomers.forEach(tradeCustomer->{
+                TradeCustomer newTradeCustomer = new TradeCustomer();
+                BeanUtils.copyProperties(tradeCustomer, newTradeCustomer);
+                newTradeCustomer.setId(null);
+                newTradeCustomer.setTradeId(tradeNewId);
+                newTradeCustomer.setTradeUuid(tradeUuid);
+                newTradeCustomer.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                tradeCustomerRepository.save(newTradeCustomer);
+            });
+        }
+    }
+
+    private Trade returnTradeByCopyAndSave(CancelTradeBo cancelTradeBo, Trade trade) {
+        Trade tradeNew = new Trade();
+        BeanUtils.copyProperties(trade, tradeNew);
+        tradeNew.setId(null);
+        tradeNew.setRelateTradeId(cancelTradeBo.getContent().getTradeId());
+        tradeNew.setTradeType(2);
+        tradeNew.setUuid(UUID.randomUUID().toString().substring(0, 32));
+        tradeRepository.save(tradeNew);
+        return tradeNew;
     }
 
     private List<Tables> getRelatedTablesByTrade(List<TradeTable> tradeTables, boolean needDelData) {
