@@ -19,6 +19,7 @@ public interface PaymentItemRepository extends JpaRepository<PaymentItem,Long>{
 
     public List<PaymentItem> findByPaymentIdIn(List<Long>  paymentId);
     public List<PaymentItem> findByPaymentIdInAndStatusFlag(List<Long> paymentId, Integer statusFlag);
+    public List<PaymentItem> findByPaymentIdAndStatusFlag(Long paymentId,Integer statusFlag);
 
 }
 

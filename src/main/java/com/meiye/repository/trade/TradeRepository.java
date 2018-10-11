@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * table name:  trade
@@ -24,5 +25,7 @@ public interface TradeRepository extends JpaRepository<Trade,Long>{
     Trade findByIdAndBrandIdentyAndTradeStatusIsNot(Long id,Long brandIdenty,Integer tradeStatus);
 
     Trade findByTradeNo(String tradeNo);
+
+    List<Trade> findByRelateTradeIdAndTradeType(Long relateTradeId,Integer tradeType);
 }
 

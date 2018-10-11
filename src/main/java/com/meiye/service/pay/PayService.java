@@ -22,6 +22,12 @@ public interface PayService {
     @Transactional
     void paySuccess(Long tradeId, Long paymentId, String yiPayTradeNo);
 
+    void returnPayment(Long tradeId);
+
+    void refundSuccessful(Long tradeId);
+
+    void refundFailed(Long tradeId);
+
     void afterPaySucess(Long tradeId);
 
     void savePaymentData(AccountingBo accountingBo);

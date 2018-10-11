@@ -12,4 +12,8 @@ public class YiPayRefundResponseBo {
     private String err_msg;
     private String refund_time;
     private String pay_type;
+
+    public boolean isSuccess(){
+        return "0".equalsIgnoreCase(code);
+    }
 }

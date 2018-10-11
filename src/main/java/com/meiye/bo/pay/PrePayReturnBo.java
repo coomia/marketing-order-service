@@ -2,6 +2,8 @@ package com.meiye.bo.pay;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * Created by Administrator on 2018/9/24 0024.
  */
@@ -16,4 +18,5 @@ public class PrePayReturnBo {
     private String payType;//调用翼支付时的支付方式，0--微信，1--支付宝；3--翼支付
     private boolean needYiPay=false;
     private Long payItemId;
+    private Double banlancePayAmount;//余额支付的金额
 }

@@ -1,6 +1,7 @@
 package com.meiye.service.pay.impl;
 
 import com.meiye.bo.accounting.AccountingBo;
+import com.meiye.bo.accounting.InternalApiResult;
 import com.meiye.bo.pay.*;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.exception.BusinessException;
@@ -14,8 +15,10 @@ import com.meiye.repository.pay.PaymentRepository;
 import com.meiye.repository.trade.TradeRepository;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.MeiYeInternalApi;
 import com.meiye.util.UUIDUtil;
+import com.meiye.util.YiPayApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +114,8 @@ public class PayServiceImpl implements PayService {
             PaymentItemExtra paymentItemExtra=new PaymentItemExtra();
             paymentItemExtra.setUuid(UUIDUtil.randomUUID());
             paymentItemExtra.setPaymentItemId(paymentId);
+            paymentItemExtra.setPayTranNo(yiPayTradeNo);
+            paymentItemExtra.setPayCallbackTime(now);
             paymentItemExtra.setShopIdenty(trade.getShopIdenty());
             paymentItemExtra.setBrandIdenty(trade.getBrandIdenty());
             paymentItemExtra.setDeviceIdenty(trade.getDeviceIdenty());
@@ -122,6 +127,122 @@ public class PayServiceImpl implements PayService {
             paymentItemExtra.setUpdatorId(trade.getUpdatorId());
             paymentItemExtra.setUpdatorName(trade.getUpdatorName());
             paymentItemExtraRepository.save(paymentItemExtra);
+        }
+    }
+
+
+    @Transactional
+    @Override
+    public void returnPayment(Long tradeId){
+        Trade returnTrade = tradeRepository.findById(tradeId).get();
+        try {
+            Trade oriTrade = tradeRepository.findById(returnTrade.getRelateTradeId()).get();
+            List<Payment> payments = this.findPaymentsByTradeId(tradeId, false);
+            MeiYeInternalApi.returnPrivilege(tradeId, WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId());
+            Integer returnAmt = 0;
+            List<PaymentItem> yiPaymentItems = new ArrayList<>();
+            if (!ObjectUtils.isEmpty(payments)) {
+                for (Payment payment : payments) {
+                    if (payment.getIsPaid() == 1) {
+                        List<PaymentItem> paymentItems = paymentItemRepository.findByPaymentIdAndStatusFlag(payment.getId(), 1);
+                        if (!ObjectUtils.isEmpty(paymentItems)) {
+                            for (PaymentItem paymentItem : paymentItems) {
+                                if (paymentItem.getPayStatus() == 4) {
+                                    if (paymentItem.getPayModeId() == 1) {
+                                        InternalApiResult internalApiResult = MeiYeInternalApi.refund(orderService.getCustomerIdByType(tradeId, 3), tradeId, paymentItem.getId(), paymentItem.getUsefulAmount(), WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId(), paymentItem.getCreatorId(), paymentItem.getCreatorName());
+                                        if (!internalApiResult.isSuccess())
+                                            throw new BusinessException("余额退回失败");
+                                    } else if (paymentItem.getPayModeId() == 4 || paymentItem.getPayModeId() == 5) {
+                                        yiPaymentItems.add(paymentItem);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!ObjectUtils.isEmpty(yiPaymentItems)) {
+                returnAmt = new Double(yiPaymentItems.get(0).getUsefulAmount() * 100).intValue();
+                YiPayRefundResponseBo yiPayRefundResponseBo = YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, oriTrade.getTradeNo(), null, returnTrade.getTradeNo());
+                if (yiPayRefundResponseBo == null || !yiPayRefundResponseBo.isSuccess()) {
+                    throw new BusinessException("翼支付退款失败");
+                } else {
+                    PaymentItemExtra paymentItemExtra = new PaymentItemExtra();
+                    paymentItemExtra.setUuid(UUIDUtil.randomUUID());
+                    paymentItemExtra.setPaymentItemId(yiPaymentItems.get(0).getId());
+                    paymentItemExtra.setShopIdenty(oriTrade.getShopIdenty());
+                    paymentItemExtra.setBrandIdenty(oriTrade.getBrandIdenty());
+                    paymentItemExtra.setDeviceIdenty(oriTrade.getDeviceIdenty());
+                    paymentItemExtra.setStatusFlag(1);
+                    paymentItemExtra.setRefundCallbackTime(new Timestamp(System.currentTimeMillis()));
+                    paymentItemExtra.setRefundTradeNo(yiPayRefundResponseBo.getHaipay_refund_id());
+                    paymentItemExtra.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
+                    paymentItemExtra.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
+                    paymentItemExtra.setCreatorId(oriTrade.getCreatorId());
+                    paymentItemExtra.setCreatorName(oriTrade.getCreatorName());
+                    paymentItemExtra.setUpdatorId(oriTrade.getUpdatorId());
+                    paymentItemExtra.setUpdatorName(oriTrade.getUpdatorName());
+                    paymentItemExtraRepository.save(paymentItemExtra);
+                }
+            }else{
+                refundSuccessful(tradeId);
+            }
+        }catch (Exception exp){
+            logger.info("订单("+tradeId+")退款失败",exp);
+            refundFailed(tradeId);
+        }
+    }
+
+
+    @Transactional
+    @Override
+    public void refundSuccessful(Long tradeId){
+        Trade trade=tradeRepository.findById(tradeId).get();
+        if(trade.getTradePayStatus()==4){
+            trade.setTradePayStatus(5);
+            trade.setTradeStatus(5);
+            List<Payment> payments = this.findPaymentsByTradeId(tradeId, false);
+            if (!ObjectUtils.isEmpty(payments)) {
+                for (Payment payment : payments) {
+                    if (payment.getIsPaid() == 1) {
+                        List<PaymentItem> paymentItems = paymentItemRepository.findByPaymentIdAndStatusFlag(payment.getId(), 1);
+                        if (!ObjectUtils.isEmpty(paymentItems)) {
+                            for (PaymentItem paymentItem : paymentItems) {
+                                paymentItem.setIsRefund(1);
+                                paymentItem.setPayStatus(5);
+                            }
+                        }
+                        paymentItemRepository.saveAll(paymentItems);
+                    }
+                }
+            }
+            tradeRepository.save(trade);
+        }
+        MeiYeInternalApi.subtractCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
+    }
+
+    @Transactional
+    @Override
+    public void refundFailed(Long tradeId){
+        Trade trade=tradeRepository.findById(tradeId).get();
+        if(trade.getTradePayStatus()==4){
+            trade.setTradePayStatus(6);
+            List<Payment> payments = this.findPaymentsByTradeId(tradeId, false);
+            if (!ObjectUtils.isEmpty(payments)) {
+                for (Payment payment : payments) {
+                    if (payment.getIsPaid() == 1) {
+                        List<PaymentItem> paymentItems = paymentItemRepository.findByPaymentIdAndStatusFlag(payment.getId(), 1);
+                        if (!ObjectUtils.isEmpty(paymentItems)) {
+                            for (PaymentItem paymentItem : paymentItems) {
+                                paymentItem.setIsRefund(2);
+                                paymentItem.setPayStatus(6);
+                            }
+                        }
+                        paymentItemRepository.saveAll(paymentItems);
+                    }
+                }
+            }
+            tradeRepository.save(trade);
         }
     }
 
@@ -150,8 +271,13 @@ public class PayServiceImpl implements PayService {
                 MeiYeInternalApi.recharge(customerId, tradeId, paymentId,new BigDecimal(payedAmount),trade.getShopIdenty(),trade.getBrandIdenty(),trade.getCreatorId(),trade.getCreatorName());
             } else if (trade.getBusinessType() == 3) {
                 //次卡
+
+
+
             }
         }
+        //增加消费提成
+        MeiYeInternalApi.addCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
     }
 
 
@@ -255,17 +381,20 @@ public class PayServiceImpl implements PayService {
         List<PaymentItem> paymentItems=this.findPaymentItemsByPamentId(paymentIds,false);
         List<PaymentItem> wechatPayItems=new ArrayList<>();
         List<PaymentItem> alipayItems=new ArrayList<>();
+        List<PaymentItem> balancePayItems=new ArrayList<>();
         for(PaymentItem paymentItem:paymentItems){
             if(paymentItem.getPayModeId().equals(4l)){
                 //4 微信支付，5支付宝支付
                 wechatPayItems.add(paymentItem);
             }else if(paymentItem.getPayModeId().equals(5l)){
                 alipayItems.add(paymentItem);
+            }else if(paymentItem.getPayModeId().equals(1l)){
+                balancePayItems.add(paymentItem);
             }
         }
-        if(!ObjectUtils.isEmpty(wechatPayItems)&&!ObjectUtils.isEmpty(alipayItems))
+        if(!ObjectUtils.isEmpty(wechatPayItems)&&!ObjectUtils.isEmpty(alipayItems)&&!ObjectUtils.isEmpty(balancePayItems))
             throw new BusinessException("暂不支持混合支付",ResetApiResult.STATUS_ERROR,1003);
-        if(wechatPayItems.size()>1||alipayItems.size()>1)
+        if(wechatPayItems.size()>1||alipayItems.size()>1||balancePayItems.size()>1)
             throw new BusinessException("暂不支持混合支付",ResetApiResult.STATUS_ERROR,1003);
         String payRequestUuid="";
         if(!ObjectUtils.isEmpty(wechatPayItems)){
@@ -286,6 +415,12 @@ public class PayServiceImpl implements PayService {
             prePayReturnBo.setPayType("1");
             payRequestUuid=paymentItem.getUuid();
             prePayReturnBo.setPayItemId(paymentItem.getId());
+        }else if(!ObjectUtils.isEmpty(balancePayItems)){
+            PaymentItem paymentItem=alipayItems.get(0);
+            if (paymentItem.getUsefulAmount() == null || paymentItem.getUsefulAmount() <= 0d)
+                throw new BusinessException("支付金额异常", ResetApiResult.STATUS_ERROR, 1003);
+            prePayReturnBo.setPayItemId(paymentItem.getId());
+            prePayReturnBo.setBanlancePayAmount(paymentItem.getUsefulAmount());
         }
         //如果是POS扫码支付，则需要获取authcode
         if("ScanPay".equalsIgnoreCase(payRequestType)){

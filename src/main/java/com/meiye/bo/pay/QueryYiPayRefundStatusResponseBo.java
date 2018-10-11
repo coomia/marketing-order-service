@@ -12,4 +12,9 @@ public class QueryYiPayRefundStatusResponseBo {
     private String code;
     private String err_msg;
     private List<QueryYiPayRefundStatusResponseDetailBo> refund_lists;
+
+    public boolean isSuccess(){
+        return "0".equalsIgnoreCase(code);
+    }
+
 }

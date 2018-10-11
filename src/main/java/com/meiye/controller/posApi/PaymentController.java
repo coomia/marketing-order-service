@@ -2,10 +2,7 @@ package com.meiye.controller.posApi;
 
 import com.meiye.bo.accounting.AccountingBo;
 import com.meiye.bo.accounting.WriteOffResultBo;
-import com.meiye.bo.pay.PrePayReturnBo;
-import com.meiye.bo.pay.QueryTradePaymentBo;
-import com.meiye.bo.pay.StorePaymentParamBo;
-import com.meiye.bo.pay.SyncPayStatusResponseBo;
+import com.meiye.bo.pay.*;
 import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.TradeBo;
@@ -70,18 +67,32 @@ public class PaymentController extends AbstractPayController {
         TradeBo tradeBo=orderService.getTradeByTradeId(tradeId);
         if(ObjectUtils.isEmpty(tradeBo))
             return PosApiResult.error(null,1003,"订单不存在");
-        if(tradeBo.getTradePayStatus().equals(1)||tradeBo.getTradePayStatus().equals(2)){
-            SyncPayStatusResponseBo syncPayStatusResponseBo=YiPayApi.syncPayStatus(storePaymentParamBo, tradeBo.getTradeNo(), null);
-            if(syncPayStatusResponseBo.isPaySuccess()) {
-                String attach=syncPayStatusResponseBo.getAttach();
-                Long paymentItemId=YiPayApi.getPaymentIdFromAttach(attach);
-                payService.yipaySuccess(syncPayStatusResponseBo.getOut_trade_no(), syncPayStatusResponseBo.getTrade_id(),paymentItemId);
-                Trade trade=orderService.getTradeByTradeNo(syncPayStatusResponseBo.getOut_trade_no());
-                payService.afterPaySucess(trade.getId());
+        if(tradeBo.getTradeType()==1) {
+            if (tradeBo.getTradePayStatus().equals(1) || tradeBo.getTradePayStatus().equals(2)) {
+                SyncPayStatusResponseBo syncPayStatusResponseBo = YiPayApi.syncPayStatus(storePaymentParamBo, tradeBo.getTradeNo(), null);
+                if (syncPayStatusResponseBo.isPaySuccess()) {
+                    String attach = syncPayStatusResponseBo.getAttach();
+                    Long paymentItemId = YiPayApi.getPaymentIdFromAttach(attach);
+                    payService.yipaySuccess(syncPayStatusResponseBo.getOut_trade_no(), syncPayStatusResponseBo.getTrade_id(), paymentItemId);
+                    Trade trade = orderService.getTradeByTradeNo(syncPayStatusResponseBo.getOut_trade_no());
+                    payService.afterPaySucess(trade.getId());
+                } else if (syncPayStatusResponseBo.isRefundSuccess())
+                    //TODO refund success logic.
+                    System.out.println("请处理退款成功的逻辑");
             }
-            else if(syncPayStatusResponseBo.isRefundSuccess())
-                //TODO refund success logic.
-                System.out.println("请处理退款成功的逻辑");
+        }else if(tradeBo.getTradeType()==2){
+            QueryYiPayRefundStatusResponseBo refundStatusResponseBo=YiPayApi.queryRefundStatus(storePaymentParamBo,tradeBo.getTradeNo(),null);
+            if(refundStatusResponseBo.isSuccess()) {
+                if (ObjectUtils.isEmpty(refundStatusResponseBo.getRefund_lists())) {
+                    QueryYiPayRefundStatusResponseDetailBo refundStatusResponseDetailBo = refundStatusResponseBo.getRefund_lists().get(0);
+                    if ("1".equalsIgnoreCase(refundStatusResponseDetailBo.getRefund_status())) {
+                        payService.refundSuccessful(tradeId);
+                    } else if ("0".equalsIgnoreCase(refundStatusResponseDetailBo.getRefund_status())) {
+                        payService.refundFailed(tradeId);
+                    }
+                }
+
+            }
         }
         Map<String,Object> map=super.getOrderPaymentData(tradeId);
         return PosApiResult.sucess(map);

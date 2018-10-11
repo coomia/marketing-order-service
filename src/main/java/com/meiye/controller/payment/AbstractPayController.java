@@ -1,11 +1,13 @@
 package com.meiye.controller.payment;
 
 import com.meiye.bo.accounting.AccountingBo;
+import com.meiye.bo.accounting.InternalApiResult;
 import com.meiye.bo.accounting.WriteOffResultBo;
 import com.meiye.bo.pay.*;
 import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
+import com.meiye.bo.trade.TradeBo;
 import com.meiye.controller.posApi.PaymentController;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.pay.Payment;
@@ -15,6 +17,7 @@ import com.meiye.model.setting.Tables;
 import com.meiye.model.trade.Trade;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.MeiYeInternalApi;
 import com.meiye.util.YiPayApi;
 import org.slf4j.Logger;
@@ -54,6 +57,15 @@ public class AbstractPayController {
             if(resultBo.isSuccess()){
                 try {
                     PrePayReturnBo payReturnBo = payService.prePay(accountingBo, payRequestType);
+                    if(payReturnBo.getBanlancePayAmount()!=null&&payReturnBo.getBanlancePayAmount()>0d){
+                        Long customerId=orderService.getCustomerIdByType(orderId,3);
+                        TradeBo trade=orderService.getTradeByTradeId(orderId);
+                        InternalApiResult internalApiResult=MeiYeInternalApi.expense(customerId,orderId,payReturnBo.getPayItemId(),payReturnBo.getBanlancePayAmount(),trade.getShopIdenty(),trade.getBrandIdenty(),trade.getCreatorId(),trade.getCreatorName());
+                        if(!internalApiResult.isSuccess()){
+                            throw new BusinessException("余额扣款失败", ResetApiResult.STATUS_ERROR,1003);
+                        }
+                    }
+
                     if (payReturnBo.isNeedYiPay()) {
                         StorePaymentParamBo storePaymentParamBo=payService.getStorePaymentParamBo(accountingBo.getShopId());
                         //如果需要调用翼支付，则发起翼支付的调用

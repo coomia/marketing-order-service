@@ -17,5 +17,6 @@ import java.util.List;
 public interface PaymentItemExtraRepository extends JpaRepository<PaymentItemExtra,Long>{
     public List<PaymentItemExtra> findByPaymentItemIdIn(List<Long> paymentItemId);
     public List<PaymentItemExtra> findByPaymentItemIdInAndStatusFlag(List<Long> paymentItemId, Integer statusFlag);
+    public List<PaymentItemExtra> findByPaymentItemIdAndStatusFlag(Long paymentItemId, Integer statusFlag);
 }
 

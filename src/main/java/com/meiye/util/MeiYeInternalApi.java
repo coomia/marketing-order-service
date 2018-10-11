@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class MeiYeInternalApi {
     static Logger logger= LoggerFactory.getLogger(MeiYeInternalApi.class);
-    private final static String MeiYeIntegerApiUrlPrefix="http://172.31.144.129:8080/";
+    public final static String MeiYeIntegerApiUrlPrefix="http://172.31.144.129:8080/";
 
     //核销
     public static WriteOffResultBo writeOff(Long tradeId, Long brandIdenty, Long shopIdenty){
@@ -63,14 +63,14 @@ public class MeiYeInternalApi {
     }
 
     //余额消费
-    public static InternalApiResult expense(Long customerId, Long tradeId, Long paymentItemId, BigDecimal usefulAmount, Long shopId, Long brandId, Long creatorId, String creatorName){
+    public static InternalApiResult expense(Long customerId, Long tradeId, Long paymentItemId, Double usefulAmount, Long shopId, Long brandId, Long creatorId, String creatorName){
         try{
             String apiUrl=MeiYeIntegerApiUrlPrefix+"/internal/customer/balance/expense";
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
             params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
-            params.put("usefulAmount",usefulAmount==null?null:usefulAmount.setScale(2).toString());
+            params.put("usefulAmount",usefulAmount==null?null:usefulAmount.toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
             params.put("creatorId",creatorId==null?null:creatorId.toString());
@@ -82,14 +82,14 @@ public class MeiYeInternalApi {
     }
 
     //余额退回
-    public static InternalApiResult refund(Long customerId, Long tradeId, Long paymentItemId, BigDecimal usefulAmount, Long shopId, Long brandId, Long creatorId, String creatorName){
+    public static InternalApiResult refund(Long customerId, Long tradeId, Long paymentItemId, Double usefulAmount, Long shopId, Long brandId, Long creatorId, String creatorName){
         try{
             String apiUrl=MeiYeIntegerApiUrlPrefix+"/internal/customer/balance/refund";
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
             params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
-            params.put("usefulAmount",usefulAmount==null?null:usefulAmount.setScale(2).toString());
+            params.put("usefulAmount",usefulAmount==null?null:usefulAmount.toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
             params.put("creatorId",creatorId==null?null:creatorId.toString());

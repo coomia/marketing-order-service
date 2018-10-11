@@ -7,13 +7,22 @@ import com.meiye.bo.trade.CancelTrade.ReturnInventoryItem;
 import com.meiye.bo.trade.OrderDto.*;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.part.DishShop;
+import com.meiye.model.pay.Payment;
+import com.meiye.model.pay.PaymentItem;
+import com.meiye.model.pay.PaymentItemExtra;
 import com.meiye.model.setting.Tables;
 import com.meiye.model.trade.*;
 import com.meiye.repository.part.DishShopRepository;
+import com.meiye.repository.pay.PaymentItemExtraRepository;
+import com.meiye.repository.pay.PaymentItemRepository;
+import com.meiye.repository.pay.PaymentRepository;
 import com.meiye.repository.setting.TablesRepository;
 import com.meiye.repository.trade.*;
+import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import com.meiye.util.Constants;
+import com.meiye.util.ObjectUtil;
+import com.meiye.util.UUIDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -56,6 +65,18 @@ public class OrderServiceImpl implements OrderService {
     TablesRepository tablesRepository;
     @Autowired
     DishShopRepository dishShopRepository;
+
+    @Autowired
+    PaymentRepository paymentRepository;
+
+    @Autowired
+    PaymentItemRepository paymentItemRepository;
+
+    @Autowired
+    PaymentItemExtraRepository paymentItemExtraRepository;
+
+    @Autowired
+    PayService payService;
 
     @Override
     public void testLog() {
@@ -466,8 +487,19 @@ public class OrderServiceImpl implements OrderService {
             if (order == null || order.getTrade() == null){
                 throw new BusinessException("退货订单接口- 未找到退货订单");
             }
-            //copy trade and save trade
             Trade trade = order.getTrade();
+            if(trade.getTradePayStatus()!=3)
+                throw new BusinessException("退货订单接口- 订单未支付，不能退货");
+            List<Trade> returnTrads=tradeRepository.findByRelateTradeIdAndTradeType(trade.getId(),2);
+            if(!ObjectUtils.isEmpty(returnTrads)){
+                for(Trade returnTrade:returnTrads){
+                    if(returnTrade.getTradePayStatus()==4||returnTrade.getTradePayStatus()==5)
+                        throw new BusinessException("存在已退货的订单或正在退款中的退货单");
+                }
+            }
+
+            //copy trade and save trade
+
             Trade tradeNew = returnTradeByCopyAndSave(cancelTradeBo, trade);
             Long tradeNewId = tradeNew.getId();
             String tradeUuid = tradeNew.getUuid();
@@ -484,6 +516,8 @@ public class OrderServiceImpl implements OrderService {
             // copy customerCardTime
             returnCustomerCardTimeByCopyAndSave(order, tradeNewId, tradeUuid);
 
+            //copy payment
+            returnPayment(trade.getId(),tradeNewId,tradeUuid);
             //归还库存
             if (cancelTradeBo.getContent().getReturnInventoryItems() != null && cancelTradeBo.getContent().getReturnInventoryItems().size() > 0) {
                 List<ReturnInventoryItem> returnInventoryItems = cancelTradeBo.getContent().getReturnInventoryItems();
@@ -499,13 +533,62 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
 
-
+            payService.returnPayment(tradeNew.getId());
 
         } else {
             throw new BusinessException("退货订单接口- trade数据校验不通过");
         }
 
         return getOrderResponse(cancelTradeBo.getContent().getTradeId(), false);
+    }
+
+
+    private void returnPayment(Long oldTradeId, Long tradeNewId, String tradeUuid){
+        List<Payment> payments=paymentRepository.findByRelateIdAndStatusFlag(oldTradeId,1);
+        if(!ObjectUtils.isEmpty(payments)){
+            for(Payment payment:payments){
+                Payment newPayment=new Payment();
+                BeanUtils.copyProperties(payment,newPayment);
+                newPayment.setId(null);
+                if(payment.getPaymentType()==1)
+                    newPayment.setPaymentType(2);
+                else if(payment.getPaymentType()==3)
+                    newPayment.setPaymentType(4);
+                else if(payment.getPaymentType()==5)
+                    newPayment.setPaymentType(6);
+                newPayment.setRelateUuid(tradeUuid);
+                newPayment.setRelateId(tradeNewId);
+                newPayment.setUuid(UUIDUtil.randomUUID());
+                paymentRepository.save(newPayment);
+
+                List<PaymentItem> paymentItems=paymentItemRepository.findByPaymentIdAndStatusFlag(payment.getId(),1);
+                if(!ObjectUtils.isEmpty(paymentItems)){
+                    for(PaymentItem paymentItem:paymentItems){
+                        PaymentItem newPaymentItem=new PaymentItem();
+                        BeanUtils.copyProperties(paymentItem,newPaymentItem);
+                        newPaymentItem.setId(null);
+                        newPaymentItem.setPaymentUuid(newPayment.getUuid());
+                        newPaymentItem.setPaymentId(newPayment.getId());
+                        newPaymentItem.setUuid(UUIDUtil.randomUUID());
+                        if(3==newPaymentItem.getPayStatus())
+                            newPaymentItem.setStatusFlag(4);
+                        paymentItemRepository.save(newPaymentItem);
+
+                        List<PaymentItemExtra> paymentItemExtras=paymentItemExtraRepository.findByPaymentItemIdAndStatusFlag(paymentItem.getId(),1);
+                        if(!ObjectUtils.isEmpty(paymentItemExtras)){
+                            for(PaymentItemExtra paymentItemExtra:paymentItemExtras){
+                                PaymentItemExtra newPaymentItemExtra=new PaymentItemExtra();
+                                BeanUtils.copyProperties(paymentItemExtra,newPaymentItemExtra);
+                                newPaymentItemExtra.setId(null);
+                                newPaymentItemExtra.setPaymentItemId(newPaymentItem.getId());
+                                newPaymentItemExtra.setUuid(UUIDUtil.randomUUID());
+                                paymentItemExtraRepository.save(newPaymentItemExtra);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void returnCustomerCardTimeByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
@@ -622,7 +705,10 @@ public class OrderServiceImpl implements OrderService {
         tradeNew.setId(null);
         tradeNew.setRelateTradeId(cancelTradeBo.getContent().getTradeId());
         tradeNew.setTradeType(2);
+        if(tradeNew.getTradePayStatus()==3)
+            tradeNew.setTradePayStatus(4);
         tradeNew.setUuid(UUID.randomUUID().toString().substring(0, 32));
+        tradeNew.setTradeNo(UUIDUtil.randomUUID());
         tradeRepository.save(tradeNew);
         return tradeNew;
     }

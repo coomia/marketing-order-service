@@ -12,6 +12,7 @@ public class ResetApiResult extends ApiResult {
     private String message;
     private String messageType;
     private Object data;
+    private String dataType="JSON";
 
     public static final String STATUS_SUCCESS="info";
     public static final String STATUS_ERROR="error";

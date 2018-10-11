@@ -7,6 +7,7 @@ import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.exception.BusinessException;
+import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,8 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
+    @Autowired
+    PayService payService;
 
     @GetMapping("/testLog")
     public ResetApiResult testLog(){
