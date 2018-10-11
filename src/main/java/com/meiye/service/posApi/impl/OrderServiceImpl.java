@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
@@ -442,6 +443,9 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             }
+
+
+
         } else {
             throw new BusinessException("退货订单接口- trade数据校验不通过");
         }
@@ -590,6 +594,19 @@ public class OrderServiceImpl implements OrderService {
             return null;
         else
             return trade.get().copyTo(TradeBo.class);
+    }
+
+
+    @Override
+    public Long getCustomerIdByType(Long tradeId,Integer type){
+        List<TradeCustomer> tradeCustomers=tradeCustomerRepository.findAllByTradeIdAndStatusFlag(tradeId,1);
+        if(!ObjectUtils.isEmpty(tradeCustomers)){
+            for(TradeCustomer tradeCustomer:tradeCustomers){
+                if(type.equals(tradeCustomer.getCustomerType()))
+                    return tradeCustomer.getCustomerId();
+            }
+        }
+        return null;
     }
 
 }

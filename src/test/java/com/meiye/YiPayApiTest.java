@@ -29,7 +29,7 @@ public class YiPayApiTest {
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(paymentParamBo,1,"sdssdsdsd","11111111112222332","0");
+        ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(paymentParamBo,1,"sdssdsdsd","11111111112222332","0",1l);
         System.out.println(scanPayResponseBo.toString());
     }
 
@@ -41,7 +41,7 @@ public class YiPayApiTest {
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
         String outTradeNo= UUIDUtil.randomUUID();
-        ScanQrCodePayResponseBo scanQrCodePayResponseBo=YiPayApi.getQrCodeForPay(paymentParamBo,outTradeNo,1);
+        ScanQrCodePayResponseBo scanQrCodePayResponseBo=YiPayApi.getQrCodeForPay(paymentParamBo,outTradeNo,1,1l);
         System.out.println("Out trade no is:"+outTradeNo);
         System.out.println(scanQrCodePayResponseBo.getQrcode_url());
         System.out.println(scanQrCodePayResponseBo.toString());
@@ -82,6 +82,16 @@ public class YiPayApiTest {
         System.out.println("Refund id is: 20180920002233621701404062480");
         System.out.println("Out refund no is:"+outRefundId);
         System.out.println(refundResponseBo.toString());
+    }
+
+    @Test
+    public void microPay(){
+        StorePaymentParamBo paymentParamBo=new StorePaymentParamBo();
+        paymentParamBo.setAppid(appid);
+        paymentParamBo.setAppsecret(appsecret);
+        paymentParamBo.setContextPath(callbackContextPath);
+        MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(paymentParamBo,1,"bd7fcdb704e44b859515be3e16bv443f","wxcc7307f40486d242","oVlb2wJU3m70N_gY5lrzsISgLVfw","118.112.52.34",1l);
+        System.out.println(microAppPayResponseBo.toString());
     }
 
 

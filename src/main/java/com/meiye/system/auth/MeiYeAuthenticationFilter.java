@@ -77,7 +77,7 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
             }else if(WebUtil.isPosApiPath(httpServletRequest)) {
                 httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }else if(WebUtil.isWechatApiPath(httpServletRequest)) {
-                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+                httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }else{
                 httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }
@@ -127,7 +127,19 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
                 throw new BusinessException("参数错误");
             }
         }else if(WebUtil.isWechatApiPath(request)){
-
+            try {
+                UserBo userBo = new UserBo();
+                String msgId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-msgid");
+                String deviceId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-device-id");
+                Long brandId = Long.parseLong(request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-brand-id"));
+                Long shopId = Long.parseLong(request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-shop-id"));
+                userBo.setStoreBo(storeService.findStoreById(shopId));
+                userBo.setRequestMsgId(msgId);
+                userBo.setDeviceId(deviceId);
+                return new UsernamePasswordAuthenticationToken(userBo, null,null);
+            }catch (Exception exp){
+                throw new BusinessException("参数错误");
+            }
         }
         return null;
     }

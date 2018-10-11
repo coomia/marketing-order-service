@@ -17,10 +17,12 @@ public interface PayService {
     String getAppSercet(Integer storeId);
 
     @Transactional
-    void yipaySuccess(String tradeNo, String yiPayTradeNo);
+    void yipaySuccess(String tradeNo, String yiPayTradeNo, Long paymentId);
 
     @Transactional
-    void paySuccess(Long tradeId);
+    void paySuccess(Long tradeId, Long paymentId, String yiPayTradeNo);
+
+    void afterPaySucess(Long tradeId);
 
     void savePaymentData(AccountingBo accountingBo);
 

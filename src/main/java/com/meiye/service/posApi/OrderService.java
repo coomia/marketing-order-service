@@ -29,4 +29,6 @@ public interface OrderService {
     Trade getTradeByTradeNo(String tradeNo);
 
     TradeBo getTradeByTradeId(Long tradeId);
+
+    Long getCustomerIdByType(Long tradeId, Integer type);
 }

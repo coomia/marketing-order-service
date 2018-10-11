@@ -37,10 +37,10 @@ import java.util.stream.Collectors;
 public class AbstractPayController {
     Logger logger= LoggerFactory.getLogger(AbstractPayController.class);
     @Autowired
-    PayService payService;
+    protected PayService payService;
 
     @Autowired
-    OrderService orderService;
+    protected OrderService orderService;
 
 
 
@@ -57,21 +57,16 @@ public class AbstractPayController {
                     if (payReturnBo.isNeedYiPay()) {
                         StorePaymentParamBo storePaymentParamBo=payService.getStorePaymentParamBo(accountingBo.getShopId());
                         //如果需要调用翼支付，则发起翼支付的调用
-                        if("MicroPay".equalsIgnoreCase(payRequestType)){
-                            MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(storePaymentParamBo,payReturnBo.getTradeAmout(),payReturnBo.getOutTradeNo(),payReturnBo.getWechatAppid(),payReturnBo.getWechatOpenId(),request.getRemoteHost());
-                            if(microAppPayResponseBo.isSuccess())
-                                payResult.put("wechatPayParams",microAppPayResponseBo);
-                            else
-                                throw new BusinessException("调用小程序支付失败",ResetApiResult.STATUS_ERROR,1003);
-                        }else if("ScanPay".equalsIgnoreCase(payRequestType)){
-                            ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(storePaymentParamBo,payReturnBo.getTradeAmout(),payReturnBo.getAuthCode(),payReturnBo.getOutTradeNo(),payReturnBo.getPayType());
+                        if("ScanPay".equalsIgnoreCase(payRequestType)){
+                            ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(storePaymentParamBo,payReturnBo.getTradeAmout(),payReturnBo.getAuthCode(),payReturnBo.getOutTradeNo(),payReturnBo.getPayType(),payReturnBo.getPayItemId());
                             if(scanPayResponseBo.isPaySuccess()){
-                                payService.paySuccess(orderId);
+                                payService.paySuccess(orderId,payReturnBo.getPayItemId(),scanPayResponseBo.getTrade_id());
+                                payService.afterPaySucess(orderId);
                                 payResult.putAll(getOrderPaymentData(orderId));
                             }else
                                 throw new BusinessException("扫码支付失败,请手工同步订单状态",ResetApiResult.STATUS_ERROR,1003);
                         }else if("ScanQrPay".equalsIgnoreCase(payRequestType)){
-                            ScanQrCodePayResponseBo scanQrCodePayResponseBo=YiPayApi.getQrCodeForPay(storePaymentParamBo,payReturnBo.getOutTradeNo(),payReturnBo.getTradeAmout());
+                            ScanQrCodePayResponseBo scanQrCodePayResponseBo=YiPayApi.getQrCodeForPay(storePaymentParamBo,payReturnBo.getOutTradeNo(),payReturnBo.getTradeAmout(),payReturnBo.getPayItemId());
                             if(scanQrCodePayResponseBo.isSuccess())
                                 payResult.put("qrcodeUrl",scanQrCodePayResponseBo.getQrcode_url());
                             else
@@ -79,7 +74,8 @@ public class AbstractPayController {
                         }
                     } else {
                         //不需要翼支付，则开始修改订单状态为支付完成
-                        payService.paySuccess(orderId);
+                        payService.paySuccess(orderId,payReturnBo.getPayItemId(),null);
+                        payService.afterPaySucess(orderId);
                         payResult.putAll(getOrderPaymentData(orderId));
                     }
                 }catch (Exception exp){

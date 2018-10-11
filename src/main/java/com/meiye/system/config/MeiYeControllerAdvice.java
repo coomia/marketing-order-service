@@ -33,7 +33,7 @@ public class MeiYeControllerAdvice extends FastJsonViewResponseBodyAdvice {
                 BusinessException businessException = (BusinessException) ex;
                 return PosApiResult.error(null,ex.getMessage());
             }else if(WebUtil.isWechatApiPath(request)) {
-                return ResetApiResult.error(null,"未知错误.");
+                return PosApiResult.error(null,"未知错误.");
             }else{
                 return ResetApiResult.error(null,"未知错误.");
             }
@@ -43,7 +43,7 @@ public class MeiYeControllerAdvice extends FastJsonViewResponseBodyAdvice {
             }else if(WebUtil.isPosApiPath(request)) {
                 return PosApiResult.error(null,"系统未知错误.");
             }else if(WebUtil.isWechatApiPath(request)) {
-                return ResetApiResult.error(null,"未知错误.");
+                return PosApiResult.error(null,"未知错误.");
             }else{
                 return ResetApiResult.error(null,"未知错误.");
             }

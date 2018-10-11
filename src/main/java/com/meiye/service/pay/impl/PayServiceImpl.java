@@ -14,6 +14,8 @@ import com.meiye.repository.pay.PaymentRepository;
 import com.meiye.repository.trade.TradeRepository;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
+import com.meiye.util.MeiYeInternalApi;
+import com.meiye.util.UUIDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,16 +62,16 @@ public class PayServiceImpl implements PayService {
 
     @Override
     @Transactional
-    public void yipaySuccess(String tradeNo, String yiPayTradeNo){
+    public void yipaySuccess(String tradeNo, String yiPayTradeNo, Long paymentId){
         Trade trade=orderService.getTradeByTradeNo(tradeNo);
         if(trade==null)
             throw new BusinessException("交易记录不存在.");
-        this.paySuccess(trade.getId());
+        this.paySuccess(trade.getId(),paymentId,yiPayTradeNo);
     }
 
     @Override
     @Transactional
-    public void paySuccess(Long tradeId){
+    public void paySuccess(Long tradeId, Long paymentId, String yiPayTradeNo){
         Optional<Trade> tradeOption=tradeRepository.findById(tradeId);
         if(!tradeOption.isPresent())
             throw new BusinessException("交易记录不存在.");
@@ -95,14 +98,62 @@ public class PayServiceImpl implements PayService {
         }
         paymentItemRepository.saveAll(paymentItems);
 
-        //TODO 支付完成的后续操作，比如会员充值/次卡等
-        if(trade.getBusinessType()==2){
-            //储值
-        }else if(trade.getBusinessType()==3){
-            //次卡
+        Optional<PaymentItem> paymentItemOptional=paymentItemRepository.findById(paymentId);
+        if(paymentItemOptional.isPresent()){
+            PaymentItem paymentItem=paymentItemOptional.get();
+            paymentItem.setPayStatus(3);
+            paymentItem.setServerUpdateTime(now);
+            paymentItemRepository.saveAll(paymentItems);
         }
 
+        //调用过翼支付，并且获取到了翼支付的tradeId
+        if(!ObjectUtils.isEmpty(paymentId)&&!ObjectUtils.isEmpty(yiPayTradeNo)){
+            PaymentItemExtra paymentItemExtra=new PaymentItemExtra();
+            paymentItemExtra.setUuid(UUIDUtil.randomUUID());
+            paymentItemExtra.setPaymentItemId(paymentId);
+            paymentItemExtra.setShopIdenty(trade.getShopIdenty());
+            paymentItemExtra.setBrandIdenty(trade.getBrandIdenty());
+            paymentItemExtra.setDeviceIdenty(trade.getDeviceIdenty());
+            paymentItemExtra.setStatusFlag(1);
+            paymentItemExtra.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
+            paymentItemExtra.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
+            paymentItemExtra.setCreatorId(trade.getCreatorId());
+            paymentItemExtra.setCreatorName(trade.getCreatorName());
+            paymentItemExtra.setUpdatorId(trade.getUpdatorId());
+            paymentItemExtra.setUpdatorName(trade.getUpdatorName());
+            paymentItemExtraRepository.save(paymentItemExtra);
+        }
     }
+
+
+    @Override
+    public void afterPaySucess(Long tradeId){
+        Optional<Trade> tradeOption=tradeRepository.findById(tradeId);
+        if(!tradeOption.isPresent())
+            throw new BusinessException("交易记录不存在.");
+        Trade trade=tradeOption.get();
+        if(trade.getBusinessType()==2||trade.getBusinessType()==3) {
+            Long customerId = orderService.getCustomerIdByType(tradeId, 3);
+            Double payedAmount=null;
+            List<Payment> payments=this.findPaymentsByTradeId(trade.getId(),true);
+            List<Long> paymentIds=payments.stream().map(Payment::getId).distinct().collect(Collectors.toList());
+            List<PaymentItem> paymentItems=this.findPaymentItemsByPamentId(paymentIds,true);
+            Long paymentId=null;
+            for(PaymentItem paymentItem:paymentItems){
+                if(paymentItem.getPayStatus()==3) {
+                    payedAmount = payedAmount == null ? paymentItem.getUsefulAmount() : payedAmount + paymentItem.getUsefulAmount();
+                    paymentId=paymentItem.getId();
+                }
+            }
+            if (trade.getBusinessType() == 2) {
+                //储值
+                MeiYeInternalApi.recharge(customerId, tradeId, paymentId,new BigDecimal(payedAmount),trade.getShopIdenty(),trade.getBrandIdenty(),trade.getCreatorId(),trade.getCreatorName());
+            } else if (trade.getBusinessType() == 3) {
+                //次卡
+            }
+        }
+    }
+
 
     @Override
     @Transactional
@@ -224,6 +275,7 @@ public class PayServiceImpl implements PayService {
             prePayReturnBo.setTradeAmout(new Double(paymentItem.getUsefulAmount()*100).intValue());
             prePayReturnBo.setNeedYiPay(true);
             prePayReturnBo.setPayType("0");
+            prePayReturnBo.setPayItemId(paymentItem.getId());
             payRequestUuid=paymentItem.getUuid();
         }else if(!ObjectUtils.isEmpty(alipayItems)){
             PaymentItem paymentItem=alipayItems.get(0);
@@ -233,6 +285,7 @@ public class PayServiceImpl implements PayService {
             prePayReturnBo.setNeedYiPay(true);
             prePayReturnBo.setPayType("1");
             payRequestUuid=paymentItem.getUuid();
+            prePayReturnBo.setPayItemId(paymentItem.getId());
         }
         //如果是POS扫码支付，则需要获取authcode
         if("ScanPay".equalsIgnoreCase(payRequestType)){

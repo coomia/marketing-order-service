@@ -13,6 +13,7 @@ import com.meiye.controller.payment.AbstractPayController;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.pay.Payment;
 import com.meiye.model.pay.PaymentItem;
+import com.meiye.model.trade.Trade;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import com.meiye.util.MeiYeInternalApi;
@@ -71,8 +72,13 @@ public class PaymentController extends AbstractPayController {
             return PosApiResult.error(null,1003,"订单不存在");
         if(tradeBo.getTradePayStatus().equals(1)||tradeBo.getTradePayStatus().equals(2)){
             SyncPayStatusResponseBo syncPayStatusResponseBo=YiPayApi.syncPayStatus(storePaymentParamBo, tradeBo.getTradeNo(), null);
-            if(syncPayStatusResponseBo.isPaySuccess())
-                payService.yipaySuccess(syncPayStatusResponseBo.getOut_trade_no(),syncPayStatusResponseBo.getTrade_id());
+            if(syncPayStatusResponseBo.isPaySuccess()) {
+                String attach=syncPayStatusResponseBo.getAttach();
+                Long paymentItemId=YiPayApi.getPaymentIdFromAttach(attach);
+                payService.yipaySuccess(syncPayStatusResponseBo.getOut_trade_no(), syncPayStatusResponseBo.getTrade_id(),paymentItemId);
+                Trade trade=orderService.getTradeByTradeNo(syncPayStatusResponseBo.getOut_trade_no());
+                payService.afterPaySucess(trade.getId());
+            }
             else if(syncPayStatusResponseBo.isRefundSuccess())
                 //TODO refund success logic.
                 System.out.println("请处理退款成功的逻辑");

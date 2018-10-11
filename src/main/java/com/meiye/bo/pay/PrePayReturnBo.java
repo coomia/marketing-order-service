@@ -15,4 +15,5 @@ public class PrePayReturnBo {
     private String wechatOpenId;
     private String payType;//调用翼支付时的支付方式，0--微信，1--支付宝；3--翼支付
     private boolean needYiPay=false;
+    private Long payItemId;
 }
