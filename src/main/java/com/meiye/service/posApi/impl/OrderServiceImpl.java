@@ -119,6 +119,18 @@ public class OrderServiceImpl implements OrderService {
 
         //2.修改 交易明细 数据
         if (Objects.nonNull(tradeItems) && tradeItems.size() > 0) {
+            tradeItems.stream().forEach(bo -> {
+                        if(Objects.isNull(bo.getTradeId())){
+                            bo.setTradeId(tradeId);
+                            if (Objects.isNull(bo.getRecycleStatus())) {
+                                bo.setRecycleStatus(1);
+                            }
+                            if (Objects.isNull(bo.getBatchNo())) {
+                                bo.setBatchNo("");
+                            }
+                        }
+                    }
+            );
             logger.info("改单接口-修改交易明细开始");
             logger.info("改单接口-交易记录主单：" + JSON.toJSON(tradeItems).toString());
             List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
@@ -128,6 +140,11 @@ public class OrderServiceImpl implements OrderService {
 
         //3.修改 交易的顾客信息 数据
         if (Objects.nonNull(tradeCustomers) && tradeCustomers.size() > 0) {
+            tradeCustomers.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改交易的顾客信息开始");
             logger.info("改单接口-交易的顾客信息：" + JSON.toJSON(tradeCustomers).toString());
             List<TradeCustomer> tradeCustomerList = this.modifyTradeCustomer(tradeCustomers);
@@ -137,6 +154,11 @@ public class OrderServiceImpl implements OrderService {
 
         //4.修改 交易桌台 数据
         if (Objects.nonNull(tradeTables) && tradeTables.size() > 0) {
+            tradeTables.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改交易桌台开始");
             logger.info("改单接口-交易桌台信息：" + JSON.toJSON(tradeTables).toString());
             List<TradeTable> tradeTableList = this.modifyTradeTable(tradeTables,orderResponseDto);
@@ -146,24 +168,39 @@ public class OrderServiceImpl implements OrderService {
 
         //5.修改 优惠信息 数据
         if (Objects.nonNull(tradePrivileges) && tradePrivileges.size() > 0) {
+            tradePrivileges.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改优惠信息开始");
             logger.info("改单接口-优惠信息：" + JSON.toJSON(tradePrivileges).toString());
-            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
+            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradeItems,tradePrivileges);
             orderResponseDto.setTradePrivileges(tradePrivilegeList);
             logger.info("改单接口-修改优惠信息结束");
         }
 
         //6.修改 交易明细特征 数据
         if (Objects.nonNull(tradeItemProperties) && tradeItemProperties.size() > 0) {
+            tradeItemProperties.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改交易明细特征开始");
             logger.info("改单接口-交易明细特征：" + JSON.toJSON(tradeItemProperties).toString());
-            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
+            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItems,tradeItemProperties);
             orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
             logger.info("改单接口-修改交易明细特征结束");
         }
 
         //7.修改 订单用户关联表 数据
         if (Objects.nonNull(tradeUsers) && tradeUsers.size() > 0) {
+            tradeUsers.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改订单用户关联表开始");
             logger.info("改单接口-订单用户关联表：" + JSON.toJSON(tradeUsers).toString());
             List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
@@ -174,6 +211,11 @@ public class OrderServiceImpl implements OrderService {
 
         //8.修改 会员次卡表 数据
         if (Objects.nonNull(customerCardTimes) && customerCardTimes.size() > 0) {
+            customerCardTimes.stream().forEach(bo ->{
+                if(Objects.isNull(bo.getTradeId())){
+                    bo.setTradeId(tradeId);
+                }
+            });
             logger.info("改单接口-修改会员次卡表开始");
             logger.info("改单接口-修改会员次卡表：" + JSON.toJSON(customerCardTimes).toString());
             List<CustomerCardTime> customerCardTimeList = this.modifyCustomerCardTimeBo(customerCardTimes);
@@ -283,7 +325,7 @@ public class OrderServiceImpl implements OrderService {
             tradePrivileges.stream().forEach(bo -> bo.setTradeId(tradeId));
             logger.info("下单接口-新增优惠信息开始");
             logger.info("下单接口-优惠信息：" + JSON.toJSON(tradePrivileges).toString());
-            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradePrivileges);
+            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradeItems,tradePrivileges);
             orderResponseDto.setTradePrivileges(tradePrivilegeList);
             logger.info("下单接口-新增优惠信息结束");
         }
@@ -293,7 +335,7 @@ public class OrderServiceImpl implements OrderService {
             tradeItemProperties.stream().forEach(bo -> bo.setTradeId(tradeId));
             logger.info("下单接口-新增交易明细特征开始");
             logger.info("下单接口-交易明细特征：" + JSON.toJSON(tradeItemProperties).toString());
-            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItemProperties);
+            List<TradeItemProperty> tradeItemPropertiesList = this.modifyTradeItemProperties(tradeItems,tradeItemProperties);
             orderResponseDto.setTradeItemProperties(tradeItemPropertiesList);
             logger.info("下单接口-新增交易明细特征结束");
         }
@@ -419,16 +461,29 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto returnTrade(CancelTradeBo cancelTradeBo) {
         if (cancelTradeBo != null && cancelTradeBo.getContent() != null
                 && cancelTradeBo.getContent().getTradeId() != null) {
-            Trade trade = tradeRepository.findByIdAndBrandIdentyAndTradeStatusIsNot(cancelTradeBo.getContent().getTradeId(), cancelTradeBo.getBrandID(), 6);
-            if (trade == null) {
-                throw new BusinessException("退货订单接口- trade数据校验不通过");
+
+            OrderResponseDto order = getOrderResponse(cancelTradeBo.getContent().getTradeId(), false);
+            if (order == null || order.getTrade() == null){
+                throw new BusinessException("退货订单接口- 未找到退货订单");
             }
-            Trade tradeNew = new Trade();
-            BeanUtils.copyProperties(trade, tradeNew);
-            tradeNew.setId(null);
-            tradeNew.setRelateTradeId(cancelTradeBo.getContent().getTradeId());
-            tradeNew.setUuid(UUID.randomUUID().toString().substring(0, 32));
-            tradeRepository.save(tradeNew);
+            //copy trade and save trade
+            Trade trade = order.getTrade();
+            Trade tradeNew = returnTradeByCopyAndSave(cancelTradeBo, trade);
+            Long tradeNewId = tradeNew.getId();
+            String tradeUuid = tradeNew.getUuid();
+
+            //copy tradeCustomers and save
+            returnTradeCustomerByCopyAndSave(order, tradeNewId, tradeUuid);
+
+            //copy tradeTables and save
+            returnTradeTableByCopyAndSave(order, tradeNewId, tradeUuid);
+
+            //copy tradeItems and save
+            returnTradeItemsByCopyAndSave(order, tradeNewId, tradeUuid);
+
+            // copy customerCardTime
+            returnCustomerCardTimeByCopyAndSave(order, tradeNewId, tradeUuid);
+
             //归还库存
             if (cancelTradeBo.getContent().getReturnInventoryItems() != null && cancelTradeBo.getContent().getReturnInventoryItems().size() > 0) {
                 List<ReturnInventoryItem> returnInventoryItems = cancelTradeBo.getContent().getReturnInventoryItems();
@@ -451,6 +506,125 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return getOrderResponse(cancelTradeBo.getContent().getTradeId(), false);
+    }
+
+    private void returnCustomerCardTimeByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
+        List<CustomerCardTime> customerCardTimes = order.getCustomerCardTimes();
+        if(customerCardTimes != null && customerCardTimes.size()>0){
+            customerCardTimes.forEach(customerCardTime ->{
+                CustomerCardTime newCustomerCardTime = new CustomerCardTime();
+                BeanUtils.copyProperties(customerCardTime, newCustomerCardTime);
+                newCustomerCardTime.setId(null);
+                newCustomerCardTime.setTradeId(tradeNewId);
+                newCustomerCardTime.setTradeUuid(tradeUuid);
+                customerCardTimeRepository.save(newCustomerCardTime);
+            });
+        }
+    }
+
+    private void returnTradeItemsByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
+        List<TradeItem> tradeItems = order.getTradeItems();
+        if(tradeItems != null && tradeItems.size()>0){
+            tradeItems.forEach(tradeItem->{
+                TradeItem newTradeItem = new TradeItem();
+                BeanUtils.copyProperties(tradeItem, newTradeItem);
+                newTradeItem.setId(null);
+                newTradeItem.setTradeId(tradeNewId);
+                newTradeItem.setTradeUuid(tradeUuid);
+                newTradeItem.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                tradeItemRepository.save(newTradeItem);
+                    //copy tradeItemProperties
+                List<TradeItemProperty> tradeItemProperties = order.getTradeItemProperties();
+                if (tradeItemProperties != null && tradeItemProperties.size()>0){
+                    tradeItemProperties.forEach(tradeItemPropertie->{
+                        if (tradeItemPropertie.getTradeItemId() == tradeItem.getId()){
+                            TradeItemProperty newTradeItemProperty = new TradeItemProperty();
+                            BeanUtils.copyProperties(tradeItem, newTradeItem);
+                            newTradeItemProperty.setId(null);
+                            newTradeItemProperty.setTradeId(tradeNewId);
+                            newTradeItemProperty.setTradeUuid(tradeUuid);
+                            newTradeItemProperty.setTradeItemId(newTradeItem.getId());
+                            newTradeItemProperty.setTradeItemUuid(newTradeItem.getUuid());
+                            newTradeItemProperty.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                            tradeItemPropertyRepository.save(newTradeItemProperty);
+                        }
+                    });
+                }
+
+                //copy tradePrivileges and save
+                List<TradePrivilege> tradePrivileges = order.getTradePrivileges();
+                if (tradePrivileges != null && tradePrivileges.size()>0){
+                    tradePrivileges.forEach(tradePrivilege ->{
+                        TradePrivilege newTradePrivilege =  new TradePrivilege();
+                        BeanUtils.copyProperties(tradePrivilege, newTradePrivilege);
+                        newTradePrivilege.setId(null);
+                        newTradePrivilege.setTradeId(tradeNewId);
+                        newTradePrivilege.setTradeUuid(tradeUuid);
+                        newTradePrivilege.setTradeItemId(newTradeItem.getId());
+                        newTradePrivilege.setTradeItemUuid(newTradeItem.getUuid());
+                        newTradePrivilege.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                        tradePrivilegeRepository.save(newTradePrivilege);
+                    });
+                }
+
+                // copy tradeUsers and save
+                List<TradeUser> tradeUsers = order.getTradeUsers();
+                if (tradeUsers != null && tradeUsers.size()>0){
+                    tradeUsers.forEach(tradeUser ->{
+                        TradeUser newTradeUser = new TradeUser();
+                        BeanUtils.copyProperties(tradeUser, newTradeUser);
+                        newTradeUser.setId(null);
+                        newTradeUser.setTradeId(tradeNewId);
+                        newTradeUser.setTradeItemId(newTradeItem.getId());
+                        newTradeUser.setTradeItemUuid(newTradeItem.getUuid());
+                        tradeUserRepository.save(newTradeUser);
+                    });
+
+                }
+
+            });
+        }
+    }
+
+    private void returnTradeTableByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
+        List<TradeTable> tradeTables = order.getTradeTables();
+        if(tradeTables != null && tradeTables.size()>0){
+            tradeTables.forEach(tradeTable->{
+                TradeTable newTradeTable = new TradeTable();
+                BeanUtils.copyProperties(tradeTable, newTradeTable);
+                newTradeTable.setId(null);
+                newTradeTable.setTradeId(tradeNewId);
+                newTradeTable.setTradeUuid(tradeUuid );
+                newTradeTable.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                tradeTableRepository.save(newTradeTable);
+            });
+        }
+    }
+
+    private void returnTradeCustomerByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {
+        List<TradeCustomer> tradeCustomers = order.getTradeCustomers();
+        if (tradeCustomers != null && tradeCustomers.size()>0){
+            tradeCustomers.forEach(tradeCustomer->{
+                TradeCustomer newTradeCustomer = new TradeCustomer();
+                BeanUtils.copyProperties(tradeCustomer, newTradeCustomer);
+                newTradeCustomer.setId(null);
+                newTradeCustomer.setTradeId(tradeNewId);
+                newTradeCustomer.setTradeUuid(tradeUuid);
+                newTradeCustomer.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                tradeCustomerRepository.save(newTradeCustomer);
+            });
+        }
+    }
+
+    private Trade returnTradeByCopyAndSave(CancelTradeBo cancelTradeBo, Trade trade) {
+        Trade tradeNew = new Trade();
+        BeanUtils.copyProperties(trade, tradeNew);
+        tradeNew.setId(null);
+        tradeNew.setRelateTradeId(cancelTradeBo.getContent().getTradeId());
+        tradeNew.setTradeType(2);
+        tradeNew.setUuid(UUID.randomUUID().toString().substring(0, 32));
+        tradeRepository.save(tradeNew);
+        return tradeNew;
     }
 
     private List<Tables> getRelatedTablesByTrade(List<TradeTable> tradeTables, boolean needDelData) {
@@ -515,10 +689,19 @@ public class OrderServiceImpl implements OrderService {
         return tradeUsers;
     }
 
-    private List<TradeItemProperty> modifyTradeItemProperties(List<TradeItemPropertyBo> tradeItemPropertieBos) {
+    private List<TradeItemProperty> modifyTradeItemProperties(List<TradeItemBo> tradeItemBoList,List<TradeItemPropertyBo> tradeItemPropertieBos) {
         List<TradeItemProperty> tradeItemPropertiesList = new ArrayList<TradeItemProperty>();
         for (TradeItemPropertyBo bo : tradeItemPropertieBos) {
             TradeItemProperty tradeItemProperty = bo.copyTo(TradeItemProperty.class);
+            for (TradeItemBo itemBo : tradeItemBoList) {
+                String uuid = itemBo.getUuid();
+                String tradeItemUuid = tradeItemProperty.getTradeItemUuid();
+                if(Objects.nonNull(tradeItemUuid)&&Objects.nonNull(uuid)
+                        &&tradeItemUuid.equals(uuid)){
+                    tradeItemProperty.setTradeItemId(itemBo.getId());
+                    break;
+                }
+            }
             tradeItemProperty = tradeItemPropertyRepository.save(tradeItemProperty);
             tradeItemPropertiesList.add(tradeItemProperty);
         }
@@ -545,10 +728,19 @@ public class OrderServiceImpl implements OrderService {
         return tradeCustomerList;
     }
 
-    private List<TradePrivilege> modifyTradePrivileges(List<TradePrivilegeBo> tradePrivilegeBos) {
+    private List<TradePrivilege> modifyTradePrivileges(List<TradeItemBo> tradeItemBoList,List<TradePrivilegeBo> tradePrivilegeBos) {
         List<TradePrivilege> tradePrivileges = new ArrayList<TradePrivilege>();
         for (TradePrivilegeBo bo : tradePrivilegeBos) {
             TradePrivilege tradePrivilege = bo.copyTo(TradePrivilege.class);
+            for (TradeItemBo itemBo : tradeItemBoList) {
+                String uuid = itemBo.getUuid();
+                String tradeItemUuid = tradePrivilege.getTradeItemUuid();
+                if(Objects.nonNull(tradeItemUuid)&&Objects.nonNull(uuid)
+                        &&tradeItemUuid.equals(uuid)){
+                    tradePrivilege.setTradeItemId(itemBo.getId());
+                    break;
+                }
+            }
             tradePrivilege = tradePrivilegeRepository.save(tradePrivilege);
             tradePrivileges.add(tradePrivilege);
         }
