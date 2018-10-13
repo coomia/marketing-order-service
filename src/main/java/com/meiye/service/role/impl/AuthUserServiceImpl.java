@@ -7,6 +7,7 @@ import com.meiye.repository.role.AuthUserRepository;
 import com.meiye.service.role.AuthRoleService;
 import com.meiye.service.role.AuthUserService;
 import com.meiye.util.Constants;
+import org.apache.shiro.crypto.hash.Sha1Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +45,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public void addAuthUser(AuthUserBo authUserBo) {
         AuthUser authUser = authUserBo.copyTo(AuthUser.class);
+//        authUser.setPassword(new Sha1Hash(authUser.getPassword(), authUser.getName(), 100).toHex());
         authUser.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));;
         if(Objects.nonNull(authUserRepository.findByAccountAndStatusFlag(authUser.getAccount(), Constants.DATA_ENABLE))){
             throw new BusinessException("登录名已被注册，请输入新的登陆账户！");

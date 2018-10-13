@@ -34,7 +34,7 @@ public class MeiYeAuthenticationProvider implements AuthenticationProvider {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-//        password=new Sha1Hash(password, name, 100).toHex();
+        password=new Sha1Hash(password, name, 100).toHex();
 
         UserBo userBo=null;
         try {
