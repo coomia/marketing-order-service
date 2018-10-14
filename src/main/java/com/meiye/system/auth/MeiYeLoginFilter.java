@@ -83,12 +83,15 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
                 }
             }
         }
+        UsernamePasswordAuthenticationToken auth=new UsernamePasswordAuthenticationToken(
+                loginBo.getUserName(),
+                loginBo.getPassword()
+        );
+        auth.setDetails(loginBo);
+
         // 返回一个验证令牌
         return getAuthenticationManager().authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginBo.getUserName(),
-                        loginBo.getPassword()
-                )
+                auth
         );
     }
 

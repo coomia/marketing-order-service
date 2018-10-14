@@ -26,7 +26,7 @@ public interface AuthUserService {
      */
     AuthUserBo findLatestAuthUser();
 
-    AuthUserBo getAuthUserBo(String userName);
+    AuthUserBo getAuthUserBo(String userName, Long shopId);
 
     Page<AuthUser> getUserPageByCriteria(Integer pageNum, Integer pageSize, AuthUserBo authUserBo);
 

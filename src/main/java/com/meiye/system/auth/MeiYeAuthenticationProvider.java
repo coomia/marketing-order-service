@@ -1,5 +1,6 @@
 package com.meiye.system.auth;
 
+import com.meiye.bo.system.LoginBo;
 import com.meiye.bo.user.UserBo;
 import com.meiye.service.user.UserService;
 import org.apache.shiro.crypto.hash.Sha1Hash;
@@ -33,12 +34,18 @@ public class MeiYeAuthenticationProvider implements AuthenticationProvider {
         // 获取认证的用户名 & 密码
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
-
-        password=new Sha1Hash(password, name, 100).toHex();
-
+        LoginBo loginBo=null;
+        Long storeId=null;
         UserBo userBo=null;
         try {
-            userBo = userService.getUserByName(name);
+            if (authentication.getDetails() != null) {
+                loginBo = (LoginBo) authentication.getDetails();
+                if (loginBo != null)
+                    storeId = Long.parseLong(loginBo.getStoreId());
+            }
+            password = new Sha1Hash(password, name, 100).toHex();
+
+            userBo = userService.getUserByName(name, storeId);
         } catch (Exception exp) {
             logger.error(exp.getMessage(),exp);
             throw new AuthenticationServiceException("未知错误");

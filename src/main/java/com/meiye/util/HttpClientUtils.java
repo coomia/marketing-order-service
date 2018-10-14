@@ -57,6 +57,10 @@ public class HttpClientUtils {
         return post(url,parameterStr,"application/x-www-form-urlencoded",charset,connTimeout,readTimeout);
     }
 
+    public static String postParameters(String url, String parameterStr,boolean useJson) throws ConnectTimeoutException, SocketTimeoutException, Exception {
+        return post(url,parameterStr,"application/x-www-form-urlencoded",charset,connTimeout,readTimeout,useJson);
+    }
+
     public static String postParameters(String url, String parameterStr, String charset, Integer connTimeout, Integer readTimeout) throws ConnectTimeoutException, SocketTimeoutException, Exception {
         return post(url,parameterStr,"application/x-www-form-urlencoded",charset,connTimeout,readTimeout);
     }
@@ -79,6 +83,12 @@ public class HttpClientUtils {
         return get(url, charset, connTimeout, readTimeout);
     }
 
+
+    public static String post(String url, String body, String mimeType, String charset, Integer connTimeout, Integer readTimeout)
+            throws ConnectTimeoutException, SocketTimeoutException, Exception{
+        return post(url,body,mimeType,charset,connTimeout,readTimeout,false);
+    }
+
     /**
      * 发送一个 Post 请求, 使用指定的字符集编码.
      *
@@ -93,7 +103,7 @@ public class HttpClientUtils {
      * @throws SocketTimeoutException  响应超时
      * @throws Exception
      */
-    public static String post(String url, String body, String mimeType, String charset, Integer connTimeout, Integer readTimeout)
+    public static String post(String url, String body, String mimeType, String charset, Integer connTimeout, Integer readTimeout,boolean postJson)
             throws ConnectTimeoutException, SocketTimeoutException, Exception {
         HttpClient client = null;
         HttpPost post = new HttpPost(url);
@@ -102,6 +112,10 @@ public class HttpClientUtils {
             if (StringUtils.isNotBlank(body)) {
                 HttpEntity entity = new StringEntity(body, ContentType.create(mimeType, charset));
                 post.setEntity(entity);
+                if(postJson) {
+                    post.addHeader("Content-Type", "application/json;charset=UTF-8");
+                    post.setHeader("Accept", "application/json");
+                }
             }
             // 设置参数
             Builder customReqConf = RequestConfig.custom();

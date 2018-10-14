@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -45,9 +46,15 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public void addAuthUser(AuthUserBo authUserBo) {
         AuthUser authUser = authUserBo.copyTo(AuthUser.class);
-//        authUser.setPassword(new Sha1Hash(authUser.getPassword(), authUser.getName(), 100).toHex());
+        if(authUserBo.getId()!=null&&authUserBo.getId()>0) {
+            if(!ObjectUtils.isEmpty(authUserBo.getPassword()))
+                authUser.setPassword(new Sha1Hash(authUser.getPassword(), authUser.getName(), 100).toHex());
+            if(!ObjectUtils.isEmpty(authUserBo.getPasswordNum()))
+                authUser.setPasswordNum(new Sha1Hash(authUser.getPasswordNum(), authUser.getName(), 100).toHex());
+
+        }
         authUser.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));;
-        if(Objects.nonNull(authUserRepository.findByAccountAndStatusFlag(authUser.getAccount(), Constants.DATA_ENABLE))){
+        if(Objects.nonNull(authUserRepository.findByAccountAndShopIdenty(authUser.getAccount(), authUser.getShopIdenty()))){
             throw new BusinessException("登录名已被注册，请输入新的登陆账户！");
         }
         authUserRepository.save(authUser);
@@ -60,9 +67,9 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
-    public AuthUserBo getAuthUserBo(String userName){
+    public AuthUserBo getAuthUserBo(String userName, Long shopId){
         if(userName!=null){
-            AuthUser authUser=authUserRepository.findFirstByAccount(userName);
+            AuthUser authUser=authUserRepository.findByAccountAndShopIdenty(userName,shopId);
             AuthUserBo authUserBo=authUser==null?null:authUser.copyTo(AuthUserBo.class);
             if(authUserBo!=null){
                 authUserBo.setRoleBo(authRoleService.findOneById(authUserBo.getRoleId()));

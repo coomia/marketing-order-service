@@ -4,14 +4,18 @@ import com.meiye.bo.accounting.AccountingBo;
 import com.meiye.bo.accounting.InternalApiResult;
 import com.meiye.bo.pay.*;
 import com.meiye.bo.system.ResetApiResult;
+import com.meiye.bo.trade.TradeBo;
+import com.meiye.bo.trade.TradeItemBo;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.pay.Payment;
 import com.meiye.model.pay.PaymentItem;
 import com.meiye.model.pay.PaymentItemExtra;
 import com.meiye.model.trade.Trade;
+import com.meiye.model.trade.TradeItem;
 import com.meiye.repository.pay.PaymentItemExtraRepository;
 import com.meiye.repository.pay.PaymentItemRepository;
 import com.meiye.repository.pay.PaymentRepository;
+import com.meiye.repository.trade.TradeItemRepository;
 import com.meiye.repository.trade.TradeRepository;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
@@ -52,6 +56,9 @@ public class PayServiceImpl implements PayService {
     @Autowired
     PaymentItemExtraRepository paymentItemExtraRepository;
 
+    @Autowired
+    TradeItemRepository tradeItemRepository;
+
     @Override
     public String getAppSercet(Integer storeId){
         return "test";
@@ -74,7 +81,7 @@ public class PayServiceImpl implements PayService {
 
     @Override
     @Transactional
-    public void paySuccess(Long tradeId, Long paymentId, String yiPayTradeNo){
+    public void paySuccess(Long tradeId, Long paymentItemId, String yiPayTradeNo){
         Optional<Trade> tradeOption=tradeRepository.findById(tradeId);
         if(!tradeOption.isPresent())
             throw new BusinessException("交易记录不存在.");
@@ -101,32 +108,48 @@ public class PayServiceImpl implements PayService {
         }
         paymentItemRepository.saveAll(paymentItems);
 
-        Optional<PaymentItem> paymentItemOptional=paymentItemRepository.findById(paymentId);
-        if(paymentItemOptional.isPresent()){
-            PaymentItem paymentItem=paymentItemOptional.get();
-            paymentItem.setPayStatus(3);
-            paymentItem.setServerUpdateTime(now);
-            paymentItemRepository.saveAll(paymentItems);
+        if(paymentItemId!=null) {
+            Optional<PaymentItem> paymentItemOptional = paymentItemRepository.findById(paymentItemId);
+            if (paymentItemOptional.isPresent()) {
+                PaymentItem paymentItem = paymentItemOptional.get();
+                paymentItem.setPayStatus(3);
+                paymentItem.setServerUpdateTime(now);
+                paymentItemRepository.saveAll(paymentItems);
+            }
         }
 
         //调用过翼支付，并且获取到了翼支付的tradeId
-        if(!ObjectUtils.isEmpty(paymentId)&&!ObjectUtils.isEmpty(yiPayTradeNo)){
-            PaymentItemExtra paymentItemExtra=new PaymentItemExtra();
-            paymentItemExtra.setUuid(UUIDUtil.randomUUID());
-            paymentItemExtra.setPaymentItemId(paymentId);
-            paymentItemExtra.setPayTranNo(yiPayTradeNo);
-            paymentItemExtra.setPayCallbackTime(now);
-            paymentItemExtra.setShopIdenty(trade.getShopIdenty());
-            paymentItemExtra.setBrandIdenty(trade.getBrandIdenty());
-            paymentItemExtra.setDeviceIdenty(trade.getDeviceIdenty());
-            paymentItemExtra.setStatusFlag(1);
-            paymentItemExtra.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
-            paymentItemExtra.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
-            paymentItemExtra.setCreatorId(trade.getCreatorId());
-            paymentItemExtra.setCreatorName(trade.getCreatorName());
-            paymentItemExtra.setUpdatorId(trade.getUpdatorId());
-            paymentItemExtra.setUpdatorName(trade.getUpdatorName());
-            paymentItemExtraRepository.save(paymentItemExtra);
+        if (!ObjectUtils.isEmpty(paymentItemId) && !ObjectUtils.isEmpty(yiPayTradeNo)) {
+            List<PaymentItemExtra> paymentItemExtras=paymentItemExtraRepository.findByPaymentItemIdAndStatusFlag(paymentItemId,1);
+            if(!ObjectUtils.isEmpty(paymentItemExtras)){
+                for(PaymentItemExtra paymentItemExtra:paymentItemExtras){
+                    paymentItemExtra.setPayTranNo(yiPayTradeNo);
+                    paymentItemExtra.setPayCallbackTime(now);
+                    paymentItemExtra.setStatusFlag(1);
+                    paymentItemExtra.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
+                    paymentItemExtra.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
+                    paymentItemExtra.setUpdatorId(trade.getUpdatorId());
+                    paymentItemExtra.setUpdatorName(trade.getUpdatorName());
+                }
+                paymentItemExtraRepository.saveAll(paymentItemExtras);
+            }else {
+                PaymentItemExtra paymentItemExtra = new PaymentItemExtra();
+                paymentItemExtra.setUuid(UUIDUtil.randomUUID());
+                paymentItemExtra.setPaymentItemId(paymentItemId);
+                paymentItemExtra.setPayTranNo(yiPayTradeNo);
+                paymentItemExtra.setPayCallbackTime(now);
+                paymentItemExtra.setShopIdenty(trade.getShopIdenty());
+                paymentItemExtra.setBrandIdenty(trade.getBrandIdenty());
+                paymentItemExtra.setDeviceIdenty(trade.getDeviceIdenty());
+                paymentItemExtra.setStatusFlag(1);
+                paymentItemExtra.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
+                paymentItemExtra.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
+                paymentItemExtra.setCreatorId(trade.getCreatorId());
+                paymentItemExtra.setCreatorName(trade.getCreatorName());
+                paymentItemExtra.setUpdatorId(trade.getUpdatorId());
+                paymentItemExtra.setUpdatorName(trade.getUpdatorName());
+                paymentItemExtraRepository.save(paymentItemExtra);
+            }
         }
     }
 
@@ -271,9 +294,16 @@ public class PayServiceImpl implements PayService {
                 MeiYeInternalApi.recharge(customerId, tradeId, paymentId,new BigDecimal(payedAmount),trade.getShopIdenty(),trade.getBrandIdenty(),trade.getCreatorId(),trade.getCreatorName());
             } else if (trade.getBusinessType() == 3) {
                 //次卡
-
-
-
+                TradeBo tradeBo=trade.copyTo(TradeBo.class);
+                List<TradeItem> tradeItems=tradeItemRepository.findAllByTradeIdAndStatusFlag(tradeId,1);
+                if(!ObjectUtils.isEmpty(tradeItems)){
+                    List<TradeItemBo> tradeItemBos=new ArrayList<>();
+                    for(TradeItem tradeItem:tradeItems){
+                        tradeItemBos.add(tradeItem.copyTo(TradeItemBo.class));
+                    }
+                    tradeBo.setTradeItems(tradeItemBos);
+                }
+                MeiYeInternalApi.buyCardTimes(customerId,tradeBo);
             }
         }
         //增加消费提成

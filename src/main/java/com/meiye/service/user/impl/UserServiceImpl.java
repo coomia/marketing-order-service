@@ -31,8 +31,8 @@ public class UserServiceImpl implements UserService {
     StoreService storeService;
 
     @Override
-    public UserBo getUserByName(String userName) {
-        AuthUserBo authUserBo=authUserService.getAuthUserBo(userName);
+    public UserBo getUserByName(String userName,Long shopId) {
+        AuthUserBo authUserBo=authUserService.getAuthUserBo(userName,shopId);
         if(authUserBo!=null) {
             UserBo userBo = new UserBo();
             userBo.setUsername(authUserBo.getAccount());
