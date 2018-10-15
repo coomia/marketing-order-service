@@ -62,8 +62,8 @@ public class DishShopBo extends BusinessParentBo {
   private Long defProperty=1l;
 
   private Double stepNum=1d;
-  private Long minNum=0l;
-  private Long maxUum=0l;
+  private Long minNum=1l;
+  private Long maxUum=1l;
   private Long clearStatus=1l;
   private Long isManual;
   private Double saleTotal=0d;

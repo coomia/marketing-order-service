@@ -474,7 +474,7 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new BusinessException("作废订单接口- trade数据校验不通过");
         }
-        return getOrderResponse(cancelTradeBo.getContent().getObsoleteRequest().getTradeId(), false);
+        return null;
     }
 
     @Transactional(rollbackOn = {Exception.class})

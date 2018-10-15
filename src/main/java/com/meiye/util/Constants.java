@@ -21,4 +21,8 @@ public class Constants {
     public static Integer SELF_TABLE_STATUS_UNLOCK = 1;
     public static Integer SELF_TABLE_STATUS_LOCK = 2;
 
+    public static Integer PENDDING_STATUS = -1;//未到店
+    public static Integer SUCCESS_STATUS = 2;//已离店(开单)
+    public static Integer CANCEL_STATUS = 9;//已取消
+
 }

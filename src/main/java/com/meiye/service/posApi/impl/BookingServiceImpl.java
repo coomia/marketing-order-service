@@ -181,7 +181,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BusinessException("删除预定接口-数据库未找到需要删除的预订单！");
         }
         Booking booking = byId.get();
-        booking.setStatusFlag(Constants.DATA_DISABLE);
+       // booking.setStatusFlag(Constants.DATA_DISABLE); 改预订单状态为9，不做物理删除
         if(Objects.nonNull(content.getReason())){
             booking.setRemark(content.getReason());
         }
@@ -194,6 +194,7 @@ public class BookingServiceImpl implements BookingService {
         if(Objects.nonNull(content.getCancelOrderUser())){
             booking.setUpdatorId(content.getCancelOrderUser());
         }
+        booking.setOrderStatus(Constants.CANCEL_STATUS);
         Booking booking1 = bookingRepository.save(booking);
         return booking1;
     }
@@ -230,7 +231,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BusinessException("预订转订单接口-版本校验失败！");
         }
         //修改预订单状态
-        booking1.setOrderStatus(2);
+        booking1.setOrderStatus(Constants.SUCCESS_STATUS);
         booking1 = bookingRepository.save(booking1);
         //插入新订单信息
         OrderResponseDto orderResponseDto = orderService.addOrderData(orderRequestDto);
@@ -299,7 +300,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Page<Booking> getBookPageByCriteria(Integer pageNum, Integer pageSize, BookingPageRequestDto bookingPageRequestDto) {
-        Pageable pageable = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "serverCreateTime");
         Page<Booking> usersPage = bookingRepository.findAll(new Specification<Booking>() {
             @Override
             public Predicate toPredicate(Root<Booking> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
@@ -310,14 +311,25 @@ public class BookingServiceImpl implements BookingService {
                 if (null != bookingPageRequestDto.getShopID()) {
                     list.add(criteriaBuilder.equal(root.get("shopIdenty").as(Long.class), bookingPageRequestDto.getShopID()));
                 }
-
-                if (null != bookingPageRequestDto.getContent().getStartTime()) {
-                    list.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startTime").as(Date.class),bookingPageRequestDto.getContent().getStartTime()));
+                if(2 == bookingPageRequestDto.getContent().getType() ){//已超时
+                    if (null != bookingPageRequestDto.getContent().getStartTime()) {
+                        list.add(criteriaBuilder.lessThan(root.get("startTime").as(Date.class),bookingPageRequestDto.getContent().getStartTime()));
+                    }
+                }else{
+                    if (null != bookingPageRequestDto.getContent().getStartTime()) {
+                        list.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startTime").as(Date.class),bookingPageRequestDto.getContent().getStartTime()));
+                    }
+                    if (null != bookingPageRequestDto.getContent().getEndTime()) {
+                        list.add(criteriaBuilder.lessThanOrEqualTo(root.get("endTime").as(Date.class),bookingPageRequestDto.getContent().getEndTime()));
+                    }
+                    if (null != bookingPageRequestDto.getContent().getType()) {
+                        if(1 == bookingPageRequestDto.getContent().getType()){ //待服务
+                            list.add(criteriaBuilder.equal(root.get("orderStatus").as(Integer.class),Constants.PENDDING_STATUS));
+                        }else if (3 == bookingPageRequestDto.getContent().getType()){//已取消
+                            list.add(criteriaBuilder.equal(root.get("orderStatus").as(Integer.class),Constants.CANCEL_STATUS));
+                        }
+                    }
                 }
-                if (null != bookingPageRequestDto.getContent().getEndTime()) {
-                    list.add(criteriaBuilder.lessThanOrEqualTo(root.get("endTime").as(Date.class),bookingPageRequestDto.getContent().getEndTime()));
-                }
-
 
                 list.add(criteriaBuilder.equal(root.get("statusFlag").as(Long.class), 1));
                 Predicate[] p = new Predicate[list.size()];

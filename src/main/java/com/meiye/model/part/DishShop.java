@@ -44,9 +44,9 @@ public class DishShop extends BusinessParentEntity implements Serializable {
   private Long isSendOutside;
   private Long isOrder;
   private Long defProperty;
-  private Double stepNum;
-  private Long minNum;
-  private Long maxUum;
+  private Double stepNum=1d;
+  private Long minNum=1l;
+  private Long maxUum=1l;
   private Long clearStatus;
   private Long isManual;
   private Double saleTotal;
@@ -61,7 +61,7 @@ public class DishShop extends BusinessParentEntity implements Serializable {
   private Long enabledFlag;
   private String skuKey;
   private Long hasStandard;
-  private Double dishQty;
+  private Double dishQty=1d;
   private Long boxQty;
   private Long currRemainTotal;
   private Long isChangePrice;

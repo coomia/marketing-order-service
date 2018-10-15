@@ -83,7 +83,7 @@ public class OrderController {
     public PosApiResult deleteOrderData(@RequestBody CancelTradeBo cancelTradeBo){
         try {
             OrderResponseDto orderResponseDto = orderService.deleteTrade(cancelTradeBo);
-            return PosApiResult.sucess(orderResponseDto);
+            return PosApiResult.sucess(orderService.getOrderResponse(cancelTradeBo.getContent().getObsoleteRequest().getTradeId(), false));
         }catch (BusinessException b){
             throw new BusinessException(b.getMessage());
         }catch (Exception e){
