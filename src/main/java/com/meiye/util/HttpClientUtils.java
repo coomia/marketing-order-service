@@ -23,6 +23,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
@@ -41,6 +43,7 @@ import java.util.Set;
 
 public class HttpClientUtils {
 
+    static Logger logger= LoggerFactory.getLogger(HttpClientUtils.class);
     public static final int connTimeout=10000;
     public static final int readTimeout=10000;
     public static final String charset="UTF-8";
@@ -76,7 +79,10 @@ public class HttpClientUtils {
     }
 
     public static String get(String url) throws Exception {
-        return get(url, charset, null, null);
+        logger.info("request URL is:"+url);
+        String result= get(url, charset, null, null);
+        logger.info("request URL("+url+") result is:"+result);
+        return result;
     }
 
     public static String get(String url, String charset) throws Exception {

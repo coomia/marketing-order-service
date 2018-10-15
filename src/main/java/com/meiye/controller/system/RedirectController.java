@@ -29,22 +29,22 @@ public class RedirectController {
             String userName=WebUtil.getCurrentUser().getUsername();
             String url= MeiYeInternalApi.MeiYeIntegerApiUrlPrefix;
             if("index".equalsIgnoreCase(redirectType)){
-                url+=String.format("report/main?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
+                url+=String.format("/internal/report/main?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
                 html= HttpClientUtils.get(url);
             }else if("report".equalsIgnoreCase(redirectType)){
-                url+=String.format("report/salesReport?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
+                url+=String.format("/internal/report/salesReport?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
                 html= HttpClientUtils.get(url);
             }else if("marketing".equalsIgnoreCase(redirectType)){
                 url+=String.format("?creatorId=%s&creatorName=%s",userId,userName);
                 html= HttpClientUtils.get(url);
             }else if("customer".equalsIgnoreCase(redirectType)){
-                url+=String.format("customer?creatorId=%s&creatorName=%s",userId,userName);
+                url+=String.format("/customer?creatorId=%s&creatorName=%s",userId,userName);
                 html= HttpClientUtils.get(url);
             }else if("commercialSetting".equalsIgnoreCase(redirectType)){
-                url+=String.format("commercial/settingPage?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
+                url+=String.format("/internal/commercial/settingPage?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
                 html= HttpClientUtils.get(url);
             }else if("customerSetting".equalsIgnoreCase(redirectType)){
-                url+=String.format("customerLevelRule/gotoPage?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
+                url+=String.format("/internal/customerLevelRule/gotoPage?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
                 html= HttpClientUtils.get(url);
             }else{
                 throw new BusinessException("页面不存在");
