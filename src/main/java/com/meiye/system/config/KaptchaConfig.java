@@ -23,11 +23,11 @@ public class KaptchaConfig {
         // 字体颜色
         properties.setProperty("kaptcha.textproducer.font.color", "red");
         // 图片宽
-        properties.setProperty("kaptcha.image.width", "110");
+        properties.setProperty("kaptcha.image.width", "150");
         // 图片高
-        properties.setProperty("kaptcha.image.height", "40");
+        properties.setProperty("kaptcha.image.height", "50");
         // 字体大小
-        properties.setProperty("kaptcha.textproducer.font.size", "30");
+        properties.setProperty("kaptcha.textproducer.font.size", "40");
         // session key
         properties.setProperty("kaptcha.session.key", "code");
         // 验证码长度
