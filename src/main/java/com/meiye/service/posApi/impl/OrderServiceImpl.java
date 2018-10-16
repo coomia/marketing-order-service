@@ -22,6 +22,7 @@ import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import com.meiye.util.Constants;
 import com.meiye.util.ObjectUtil;
+import com.meiye.util.StringUtil;
 import com.meiye.util.UUIDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -707,8 +709,10 @@ public class OrderServiceImpl implements OrderService {
         tradeNew.setTradeType(2);
         if(tradeNew.getTradePayStatus()==3)
             tradeNew.setTradePayStatus(4);
-        tradeNew.setUuid(UUID.randomUUID().toString().substring(0, 32));
-        tradeNew.setTradeNo(UUIDUtil.randomUUID());
+        String oldTradeNo=trade.getTradeNo();
+        String newTradeNo=oldTradeNo.substring(0,3)+ StringUtil.getCurrentTime(null)+oldTradeNo.substring(oldTradeNo.length()-7);
+        tradeNew.setUuid(UUIDUtil.randomUUID());
+        tradeNew.setTradeNo(newTradeNo);
         tradeRepository.save(tradeNew);
         return tradeNew;
     }

@@ -1,6 +1,7 @@
 package com.meiye;
 
 import com.meiye.bo.pay.*;
+import com.meiye.util.StringUtil;
 import com.meiye.util.UUIDUtil;
 import com.meiye.util.YiPayApi;
 import org.junit.Test;
@@ -90,9 +91,8 @@ public class YiPayApiTest {
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(paymentParamBo,1,"bd7fcdb704e44b859515be3e16bv443f","wxcc7307f40486d242","oVlb2wJU3m70N_gY5lrzsISgLVfw","118.112.52.34",1l);
+        MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(paymentParamBo,1,"bd7fcdb704e44b859515be3e16443f","wx22d9607fa73e9364","oTf-e4uoO5lb5PmGH_CUQ8DXeUFU","118.112.52.34",1l);
         System.out.println(microAppPayResponseBo.toString());
     }
-
 
 }

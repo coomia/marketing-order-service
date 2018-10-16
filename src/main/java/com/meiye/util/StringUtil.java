@@ -1,6 +1,10 @@
 package com.meiye.util;
 
+import org.springframework.util.ObjectUtils;
+
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author Gavin Lei
@@ -21,6 +25,15 @@ public class StringUtil {
 		int d1 = n / 16;
 		int d2 = n % 16;
 		return hexDigits[d1] + hexDigits[d2];
+	}
+
+	public static String getCurrentTime(String formate){
+		String dateFormate= "yyMMddHH24mmss";
+		if(!ObjectUtils.isEmpty(formate))
+			dateFormate=formate;
+		SimpleDateFormat simpleDateFormat=new SimpleDateFormat(dateFormate);
+		Date now=new Date();
+		return simpleDateFormat.format(now);
 	}
 
 	/**
