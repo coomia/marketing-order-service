@@ -22,6 +22,7 @@ public class ResetApiResult extends ApiResult {
     public static final int STATUS_CODE_200=200;
     public static final int STATUS_CODE_404=404;
     public static final int STATUS_CODE_403=403;
+    public static final int STATUS_CODE_401=401;
     public static final int STATUS_CODE_500=500;
     private ResetApiResult(){}
 
@@ -30,6 +31,15 @@ public class ResetApiResult extends ApiResult {
         this.setMessage(message);
         this.setMessageType(messageType);
         this.setStatusCode(statusCode==null?200:statusCode);
+    }
+
+    public static ResetApiResult user(String message,String messageType,Integer statusCode,Object data){
+        ResetApiResult resetApiResult =new ResetApiResult();
+        resetApiResult.setData(data==null?new Object():data);
+        resetApiResult.setMessage(message);
+        resetApiResult.setMessageType(messageType);
+        resetApiResult.setStatusCode(statusCode);
+        return resetApiResult;
     }
 
     public static ResetApiResult sucess(Object data){

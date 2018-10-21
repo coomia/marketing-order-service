@@ -65,9 +65,8 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
                     loginBo = JSON.parseObject(loginBody, LoginBo.class, Feature.values());
                 }
             } catch (Exception exp) {
-                exp.printStackTrace();
-                httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null, "用户名密码不存在!"), WebUtil.getFastJsonSerializerFeature()));
+                logger.error("获取登录参数失败",exp);
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"用户不存在或密码错误!"), WebUtil.getFastJsonSerializerFeature()));
                 return null;
             }
             if (StringUtils.isEmpty(loginBody) || StringUtils.isEmpty(loginBo.getUserName())) {
@@ -77,8 +76,8 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
                     loginBo.setPassword(creds.getPassword());
                 } catch (Exception exp) {
                     logger.error("获取登录参数失败",exp);
-                    httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null, "用户名密码不存在!"), WebUtil.getFastJsonSerializerFeature()));
+//                    httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"用户不存在或密码错误!"), WebUtil.getFastJsonSerializerFeature()));
                     return null;
                 }
             }
