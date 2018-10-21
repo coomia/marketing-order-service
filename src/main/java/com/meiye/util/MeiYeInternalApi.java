@@ -26,8 +26,9 @@ import java.util.Map;
  */
 public class MeiYeInternalApi {
     static Logger logger= LoggerFactory.getLogger(MeiYeInternalApi.class);
-//    public final static String MeiYeIntegerApiUrlPrefix="http://172.31.144.129:8080/";
-    public final static String MeiYeIntegerApiUrlPrefix="http://47.105.100.99:8080";
+    public final static String MeiYeIntegerApiUrlPrefix="http://172.31.144.129:8080/";
+//    public final static String MeiYeIntegerApiUrlPrefix="http://47.105.100.99:8080";
+//    public final static String MeiYeIntegerApiUrlPrefix="http://zhongmeiyunfu.com:8080";
 
     //核销
     public static WriteOffResultBo writeOff(Long tradeId, Long brandIdenty, Long shopIdenty){

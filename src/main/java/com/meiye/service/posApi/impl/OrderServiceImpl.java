@@ -481,7 +481,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(rollbackOn = {Exception.class})
     @Override
-    public OrderResponseDto returnTrade(CancelTradeBo cancelTradeBo) {
+    public Long returnTrade(CancelTradeBo cancelTradeBo) {
         if (cancelTradeBo != null && cancelTradeBo.getContent() != null
                 && cancelTradeBo.getContent().getTradeId() != null) {
 
@@ -536,12 +536,10 @@ public class OrderServiceImpl implements OrderService {
             }
 
             payService.returnPayment(tradeNew.getId());
-
+            return tradeNew.getId();
         } else {
             throw new BusinessException("退货订单接口- trade数据校验不通过");
         }
-
-        return getOrderResponse(cancelTradeBo.getContent().getTradeId(), false);
     }
 
 

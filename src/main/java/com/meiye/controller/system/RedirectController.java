@@ -35,10 +35,10 @@ public class RedirectController {
                 url+=String.format("/internal/report/salesReport?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
                 html= HttpClientUtils.get(url);
             }else if("marketing".equalsIgnoreCase(redirectType)){
-                url+=String.format("?creatorId=%s&creatorName=%s",userId,userName);
+                url+=String.format("/internal?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
                 html= HttpClientUtils.get(url);
             }else if("customer".equalsIgnoreCase(redirectType)){
-                url+=String.format("/customer?creatorId=%s&creatorName=%s",userId,userName);
+                url+=String.format("/internal/customer?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);
                 html= HttpClientUtils.get(url);
             }else if("commercialSetting".equalsIgnoreCase(redirectType)){
                 url+=String.format("/internal/commercial/settingPage?brandIdenty=%s&shopIdenty=%s&creatorId=%s&creatorName=%s",brandId,shopId,userId,userName);

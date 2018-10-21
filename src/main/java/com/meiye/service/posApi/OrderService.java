@@ -24,7 +24,7 @@ public interface OrderService {
 
     OrderResponseDto deleteTrade(CancelTradeBo cancelTradeBo);
 
-    OrderResponseDto returnTrade(CancelTradeBo cancelTradeBo);
+    Long returnTrade(CancelTradeBo cancelTradeBo);
 
     Trade getTradeByTradeNo(String tradeNo);
 

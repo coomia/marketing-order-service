@@ -34,7 +34,7 @@ server:
 jwt:
   configuration:
     secret: MeiYe_York
-    time-out: 1800000000
+    time-out: 300000
     token-in-header: token
     valid-token-start-with: Bearer;
 mybatis:

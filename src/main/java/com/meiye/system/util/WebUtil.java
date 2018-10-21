@@ -3,11 +3,16 @@ package com.meiye.system.util;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.meiye.bo.store.CommercialBo;
 import com.meiye.bo.store.StoreBo;
+import com.meiye.bo.system.JWTConfiguration;
 import com.meiye.bo.user.UserBo;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -84,5 +89,17 @@ public class WebUtil {
             return userBo.getRequestMsgId();
         else
             return null;
+    }
+
+
+    public static String getJwtString (JWTConfiguration jwtConfiguration,Authentication authResult){
+        String JWT =jwtConfiguration.getValidTokenStartWith() + Jwts.builder()
+                .claim("userBo", authResult)
+                .setSubject(authResult.getName())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtConfiguration.getTimeOut()))
+                .signWith(SignatureAlgorithm.HS512, jwtConfiguration.getSecret())
+                .compact();
+
+        return JWT;
     }
 }

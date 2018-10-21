@@ -58,7 +58,7 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
         WebUtil.setRestResponseHeader(httpServletResponse);
         Authentication authentication=null;
         try {
-            authentication = getAuthentication(httpServletRequest);
+            authentication = getAuthentication(httpServletRequest,httpServletResponse);
             SecurityContextHolder.getContext()
                     .setAuthentication(authentication);
             filterChain.doFilter(httpServletRequest,httpServletResponse);
@@ -89,7 +89,7 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
     }
 
 
-    private Authentication getAuthentication(HttpServletRequest request) {
+    private Authentication getAuthentication(HttpServletRequest request,HttpServletResponse httpServletResponse) {
         if(WebUtil.isMsApiPath(request)) {
             String token = request.getHeader(jwtConfiguration.getTokenInHeader());
             if (token == null)
@@ -106,9 +106,15 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
                 userBo = JSON.parseObject(userBoJson, UserBo.class);
 
                 List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-                return userBo != null ?
+                Authentication authentication= userBo != null ?
                         new UsernamePasswordAuthenticationToken(userBo, null, userBo.getAuthorities()) :
                         null;
+                //重置token
+                if(authentication!=null){
+                    String newJwtString=WebUtil.getJwtString(jwtConfiguration,authentication);
+                    httpServletResponse.setHeader(jwtConfiguration.getTokenInHeader(),newJwtString);
+                }
+                return authentication;
             } else {
                 throw new AuthenticationCredentialsNotFoundException("登录信息不存在");
             }

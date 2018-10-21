@@ -97,7 +97,8 @@ public class OrderController {
     @PostMapping("/returnOrderData")
     public PosApiResult returnOrderData(@RequestBody CancelTradeBo cancelTradeBo){
         try {
-            OrderResponseDto orderResponseDto = orderService.returnTrade(cancelTradeBo);
+            Long newTradeId = orderService.returnTrade(cancelTradeBo);
+            OrderResponseDto orderResponseDto=orderService.getOrderResponse(newTradeId, false);
             return PosApiResult.sucess(orderResponseDto);
         }catch (BusinessException b){
             throw new BusinessException(b.getMessage());

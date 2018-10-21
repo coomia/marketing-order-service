@@ -50,7 +50,7 @@ public class YiPayApi {
         }
     }
 
-    public static MicroAppPayResponseBo microAppPay(StorePaymentParamBo paymentParamBo, Integer totalAmount, String outTradeNo, String wechatAppId, String wechatOpenId, String remoteIp,Long paymentId){
+    public static MicroAppPayResponseBo microAppPay(StorePaymentParamBo paymentParamBo, Integer totalAmount, String outTradeNo, String wechatAppId, String wechatOpenId, String remoteIp,Long paymentItemId){
         logger.info("Start micro pay for order:"+outTradeNo);
         try {
             MicroAppPayRequestBo microAppPayRequestBo = new MicroAppPayRequestBo();
@@ -60,7 +60,7 @@ public class YiPayApi {
             microAppPayRequestBo.setSub_appid(wechatAppId);
             microAppPayRequestBo.setSub_openid(wechatOpenId);
             microAppPayRequestBo.setSpbill_create_ip(remoteIp);
-            microAppPayRequestBo.setReturn_url(paymentParamBo.getContextPath() + MICRO_APP_RETURN_URL+"/"+paymentId);
+            microAppPayRequestBo.setReturn_url(paymentParamBo.getContextPath() + MICRO_APP_RETURN_URL+"/"+paymentItemId);
             microAppPayRequestBo.setNonce_str(UUIDUtil.randomUUID());
             microAppPayRequestBo.setVersion(YIPAY_VERSION);
             String sortString = SortObjectUtil.getSortString(microAppPayRequestBo, new String[]{"sign"}, true);

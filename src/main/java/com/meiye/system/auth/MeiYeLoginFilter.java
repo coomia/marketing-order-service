@@ -109,13 +109,7 @@ public class MeiYeLoginFilter extends AbstractAuthenticationProcessingFilter {
 
 
     private void addAuthentication(HttpServletResponse response, Authentication authResult) {
-
-        String JWT =jwtConfiguration.getValidTokenStartWith() + Jwts.builder()
-                .claim("userBo", authResult)
-                .setSubject(authResult.getName())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtConfiguration.getTimeOut()))
-                .signWith(SignatureAlgorithm.HS512, jwtConfiguration.getSecret())
-                .compact();
+        String JWT=WebUtil.getJwtString(jwtConfiguration,authResult);
         try {
             response.setStatus(HttpServletResponse.SC_OK);
             response.setHeader(jwtConfiguration.getTokenInHeader(),JWT);
