@@ -37,5 +37,6 @@ public class TradePrivilege extends BusinessParentEntity implements Serializable
 	private String uuid;
 	private Date clientCreateTime;
 	private Date clientUpdateTime;
+	private Long couponId;
 }
 

@@ -23,4 +23,11 @@ public class MeiYeInternalApiTest {
 
     }
 
+    @Test
+    public void testWriteOff(){
+        WriteOffResultBo writeOffResultBo=MeiYeInternalApi.writeOff(298l,1l,1l);
+
+        System.out.println(writeOffResultBo);
+    }
+
 }

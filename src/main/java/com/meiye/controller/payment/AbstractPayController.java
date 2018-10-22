@@ -93,12 +93,15 @@ public class AbstractPayController {
                 }catch (Exception exp){
                     logger.error("支付失败",exp);
                     WriteOffResultBo returnPrivilege=MeiYeInternalApi.returnPrivilege(orderId,accountingBo.getBrandId(),accountingBo.getShopId());
-                    throw new BusinessException("支付失败", ResetApiResult.STATUS_ERROR,1003);
+                    if(returnPrivilege.isSuccess())
+                        throw new BusinessException("支付失败", ResetApiResult.STATUS_ERROR,1003);
+                    else
+                        throw new BusinessException("支付失败，调用反核销程序失败："+returnPrivilege.getMsg(),ResetApiResult.STATUS_ERROR,1003);
                 }
             }else{
                 //处理错误逻辑
-                if("1002".equals(resultBo.getState())||"1003".equals(resultBo.getState()))
-                    return PosApiResult.error(null,5002,resultBo.getMsg());
+//                if("1002".equals(resultBo.getState())||"1003".equals(resultBo.getState()))
+                return PosApiResult.error(null,5002,resultBo.getMsg());
             }
             return PosApiResult.sucess(payResult);
         }catch (BusinessException exp){
