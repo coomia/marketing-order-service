@@ -72,6 +72,8 @@ public class DishShopServiceImpl implements DishShopService{
                     list.add(criteriaBuilder.equal(root.get("dishTypeId").as(Long.class), dishShopBo.getDishTypeId()));
                 }
                 list.add(criteriaBuilder.equal(root.get("statusFlag").as(Long.class), 1));
+                list.add(criteriaBuilder.equal(root.get("shopIdenty").as(Long.class),WebUtil.getCurrentStoreId()));
+                list.add(criteriaBuilder.equal(root.get("brandIdenty").as(Long.class),WebUtil.getCurrentBrandId()));
                 Predicate[] p = new Predicate[list.size()];
                 return criteriaBuilder.and(list.toArray(p));
             }

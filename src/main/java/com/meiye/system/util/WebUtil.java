@@ -65,6 +65,13 @@ public class WebUtil {
         return request.getRequestURI().startsWith(request.getContextPath()+"/public/api");
     }
 
+    //是否后台管理系统的路径
+    public static boolean isInternalApiPath(HttpServletRequest request){
+        return request.getRequestURI().startsWith(request.getContextPath()+"/internal/api");
+    }
+
+
+
     //是否Pos端API
     public static boolean isPosApiPath(HttpServletRequest request){
         return request.getRequestURI().startsWith(request.getContextPath()+"/pos/api");
