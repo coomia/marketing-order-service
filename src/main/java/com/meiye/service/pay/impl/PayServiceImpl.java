@@ -248,6 +248,7 @@ public class PayServiceImpl implements PayService {
             }
             tradeRepository.save(trade);
         }
+        //次卡退货不用考虑，不会发生退货
         MeiYeInternalApi.subtractCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
     }
 
@@ -318,7 +319,8 @@ public class PayServiceImpl implements PayService {
             }
         }
         //增加消费提成
-        MeiYeInternalApi.addCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
+        if(trade.getBusinessType() ==1)
+            MeiYeInternalApi.addCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
     }
 
 

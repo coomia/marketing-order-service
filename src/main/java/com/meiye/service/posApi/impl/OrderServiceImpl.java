@@ -535,7 +535,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
 
-            String result=payService.returnPayment(tradeNew.getId());
+            String result=payService.returnPayment(cancelTradeBo.getContent().getTradeId());
             if(!ObjectUtils.isEmpty(result))
                 throw new BusinessException(result);
             return tradeNew.getId();
