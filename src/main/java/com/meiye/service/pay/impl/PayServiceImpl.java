@@ -459,7 +459,7 @@ public class PayServiceImpl implements PayService {
             payRequestUuid=paymentItem.getUuid();
             prePayReturnBo.setPayItemId(paymentItem.getId());
         }else if(!ObjectUtils.isEmpty(balancePayItems)){
-            PaymentItem paymentItem=alipayItems.get(0);
+            PaymentItem paymentItem=balancePayItems.get(0);
             if (paymentItem.getUsefulAmount() == null || paymentItem.getUsefulAmount() <= 0d)
                 throw new BusinessException("支付金额异常", ResetApiResult.STATUS_ERROR, 1003);
             prePayReturnBo.setPayItemId(paymentItem.getId());
