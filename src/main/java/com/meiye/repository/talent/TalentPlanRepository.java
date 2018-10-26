@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TalentPlanRepository extends JpaRepository<TalentPlan,Long>,JpaSpecificationExecutor<TalentPlan> {
     @Modifying
@@ -21,4 +23,7 @@ public interface TalentPlanRepository extends JpaRepository<TalentPlan,Long>,Jpa
     @Modifying
     @Query(value = "update TalentPlan tp set tp.enabledFlag = ?2  where tp.id = ?1")
     void changeStatus(Long id,Integer enabledFlag);
+
+    List<TalentPlan> findAllByStatusFlagAndEnabledFlagAndBrandIdentyAndShopIdenty(Integer statusFlag,Integer enabledFlag,
+                                                                                  Long brandIdenty,Long shopIdenty);
 }
