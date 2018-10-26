@@ -77,7 +77,9 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
                 httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.user(exp.getMessage(),ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_500,null), WebUtil.getFastJsonSerializerFeature()));
             }else if(WebUtil.isPosApiPath(httpServletRequest)) {
                 httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
-            }else if(WebUtil.isWechatApiPath(httpServletRequest)) {
+            }else if(WebUtil.isInternalApiPath(httpServletRequest)){
+                httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+            } else if(WebUtil.isWechatApiPath(httpServletRequest)) {
                 httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }else{
                 httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
@@ -87,7 +89,11 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
             httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             if(WebUtil.isMsApiPath(httpServletRequest))
                 httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.user("系统错误!",ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_500,null), WebUtil.getFastJsonSerializerFeature()));
-            else
+            else if(WebUtil.isPosApiPath(httpServletRequest)) {
+                httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+            }else if(WebUtil.isInternalApiPath(httpServletRequest)){
+                httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+            } else
                 httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"系统错误!"), WebUtil.getFastJsonSerializerFeature()));
         }
     }
@@ -136,7 +142,24 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
             }catch (Exception exp){
                 throw new BusinessException("参数错误");
             }
-        }else if(WebUtil.isWechatApiPath(request)){
+        }else if(WebUtil.isInternalApiPath(request)){
+            try {
+                UserBo userBo = new UserBo();
+                Long brandId = Long.parseLong(request.getParameter("brandId"));
+                Long shopId = Long.parseLong(request.getParameter("shopId"));
+                Long userId = Long.parseLong(request.getParameter("userId"));
+                userBo=userService.getUserById(userId,shopId);
+                if(userBo==null)
+                    throw new BusinessException("用户不存在");
+                userBo.setStoreBo(storeService.findStoreById(shopId));
+                return new UsernamePasswordAuthenticationToken(userBo, null,null);
+            }catch (BusinessException exp){
+                throw exp;
+            } catch (Exception exp){
+                throw new BusinessException("参数错误");
+            }
+        }
+        else if(WebUtil.isWechatApiPath(request)){
             try {
                 UserBo userBo = new UserBo();
                 String msgId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-msgid");

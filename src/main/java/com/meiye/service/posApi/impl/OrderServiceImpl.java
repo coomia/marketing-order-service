@@ -535,7 +535,9 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
 
-            payService.returnPayment(tradeNew.getId());
+            String result=payService.returnPayment(cancelTradeBo.getContent().getTradeId());
+            if(!ObjectUtils.isEmpty(result))
+                throw new BusinessException(result);
             return tradeNew.getId();
         } else {
             throw new BusinessException("退货订单接口- trade数据校验不通过");

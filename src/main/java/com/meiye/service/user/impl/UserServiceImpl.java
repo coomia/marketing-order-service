@@ -6,6 +6,8 @@ import com.meiye.bo.user.UserBo;
 import com.meiye.service.role.AuthUserService;
 import com.meiye.service.store.StoreService;
 import com.meiye.service.user.UserService;
+import com.meiye.util.ObjectUtil;
+import org.apache.commons.lang.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -51,4 +53,27 @@ public class UserServiceImpl implements UserService {
         }else
             return null;
     }
+
+    @Override
+    public UserBo getUserById(Long userId, Long shopId) {
+        AuthUserBo authUserBo=authUserService.getOneById(userId);
+        if(authUserBo!=null&& ObjectUtils.equals(shopId, authUserBo.getShopIdenty())) {
+            UserBo userBo = new UserBo();
+            userBo.setUsername(authUserBo.getAccount());
+            userBo.setPassword(authUserBo.getPassword());
+            userBo.setId(authUserBo.getId());
+            userBo.setStoreBo(storeService.findStoreById(authUserBo.getShopIdenty()));
+            List<SimpleGrantedAuthority> authorities=new ArrayList<SimpleGrantedAuthority>();
+            if(authUserBo.getRoleBo()!=null&&authUserBo.getRoleBo().getAuthRolePermissions()!=null){
+                authUserBo.getRoleBo().getAuthRolePermissions().forEach(authRolePermissionBo -> {
+                    if(authRolePermissionBo.getAuthPermissionBo()!=null)
+                        authorities.add(new SimpleGrantedAuthority(authRolePermissionBo.getAuthPermissionBo().getCode()));
+                });
+            }
+            userBo.setAuthorities(authorities);
+            return userBo;
+        }else
+            return null;
+    }
+
 }

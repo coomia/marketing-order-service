@@ -2,6 +2,7 @@ package com.meiye.service.pay.impl;
 
 import com.meiye.bo.accounting.AccountingBo;
 import com.meiye.bo.accounting.InternalApiResult;
+import com.meiye.bo.accounting.WriteOffResultBo;
 import com.meiye.bo.pay.*;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.TradeBo;
@@ -156,12 +157,15 @@ public class PayServiceImpl implements PayService {
 
     @Transactional
     @Override
-    public void returnPayment(Long tradeId){
+    public String returnPayment(Long tradeId){
+        String message=null;
         Trade returnTrade = tradeRepository.findById(tradeId).get();
         try {
             Trade oriTrade = tradeRepository.findById(returnTrade.getRelateTradeId()).get();
             List<Payment> payments = this.findPaymentsByTradeId(tradeId, false);
-            MeiYeInternalApi.returnPrivilege(tradeId, WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId());
+            WriteOffResultBo resultBo=MeiYeInternalApi.returnPrivilege(tradeId, WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId());
+            if(!resultBo.isSuccess())
+                message="反核销重新和余额退回失败：" + resultBo.getMsg();
             Integer returnAmt = 0;
             List<PaymentItem> yiPaymentItems = new ArrayList<>();
             if (!ObjectUtils.isEmpty(payments)) {
@@ -174,7 +178,7 @@ public class PayServiceImpl implements PayService {
                                     if (paymentItem.getPayModeId() == 1) {
                                         InternalApiResult internalApiResult = MeiYeInternalApi.refund(orderService.getCustomerIdByType(tradeId, 3), tradeId, paymentItem.getId(), paymentItem.getUsefulAmount(), WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId(), paymentItem.getCreatorId(), paymentItem.getCreatorName());
                                         if (!internalApiResult.isSuccess())
-                                            throw new BusinessException("余额退回失败");
+                                            message="余额退回失败:"+internalApiResult.getMsg();
                                     } else if (paymentItem.getPayModeId() == 4 || paymentItem.getPayModeId() == 5) {
                                         yiPaymentItems.add(paymentItem);
                                     }
@@ -188,7 +192,7 @@ public class PayServiceImpl implements PayService {
                 returnAmt = new Double(yiPaymentItems.get(0).getUsefulAmount() * 100).intValue();
                 YiPayRefundResponseBo yiPayRefundResponseBo = YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, oriTrade.getTradeNo(), null, returnTrade.getTradeNo());
                 if (yiPayRefundResponseBo == null || !yiPayRefundResponseBo.isSuccess()) {
-                    throw new BusinessException("翼支付退款失败");
+                    message="翼支付退款失败";
                 } else {
                     PaymentItemExtra paymentItemExtra = new PaymentItemExtra();
                     paymentItemExtra.setUuid(UUIDUtil.randomUUID());
@@ -212,8 +216,11 @@ public class PayServiceImpl implements PayService {
             }
         }catch (Exception exp){
             logger.info("订单("+tradeId+")退款失败",exp);
-            refundFailed(tradeId);
+            message="订单退款失败";
         }
+        if(!ObjectUtils.isEmpty(message))
+            refundFailed(tradeId);
+        return message;
     }
 
 
@@ -241,6 +248,7 @@ public class PayServiceImpl implements PayService {
             }
             tradeRepository.save(trade);
         }
+        //次卡退货不用考虑，不会发生退货
         MeiYeInternalApi.subtractCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
     }
 
@@ -291,7 +299,9 @@ public class PayServiceImpl implements PayService {
             }
             if (trade.getBusinessType() == 2) {
                 //储值
-                MeiYeInternalApi.recharge(customerId, tradeId, paymentId,new BigDecimal(payedAmount),trade.getShopIdenty(),trade.getBrandIdenty(),trade.getCreatorId(),trade.getCreatorName());
+                InternalApiResult internalApiResult=MeiYeInternalApi.recharge(customerId, tradeId, paymentId,new BigDecimal(payedAmount),trade.getShopIdenty(),trade.getBrandIdenty(),trade.getCreatorId(),trade.getCreatorName());
+                if(!internalApiResult.isSuccess())
+                    throw new BusinessException("充值失败:"+internalApiResult.getMsg());
             } else if (trade.getBusinessType() == 3) {
                 //次卡
                 TradeBo tradeBo=trade.copyTo(TradeBo.class);
@@ -303,11 +313,14 @@ public class PayServiceImpl implements PayService {
                     }
                     tradeBo.setTradeItems(tradeItemBos);
                 }
-                MeiYeInternalApi.buyCardTimes(customerId,tradeBo);
+                InternalApiResult internalApiResult=MeiYeInternalApi.buyCardTimes(customerId,tradeBo);
+                if(!internalApiResult.isSuccess())
+                    throw new BusinessException("购买次卡失败:"+internalApiResult.getMsg());
             }
         }
         //增加消费提成
-        MeiYeInternalApi.addCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
+        if(trade.getBusinessType() ==1)
+            MeiYeInternalApi.addCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
     }
 
 
@@ -446,7 +459,7 @@ public class PayServiceImpl implements PayService {
             payRequestUuid=paymentItem.getUuid();
             prePayReturnBo.setPayItemId(paymentItem.getId());
         }else if(!ObjectUtils.isEmpty(balancePayItems)){
-            PaymentItem paymentItem=alipayItems.get(0);
+            PaymentItem paymentItem=balancePayItems.get(0);
             if (paymentItem.getUsefulAmount() == null || paymentItem.getUsefulAmount() <= 0d)
                 throw new BusinessException("支付金额异常", ResetApiResult.STATUS_ERROR, 1003);
             prePayReturnBo.setPayItemId(paymentItem.getId());
