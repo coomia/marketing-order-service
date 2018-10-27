@@ -8,11 +8,13 @@ import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.TradeBo;
 import com.meiye.bo.trade.TradeItemBo;
 import com.meiye.exception.BusinessException;
+import com.meiye.model.pay.CommercialPaySetting;
 import com.meiye.model.pay.Payment;
 import com.meiye.model.pay.PaymentItem;
 import com.meiye.model.pay.PaymentItemExtra;
 import com.meiye.model.trade.Trade;
 import com.meiye.model.trade.TradeItem;
+import com.meiye.repository.pay.CommercialPaySettingRepository;
 import com.meiye.repository.pay.PaymentItemExtraRepository;
 import com.meiye.repository.pay.PaymentItemRepository;
 import com.meiye.repository.pay.PaymentRepository;
@@ -60,6 +62,9 @@ public class PayServiceImpl implements PayService {
 
     @Autowired
     TradeItemRepository tradeItemRepository;
+
+    @Autowired
+    CommercialPaySettingRepository commercialPaySettingRepository;
 
     @Override
     public String getAppSercet(Integer storeId){
@@ -232,7 +237,10 @@ public class PayServiceImpl implements PayService {
             }else{
                 refundSuccessful(tradeId);
             }
-        }catch (Exception exp){
+        }catch (BusinessException exp){
+            logger.info("订单("+tradeId+")退款失败",exp);
+            message+="订单退款失败:"+exp.getMessage();
+        } catch (Exception exp){
             logger.info("订单("+tradeId+")退款失败",exp);
             message+="订单退款失败";
         }
@@ -507,17 +515,28 @@ public class PayServiceImpl implements PayService {
     @Override
     public StorePaymentParamBo getStorePaymentParamBo(long storeId){
         StorePaymentParamBo storePaymentParamBo=new StorePaymentParamBo();
-        storePaymentParamBo.setAppid("hf19102035480OVA");
-        storePaymentParamBo.setAppsecret("nfePmU6VhhCPmEZzuyySvFc0xhEEUWiA");
+        CommercialPaySetting commercialPaySetting=commercialPaySettingRepository.findOneByShopIdentyAndTypeAndStatusFlag(storeId,2,1);
+        if(ObjectUtils.isEmpty(commercialPaySetting)||ObjectUtils.isEmpty(commercialPaySetting.getAppid())||ObjectUtils.isEmpty(commercialPaySetting.getAppsecret()))
+            throw new BusinessException("支付设置错误,请联系管理员检查.");
+
+        storePaymentParamBo.setAppid(commercialPaySetting.getAppid());
+        storePaymentParamBo.setAppsecret(commercialPaySetting.getAppsecret());
 //        storePaymentParamBo.setAppid("hf163356826045OA");
 //        storePaymentParamBo.setAppsecret("MgAtKIRKPMMbbfycOw5b87U6NP024kWA");
-        String callbackContextPath="http://118.113.200.6:7090/MeiYe";
+        String callbackContextPath="http://b.zhongmeiyunfu.com/MeiYe";
         storePaymentParamBo.setContextPath(callbackContextPath);
         return storePaymentParamBo;
     }
 
 
-
+    @Override
+    public String getStoreWechatAppId(long storeId){
+        StorePaymentParamBo storePaymentParamBo=new StorePaymentParamBo();
+        CommercialPaySetting commercialPaySetting=commercialPaySettingRepository.findOneByShopIdentyAndTypeAndStatusFlag(storeId,1,1);
+        if(ObjectUtils.isEmpty(commercialPaySetting)||ObjectUtils.isEmpty(commercialPaySetting.getAppid()))
+            throw new BusinessException("小程序设置错误,请联系管理员检查.");
+        return commercialPaySetting.getAppid();
+    }
 
 
 }

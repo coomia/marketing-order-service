@@ -88,10 +88,10 @@ public class YiPayApiTest {
     @Test
     public void microPay(){
         StorePaymentParamBo paymentParamBo=new StorePaymentParamBo();
-        paymentParamBo.setAppid(appid);
-        paymentParamBo.setAppsecret(appsecret);
+        paymentParamBo.setAppid("hf19102035480OVA");
+        paymentParamBo.setAppsecret("nfePmU6VhhCPmEZzuyySvFc0xhEEUWiA");
         paymentParamBo.setContextPath(callbackContextPath);
-        MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(paymentParamBo,1,"bd7fcdb704e44b859515be3e16443f","wx22d9607fa73e9364","oTf-e4uoO5lb5PmGH_CUQ8DXeUFU","118.112.52.34",1l);
+        MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(paymentParamBo,1,"bd7fcdb704e44b8595s5be3e16443f","wx8ea448dd310b9504","owH5N5aO7aYdMJ0zfT4HlPF-pbsE","118.112.52.34",1l);
         System.out.println(microAppPayResponseBo.toString());
     }
 
