@@ -42,4 +42,6 @@ public interface PayService {
     PrePayReturnBo prePay(AccountingBo accountingBo, String payRequestType);
 
     StorePaymentParamBo getStorePaymentParamBo(long storeId);
+
+    String getStoreWechatAppId(long storeId);
 }

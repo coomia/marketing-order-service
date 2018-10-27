@@ -31,9 +31,9 @@ public class GenEntityMysql {
 
 
     // TODO 需要修改的地方
-    private static final String URL = "jdbc:mysql://192.168.31.172:8805/store";
-    private static final String NAME = "root";
-    private static final String PASS = "Hj_1987121";
+    private static final String URL = "jdbc:mysql://rm-m5e838987b5zfu576jo.mysql.rds.aliyuncs.com:3306/zhongmei";
+    private static final String NAME = "zhongmeiyunfu";
+    private static final String PASS = "Zs463423266";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
     private String packageOutPath = "com.meiye.model.store";
     private String repostiryPackageOutPath="com.meiye.repository.store";
@@ -412,7 +412,7 @@ public class GenEntityMysql {
      */
     public static void main(String[] args) {
         try {
-            INSTANCE.generateTables=new String[]{"payment_item_extra"};
+            INSTANCE.generateTables=new String[]{"commercial_pay_setting"};
             INSTANCE.packageOutPath = "com.meiye.model.pay";
             INSTANCE.repostiryPackageOutPath="com.meiye.repository.pay";
             INSTANCE.boPackageOutPath="com.meiye.bo.pay";

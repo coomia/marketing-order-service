@@ -5,6 +5,7 @@ import com.meiye.exception.BusinessException;
 import com.meiye.model.part.DishBrandType;
 import com.meiye.repository.part.DishBrandTypeRepository;
 import com.meiye.service.part.BrandTypeService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     public List<DishBrandTypeBo> getAllDishBrandTypeList() {
         List<DishBrandType> dishBrandTypes = null;
         try{
-             dishBrandTypes = dishBrandTypeRepository.findAllByStatusFlagOrderBySortDesc(Constants.DATA_ENABLE);
+             dishBrandTypes = dishBrandTypeRepository.findAllByStatusFlagAndBrandIdentyAndShopIdentyOrderBySortDesc(Constants.DATA_ENABLE, WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
         }catch (Exception e){
             throw new BusinessException("查找所有分类失败!");
         }

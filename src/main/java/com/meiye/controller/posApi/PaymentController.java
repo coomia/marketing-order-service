@@ -55,47 +55,52 @@ public class PaymentController extends AbstractPayController {
 
     @PostMapping("/syncTradeStatus")
     public PosApiResult syncOrderPayment(@RequestBody QueryTradePaymentBo queryTradePaymentBo){
-        if(ObjectUtils.isEmpty(queryTradePaymentBo)||ObjectUtils.isEmpty(queryTradePaymentBo.getContent()))
-            return PosApiResult.error(null,1003,"查询参数错误");
-        Long tradeId=queryTradePaymentBo.getContent().getTradeId();
-        if(tradeId==null)
-            //TODO　Base on paymentItemId to get tradeId
-            logger.debug("请处理通过其它方式查询TradeId的逻辑");
-        if(tradeId==null)
-            return PosApiResult.error(null,1003,"查询参数错误");
-        StorePaymentParamBo storePaymentParamBo=payService.getStorePaymentParamBo(queryTradePaymentBo.getShopID());
-        TradeBo tradeBo=orderService.getTradeByTradeId(tradeId);
-        if(ObjectUtils.isEmpty(tradeBo))
-            return PosApiResult.error(null,1003,"订单不存在");
-        if(tradeBo.getTradeType()==1) {
-            if (tradeBo.getTradePayStatus().equals(1) || tradeBo.getTradePayStatus().equals(2)) {
-                SyncPayStatusResponseBo syncPayStatusResponseBo = YiPayApi.syncPayStatus(storePaymentParamBo, tradeBo.getTradeNo(), null);
-                if (syncPayStatusResponseBo.isPaySuccess()) {
-                    String attach = syncPayStatusResponseBo.getAttach();
-                    Long paymentItemId = YiPayApi.getPaymentIdFromAttach(attach);
-                    payService.yipaySuccess(syncPayStatusResponseBo.getOut_trade_no(), syncPayStatusResponseBo.getTrade_id(), paymentItemId);
-                    Trade trade = orderService.getTradeByTradeNo(syncPayStatusResponseBo.getOut_trade_no());
-                    payService.afterPaySucess(trade.getId());
-                } else if (syncPayStatusResponseBo.isRefundSuccess())
-                    //TODO refund success logic.
-                    System.out.println("请处理退款成功的逻辑");
-            }
-        }else if(tradeBo.getTradeType()==2){
-            QueryYiPayRefundStatusResponseBo refundStatusResponseBo=YiPayApi.queryRefundStatus(storePaymentParamBo,tradeBo.getTradeNo(),null);
-            if(refundStatusResponseBo.isSuccess()) {
-                if (ObjectUtils.isEmpty(refundStatusResponseBo.getRefund_lists())) {
-                    QueryYiPayRefundStatusResponseDetailBo refundStatusResponseDetailBo = refundStatusResponseBo.getRefund_lists().get(0);
-                    if ("1".equalsIgnoreCase(refundStatusResponseDetailBo.getRefund_status())) {
-                        payService.refundSuccessful(tradeId);
-                    } else if ("0".equalsIgnoreCase(refundStatusResponseDetailBo.getRefund_status())) {
-                        payService.refundFailed(tradeId);
-                    }
+        try {
+            if (ObjectUtils.isEmpty(queryTradePaymentBo) || ObjectUtils.isEmpty(queryTradePaymentBo.getContent()))
+                return PosApiResult.error(null, 1003, "查询参数错误");
+            Long tradeId = queryTradePaymentBo.getContent().getTradeId();
+            if (tradeId == null)
+                return PosApiResult.error(null, 1003, "查询参数错误");
+            StorePaymentParamBo storePaymentParamBo = payService.getStorePaymentParamBo(queryTradePaymentBo.getShopID());
+            TradeBo tradeBo = orderService.getTradeByTradeId(tradeId);
+            if (ObjectUtils.isEmpty(tradeBo))
+                return PosApiResult.error(null, 1003, "订单不存在");
+            if (tradeBo.getTradeType() == 1) {
+                if (tradeBo.getTradePayStatus().equals(1) || tradeBo.getTradePayStatus().equals(2)) {
+                    SyncPayStatusResponseBo syncPayStatusResponseBo = YiPayApi.syncPayStatus(storePaymentParamBo, tradeBo.getTradeNo(), null);
+                    if (syncPayStatusResponseBo.isPaySuccess()) {
+                        String attach = syncPayStatusResponseBo.getAttach();
+                        Long paymentItemId = YiPayApi.getPaymentIdFromAttach(attach);
+                        payService.yipaySuccess(syncPayStatusResponseBo.getOut_trade_no(), syncPayStatusResponseBo.getTrade_id(), paymentItemId);
+                        Trade trade = orderService.getTradeByTradeNo(syncPayStatusResponseBo.getOut_trade_no());
+                        payService.afterPaySucess(trade.getId());
+                    } else if (syncPayStatusResponseBo.isRefundSuccess())
+                        //TODO refund success logic.
+                        System.out.println("请处理退款成功的逻辑");
                 }
+            } else if (tradeBo.getTradeType() == 2) {
+                QueryYiPayRefundStatusResponseBo refundStatusResponseBo = YiPayApi.queryRefundStatus(storePaymentParamBo, tradeBo.getTradeNo(), null);
+                if (refundStatusResponseBo.isSuccess()) {
+                    if (ObjectUtils.isEmpty(refundStatusResponseBo.getRefund_lists())) {
+                        QueryYiPayRefundStatusResponseDetailBo refundStatusResponseDetailBo = refundStatusResponseBo.getRefund_lists().get(0);
+                        if ("1".equalsIgnoreCase(refundStatusResponseDetailBo.getRefund_status())) {
+                            payService.refundSuccessful(tradeId);
+                        } else if ("0".equalsIgnoreCase(refundStatusResponseDetailBo.getRefund_status())) {
+                            payService.refundFailed(tradeId);
+                        }
+                    }
 
+                }
             }
+            Map<String, Object> map = super.getOrderPaymentData(tradeId);
+            return PosApiResult.sucess(map);
+        }catch (BusinessException exp){
+            logger.error("同步订单状态失败",exp);
+            return PosApiResult.error(null, 1003, "同步订单状态失败:"+exp.getMessage());
+        }catch (Exception exp){
+            logger.error("同步订单状态失败",exp);
+            return PosApiResult.error(null, 1003, "同步订单状态失败");
         }
-        Map<String,Object> map=super.getOrderPaymentData(tradeId);
-        return PosApiResult.sucess(map);
     }
 
 
@@ -109,7 +114,6 @@ public class PaymentController extends AbstractPayController {
             logger.debug("请处理通过其它方式查询TradeId的逻辑");
         if(tradeId==null)
             return PosApiResult.error(null,1003,"查询参数错误");
-        StorePaymentParamBo storePaymentParamBo=payService.getStorePaymentParamBo(queryTradePaymentBo.getShopID());
         TradeBo tradeBo=orderService.getTradeByTradeId(tradeId);
         if(ObjectUtils.isEmpty(tradeBo))
             return PosApiResult.error(null,1003,"订单不存在");

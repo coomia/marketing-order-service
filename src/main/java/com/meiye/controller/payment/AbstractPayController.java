@@ -90,7 +90,15 @@ public class AbstractPayController {
                         payService.afterPaySucess(orderId);
                         payResult.putAll(getOrderPaymentData(orderId));
                     }
-                }catch (Exception exp){
+                }catch (BusinessException exp){
+                    logger.error("支付失败",exp);
+                    String message="支付失败:"+exp.getMessage();
+                    WriteOffResultBo returnPrivilege=MeiYeInternalApi.returnPrivilege(orderId,accountingBo.getBrandId(),accountingBo.getShopId());
+                    if(returnPrivilege.isSuccess())
+                        throw new BusinessException(message, ResetApiResult.STATUS_ERROR,1003);
+                    else
+                        throw new BusinessException(message+"，调用反核销程序失败："+returnPrivilege.getMsg(),ResetApiResult.STATUS_ERROR,1003);
+                } catch (Exception exp){
                     logger.error("支付失败",exp);
                     WriteOffResultBo returnPrivilege=MeiYeInternalApi.returnPrivilege(orderId,accountingBo.getBrandId(),accountingBo.getShopId());
                     if(returnPrivilege.isSuccess())
