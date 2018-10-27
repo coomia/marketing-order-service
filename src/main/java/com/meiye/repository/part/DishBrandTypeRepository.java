@@ -22,7 +22,7 @@ public interface DishBrandTypeRepository  extends JpaRepository<DishBrandType,Lo
      * @param statusFlag
      * @return
      */
-    List<DishBrandType> findAllByStatusFlagOrderBySortDesc(Integer statusFlag);
+    List<DishBrandType> findAllByStatusFlagAndBrandIdentyAndShopIdentyOrderBySortDesc(Integer statusFlag,Long brandIdenty,Long shopIdenty);
 
     @Modifying
     @Query("update DishBrandType bt set bt.name=?1,bt.typeCode=?2 where bt.id=?3")
