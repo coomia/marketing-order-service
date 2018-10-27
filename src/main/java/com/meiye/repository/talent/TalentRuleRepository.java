@@ -17,4 +17,11 @@ public interface TalentRuleRepository extends JpaRepository<TalentRule,Long> {
     void deleteByPlanId(Long id);
 
     List<TalentRule> getTalentRuleByPlanIdAndStatusFlag(Long id,Integer statusFlag);
+
+
+    @Modifying
+    @Query(value = "select tr from TalentRule tr where tr.planId = ?1 and tr.statusFlag =?2 order by tr.ruleValue ")
+    List<TalentRule> getTalentRuleByPlanIdAndStatusFlagAndOrderByRuleValue(Long id,Integer statusFlag);
+
+
 }

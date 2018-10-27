@@ -3,7 +3,10 @@ package com.meiye.bo.salary;
 import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.trade.TradeUserBo;
 import com.meiye.system.util.WebUtil;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -20,15 +23,27 @@ import java.util.List;
 public class SalaryBo  implements Serializable{
     protected Long brandIdenty= WebUtil.getCurrentBrandId();
     protected Long shopIdenty=WebUtil.getCurrentStoreId();
-    private Integer userId;
+    private Long userId;
     private String userName;
     private Date starDate;
     private Date endDate;
-    private Double baseSalary; //基本工资+岗位工资
-    private Double salesCommissions;
-    private Double saveCommissions;
-    private Double projectCommissions;
-    private Double salarySum;
+    private BigDecimal baseSalary; //基本工资+岗位工资
+    private BigDecimal salesCommissions;
+    private String salesCommissionsDetail;
+    private BigDecimal saveCommissions;
+    private String saveCommissionsDetail;
+    private BigDecimal projectCommissions;
+    private BigDecimal salarySum;
+
+    public SalaryBo(Long brandIdenty, Long shopIdenty, Long userId, String userName, Date starDate, Date endDate, BigDecimal baseSalary) {
+        this.brandIdenty = brandIdenty;
+        this.shopIdenty = shopIdenty;
+        this.userId = userId;
+        this.userName = userName;
+        this.starDate = starDate;
+        this.endDate = endDate;
+        this.baseSalary = baseSalary;
+    }
 
 
 }

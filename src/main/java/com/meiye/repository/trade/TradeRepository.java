@@ -1,5 +1,6 @@
 package com.meiye.repository.trade;
 
+import com.meiye.bo.salary.ProjectCommionsDetailBo;
 import com.meiye.bo.salary.TradeAndUserBo;
 import  com.meiye.model.trade.Trade;
 import org.springframework.data.jpa.repository.JpaRepository;
