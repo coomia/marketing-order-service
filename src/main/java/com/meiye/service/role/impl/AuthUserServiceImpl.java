@@ -6,6 +6,7 @@ import com.meiye.model.role.AuthUser;
 import com.meiye.repository.role.AuthUserRepository;
 import com.meiye.service.role.AuthRoleService;
 import com.meiye.service.role.AuthUserService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.Constants;
 import org.apache.shiro.crypto.hash.Sha1Hash;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Override
     public AuthUserBo findLatestAuthUser() {
-        AuthUser authUser = authUserRepository.findFirstByOrderByServerCreateTimeDesc();
+        AuthUser authUser = authUserRepository.findFirstByBrandIdentyAndShopIdentyOrderByServerCreateTimeDesc(WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
         return authUser.copyTo(AuthUserBo.class);
     }
 
@@ -106,7 +107,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Override
     public AuthUserBo getOneById(Long id) {
-        AuthUser byIdAndStatusFlag = authUserRepository.findByIdAndStatusFlag(id, 1);
+        AuthUser byIdAndStatusFlag = authUserRepository.findByIdAndStatusFlagAndBrandIdentyAndShopIdenty(id, 1, WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
         if (byIdAndStatusFlag != null){
             AuthUserBo authUserBo = byIdAndStatusFlag.copyTo(AuthUserBo.class);
             return authUserBo;

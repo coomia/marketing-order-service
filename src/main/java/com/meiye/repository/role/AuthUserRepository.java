@@ -25,11 +25,11 @@ public interface AuthUserRepository extends JpaRepository<AuthUser,Long>,JpaSpec
      * 查找最新加入门店的员工信息
      * @return
      */
-    AuthUser findFirstByOrderByServerCreateTimeDesc();
+    AuthUser findFirstByBrandIdentyAndShopIdentyOrderByServerCreateTimeDesc(Long brandIdenty,Long shopIdenty);
 
     AuthUser findFirstByAccount(String account);
 
-    AuthUser findByIdAndStatusFlag(Long id, Integer  statusFlag);
+    AuthUser findByIdAndStatusFlagAndBrandIdentyAndShopIdenty(Long id, Integer  statusFlag,Long brandIdenty,Long shopIdenty);
 
     AuthUser findByAccountAndShopIdenty(String accout, Long shopIdenty);
 

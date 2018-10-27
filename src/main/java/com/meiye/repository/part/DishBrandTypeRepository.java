@@ -32,4 +32,6 @@ public interface DishBrandTypeRepository  extends JpaRepository<DishBrandType,Lo
     @Query("update DishBrandType bt set bt.statusFlag=?1 where bt.id=?2")
     int deleteDishBrandType(Integer statusFlag,Long id);
 
+    DishBrandType findByIdAndBrandIdentyAndShopIdenty(Long id,Long brandIdenty,Long shopIdenty);
+
 }

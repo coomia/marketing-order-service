@@ -20,6 +20,7 @@ import com.meiye.repository.setting.TablesRepository;
 import com.meiye.repository.trade.*;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.Constants;
 import com.meiye.util.ObjectUtil;
 import com.meiye.util.StringUtil;
@@ -728,7 +729,7 @@ public class OrderServiceImpl implements OrderService {
             if(needDelData){
                 tablesList = tablesRepository.findAllById(tableIds);
             }else{
-                tablesList = tablesRepository.findAllByIdInAndStatusFlag(tableIds, Constants.DATA_ENABLE);
+                tablesList = tablesRepository.findAllByIdInAndStatusFlagAndBrandIdentyAndShopIdenty(tableIds, Constants.DATA_ENABLE, WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
             }
         }
         return tablesList;
