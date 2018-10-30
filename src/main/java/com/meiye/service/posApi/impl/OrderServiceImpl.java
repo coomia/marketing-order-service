@@ -661,6 +661,7 @@ public class OrderServiceImpl implements OrderService {
                         BeanUtils.copyProperties(tradeUser, newTradeUser);
                         newTradeUser.setId(null);
                         newTradeUser.setTradeId(tradeNewId);
+                        newTradeUser.setTradeUuid(tradeUuid);
                         newTradeUser.setTradeItemId(newTradeItem.getId());
                         newTradeUser.setTradeItemUuid(newTradeItem.getUuid());
                         tradeUserRepository.save(newTradeUser);
