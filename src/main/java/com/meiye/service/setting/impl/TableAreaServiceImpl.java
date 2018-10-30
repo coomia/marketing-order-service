@@ -5,6 +5,7 @@ import com.meiye.exception.BusinessException;
 import com.meiye.model.setting.TableArea;
 import com.meiye.repository.setting.TablesAreaRepository;
 import com.meiye.service.setting.TableAreaService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class TableAreaServiceImpl implements TableAreaService {
     public List<TableAreaBo> getAllTableArea() {
         List<TableArea> tableAreaList = null;
         try {
-            tableAreaList = tablesAreaRepository.findAllByStatusFlagOrderByServerCreateTimeAsc(Constants.DATA_ENABLE);
+            tableAreaList = tablesAreaRepository.findAllByStatusFlagAndBrandIdentyAndShopIdentyOrderByServerCreateTimeAsc(Constants.DATA_ENABLE, WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
         } catch (Exception e) {
             throw new BusinessException("查找工作台区域失败!");
         }

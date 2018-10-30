@@ -3,6 +3,7 @@ package com.meiye.bo.salary;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @Author: Shawns

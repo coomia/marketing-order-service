@@ -17,7 +17,7 @@ import java.util.List;
 @Repository
 public interface TablesAreaRepository extends JpaRepository<TableArea,Long> {
 
-    List<TableArea> findAllByStatusFlagOrderByServerCreateTimeAsc(Integer statusFlag);
+    List<TableArea> findAllByStatusFlagAndBrandIdentyAndShopIdentyOrderByServerCreateTimeAsc(Integer statusFlag,Long brandIdenty,Long shopIdenty);
 
     @Modifying
     @Query("update TableArea ta set ta.areaName=?1 where ta.id=?2")

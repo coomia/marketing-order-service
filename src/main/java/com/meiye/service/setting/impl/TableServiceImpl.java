@@ -5,6 +5,7 @@ import com.meiye.exception.BusinessException;
 import com.meiye.model.setting.Tables;
 import com.meiye.repository.setting.TablesRepository;
 import com.meiye.service.setting.TableService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class TableServiceImpl implements TableService {
         if (Objects.isNull(areaId)) {
             throw new BusinessException("工作台区域ID不能为空!");
         }
-        List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdOrderByTableNumAsc(Constants.DATA_ENABLE, areaId);
+        List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdAndBrandIdentyAndShopIdentyOrderByTableNumAsc(Constants.DATA_ENABLE, areaId, WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
         if (tablesList != null && tablesList.size() > 0) {
             return tablesList.size();
         }
@@ -42,7 +43,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public List<TablesBo> getAllTablesByAreaId(Long areaId) {
-        List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdOrderByTableNumAsc(Constants.DATA_ENABLE, areaId);
+        List<Tables> tablesList = tablesRepository.findAllByStatusFlagAndAreaIdAndBrandIdentyAndShopIdentyOrderByTableNumAsc(Constants.DATA_ENABLE, areaId, WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
         List<TablesBo> tablesBos = this.copy(tablesList);
         tablesBos= tablesBos == null ? new ArrayList<>() : tablesBos;
         return tablesBos;

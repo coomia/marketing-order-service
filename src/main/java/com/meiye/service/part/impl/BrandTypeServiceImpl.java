@@ -34,7 +34,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
         try{
            i= dishBrandTypeRepository.deleteDishBrandType(Constants.DATA_DISABLE,id);
         }catch (Exception e){
-            throw new BusinessException("查找所有分类失败!");
+            throw new BusinessException("删除分类失败!");
         }
        return i;
     }
@@ -80,7 +80,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     public DishBrandTypeBo getDishBrandType(Long id) {
         DishBrandType dishBrandType = null;
         try{
-             dishBrandType = dishBrandTypeRepository.findById(id).get();
+             dishBrandType = dishBrandTypeRepository.findByIdAndBrandIdentyAndShopIdenty(id,WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
         }catch (Exception e){
             throw new BusinessException("根据ID获取分类失败!");
         }

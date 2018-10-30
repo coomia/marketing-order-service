@@ -49,5 +49,12 @@ public interface BookingService {
 
 
     BookingPageResponseDto getPageBooking(Integer page, Integer pageCount, BookingPageRequestDto bookingPageRequestDto);
+
+    /**
+     * 更新微信预订单状态
+     * @return
+     */
+    Booking updateWxBookingStatus(WxBookingRequestDto wxBookingRequestDto);
+
 }
 

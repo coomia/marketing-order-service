@@ -45,7 +45,8 @@ public class WebUtil {
     }
 
     public static Long getCurrentBrandId(){
-        return new Long(1);
+        CommercialBo storeBo=getCurrentStore();
+        return storeBo==null?null:storeBo.getBrandId();
     }
 
     public static SerializerFeature[] getFastJsonSerializerFeature(){

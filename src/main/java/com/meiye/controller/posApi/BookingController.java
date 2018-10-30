@@ -136,7 +136,6 @@ public class BookingController {
         try {
             BookingPageResponseDto pageBooking = bookingService.getPageBooking(bookingPageRequestDto.getContent().getPage()
                     , bookingPageRequestDto.getContent().getPageCount(), bookingPageRequestDto);
-
             return PosApiResult.sucess(pageBooking);
         }catch (BusinessException b){
             throw new BusinessException(b.getMessage());
@@ -144,5 +143,23 @@ public class BookingController {
             throw new BusinessException("获取预订单接口列表- 失败！");
         }
     }
+
+    @PostMapping("/updateWxBookingStatus")
+    public PosApiResult updateWxBookingStatus(@RequestBody WxBookingRequestDto wxBookingRequestDto){
+        if(Objects.isNull(wxBookingRequestDto)){
+            logger.error("更新微信预订单接口-接口数据为空");
+            throw new BusinessException("更新微信预订单接口-接口数据为空，请检查！");
+        }
+        logger.info("更新微信预订单接口-上传json数据："+ JSON.toJSON(wxBookingRequestDto).toString());
+        try {
+            Booking booking = bookingService.updateWxBookingStatus(wxBookingRequestDto);
+            return PosApiResult.sucess(booking);
+        }catch (BusinessException b){
+            throw new BusinessException(b.getMessage());
+        }catch (Exception e){
+            throw new BusinessException("更新微信预订单接口- 更新微信预订单失败！");
+        }
+    }
+
 
 }

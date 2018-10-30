@@ -24,11 +24,11 @@ public interface TablesRepository extends JpaRepository<Tables,Long> {
      * @param areaId
      * @return
      */
-    List<Tables> findAllByStatusFlagAndAreaIdOrderByTableNumAsc(Integer statusFlag,Long areaId);
+    List<Tables> findAllByStatusFlagAndAreaIdAndBrandIdentyAndShopIdentyOrderByTableNumAsc(Integer statusFlag,Long areaId,Long brandIdenty,Long shopIdenty);
 
     List<Tables> findAllByStatusFlag(Integer statusFlag);
 
-    List<Tables> findAllByIdInAndStatusFlag(List<Long> idList,Integer statusFlag);
+    List<Tables> findAllByIdInAndStatusFlagAndBrandIdentyAndShopIdenty(List<Long> idList,Integer statusFlag,Long brandIdenty,Long shopIdenty);
 
     List<Tables> findAllByIdIn(List<Long> idList);
 

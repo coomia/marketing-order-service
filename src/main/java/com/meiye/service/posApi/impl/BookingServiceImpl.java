@@ -5,7 +5,6 @@ import com.meiye.bo.booking.BookingBo;
 import com.meiye.bo.booking.BookingTradeItemBo;
 import com.meiye.bo.booking.BookingTradeItemUserBo;
 import com.meiye.bo.booking.dto.*;
-import com.meiye.bo.trade.CancelTrade.Content;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.bo.trade.OrderDto.TradeRequestDto;
@@ -13,7 +12,6 @@ import com.meiye.exception.BusinessException;
 import com.meiye.model.booking.Booking;
 import com.meiye.model.booking.BookingTradeItem;
 import com.meiye.model.booking.BookingTradeItemUser;
-import com.meiye.model.talent.TalentPlan;
 import com.meiye.repository.booking.BookingRepository;
 import com.meiye.repository.booking.BookingTradeItemRepository;
 import com.meiye.repository.booking.BookingTradeItemUserRepository;
@@ -324,9 +322,11 @@ public class BookingServiceImpl implements BookingService {
                     }
                     if (null != bookingPageRequestDto.getContent().getType()) {
                         if(1 == bookingPageRequestDto.getContent().getType()){ //待服务
-                            list.add(criteriaBuilder.equal(root.get("orderStatus").as(Integer.class),Constants.PENDDING_STATUS));
+                            list.add(criteriaBuilder.equal(root.get("orderStatus").as(Integer.class),Constants.NOT_TO_THE_STORE__STATUS));
                         }else if (3 == bookingPageRequestDto.getContent().getType()){//已取消
                             list.add(criteriaBuilder.equal(root.get("orderStatus").as(Integer.class),Constants.CANCEL_STATUS));
+                        }else if (4 == bookingPageRequestDto.getContent().getType()){//未处理订单
+                            list.add(criteriaBuilder.equal(root.get("orderStatus").as(Integer.class),Constants.PENNDING_OPERATE_STATUS));
                         }
                     }
                 }
@@ -373,6 +373,43 @@ public class BookingServiceImpl implements BookingService {
 
 
         return bookingPageResponseDto;
+    }
+
+    @Override
+    public Booking updateWxBookingStatus(WxBookingRequestDto wxBookingRequestDto) {
+        WxBookingContentDto content = wxBookingRequestDto.getContent();
+        if(Objects.isNull(content)){
+            logger.error("更新微信预订单接口-更新微信预订单状态数据为空！");
+            throw new BusinessException("更新微信预订单接口-更新微信预订单状态数据为空，请检查！");
+        }
+        //校验版本号
+        Long bookingId = content.getBookingId();
+        if(Objects.isNull(bookingId)){
+            logger.error("更新微信预订单接口-预订单booking_Id is null！");
+            throw new BusinessException("更新微信预订单接口-预订单booking_Id is null！");
+        }
+        Optional<Booking> Optional = bookingRepository.findById(bookingId);
+        if(!Optional.isPresent()){
+            logger.error("更新微信预订单接口-未找到需要修改的预订单！booking_id:"+bookingId);
+            throw new BusinessException("更新微信预订单接口-未找到需要修改的预订单！booking_id:"+bookingId);
+        }
+        Booking booking = Optional.get();
+        Timestamp clientUpdateTime = new Timestamp(content.getBookingServerUpdateTime());
+        Timestamp serverUpdateTime = booking.getServerUpdateTime();
+        if(clientUpdateTime.equals(serverUpdateTime)){
+            booking.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
+        }else{
+            logger.error("更新微信预订单接口-版本校验失败！");
+            throw new BusinessException("更新微信预订单接口-版本校验失败！");
+        }
+        Integer orderStatus = booking.getOrderStatus();
+        if(Constants.PENNDING_OPERATE_STATUS != orderStatus){
+            logger.error("更新微信预订单接口-该订单状态不允许执行此操作！");
+            throw new BusinessException("更新微信预订单接口-该订单状态不允许执行此操作！");
+        }
+        booking.setOrderStatus(content.getToOrderStatus());
+        Booking saveBooking = bookingRepository.save(booking);
+        return saveBooking;
     }
 
 
