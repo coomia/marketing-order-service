@@ -22,6 +22,7 @@ public class TradeUser extends BusinessParentEntity implements Serializable{
 	 @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)	private Long id;
 	private Long tradeId;
+	private Long tradeUuid;
 	private Long userId;
 	private String userName;
 	private Integer type;

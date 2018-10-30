@@ -116,9 +116,9 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
-    public AuthUserBo getOneByIdAndShopIdentity(Long id,Long shopIdentity){
-        AuthUser byIdAndStatusFlag = authUserRepository.findByIdAndStatusFlag(id, 1);
-        if (byIdAndStatusFlag != null&& org.apache.commons.lang.ObjectUtils.equals(shopIdentity,byIdAndStatusFlag.getShopIdenty())){
+    public AuthUserBo getOneByIdAndShopIdentity(Long id, Long shopIdentity,Long brandIdentity){
+        AuthUser byIdAndStatusFlag = authUserRepository.findByIdAndStatusFlagAndBrandIdentyAndShopIdenty(id, 1,shopIdentity,brandIdentity);
+        if (byIdAndStatusFlag != null){
             AuthUserBo authUserBo = byIdAndStatusFlag.copyTo(AuthUserBo.class);
             return authUserBo;
         }

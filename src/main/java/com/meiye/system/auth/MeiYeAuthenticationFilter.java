@@ -148,7 +148,7 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
                 Long brandId = Long.parseLong(request.getParameter("brandId"));
                 Long shopId = Long.parseLong(request.getParameter("shopId"));
                 Long userId = Long.parseLong(request.getParameter("userId"));
-                userBo=userService.getUserById(userId,shopId);
+                userBo=userService.getUserById(userId,shopId,brandId);
                 if(userBo==null)
                     throw new BusinessException("用户不存在");
                 userBo.setStoreBo(storeService.findStoreById(shopId));

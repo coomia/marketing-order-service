@@ -5,6 +5,7 @@ import com.meiye.bo.booking.BookingTradeItemUserBo;
 import com.meiye.model.booking.Booking;
 import com.meiye.model.booking.BookingTradeItem;
 import com.meiye.model.booking.BookingTradeItemUser;
+import com.meiye.model.trade.TradeCustomer;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,5 +23,6 @@ public class BookingResponseDto implements Serializable {
     private Booking booking;
     private List<BookingTradeItem> bookingTradeItems;
     private List<BookingTradeItemUser> bookingTradeItemUsers;
+    private List<TradeCustomer> tradeCustomers;
 
 }

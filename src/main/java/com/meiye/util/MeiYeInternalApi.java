@@ -10,6 +10,7 @@ import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.TradeBo;
 import com.meiye.bo.trade.TradeItemBo;
 import com.meiye.exception.BusinessException;
+import com.meiye.model.customer.Customer;
 import com.meiye.system.util.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +155,22 @@ public class MeiYeInternalApi {
             return new InternalApiResult("1001",exp.getMessage());
         }
     }
+
+    //调会员接口
+    public static Customer registCustomer(String name, String mobile, Integer gender, Long tradeId){
+        try {
+            String apiUrl = MeiYeIntegerApiUrlPrefix + "/marketing/internal/customer/queryOrAdd";
+            Map<String,Object> params=new HashMap<>();
+            params.put("name",name);
+            params.put("mobile",mobile);
+            params.put("gender",gender);
+            String result = callInternalApi(apiUrl, params, true, "调会员接口",tradeId);
+            return JSON.parseObject(result, Customer.class);
+        }catch (Exception exp){
+            throw new BusinessException("调用会员接口失败",ResetApiResult.STATUS_ERROR,1003);
+        }
+    }
+
 
     public static String callInternalApiByForm(String apiUrl, Map<String,String> params,boolean post,String apiName,Long tradeId){
         try {
