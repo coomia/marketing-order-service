@@ -275,7 +275,7 @@ public class PayServiceImpl implements PayService {
             tradeRepository.save(trade);
         }
         //次卡退货不用考虑，不会发生退货
-        MeiYeInternalApi.subtractCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
+        MeiYeInternalApi.subtractCommission(trade.getRelateTradeId(),trade.getBrandIdenty(),trade.getShopIdenty());
     }
 
     @Transactional

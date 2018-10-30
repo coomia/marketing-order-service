@@ -32,5 +32,7 @@ public interface AuthUserService {
 
     AuthUserBo getOneById(Long id);
 
+    AuthUserBo getOneByIdAndShopIdentity(Long id, Long shopIdentity);
+
     void delete(Long id);
 }

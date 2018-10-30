@@ -115,6 +115,16 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
+    public AuthUserBo getOneByIdAndShopIdentity(Long id,Long shopIdentity){
+        AuthUser byIdAndStatusFlag = authUserRepository.findByIdAndStatusFlag(id, 1);
+        if (byIdAndStatusFlag != null&& org.apache.commons.lang.ObjectUtils.equals(shopIdentity,byIdAndStatusFlag.getShopIdenty())){
+            AuthUserBo authUserBo = byIdAndStatusFlag.copyTo(AuthUserBo.class);
+            return authUserBo;
+        }
+        return  null;
+    }
+
+    @Override
     public void delete(Long id) {
         authUserRepository.deleteById(id);
     }
