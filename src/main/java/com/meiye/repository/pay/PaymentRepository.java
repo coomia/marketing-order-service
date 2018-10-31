@@ -24,6 +24,7 @@ public interface PaymentRepository extends JpaRepository<Payment,Long>{
 
     public List<Payment> findByRelateIdAndStatusFlag(Long relateId,Integer statusFlag );
     public List<Payment> findByRelateId(Long relateId);
+    public Payment findOneByUuid(String uuid);
 
 }
 

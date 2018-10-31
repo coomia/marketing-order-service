@@ -361,11 +361,19 @@ public class PayServiceImpl implements PayService {
             Trade trade=tradeOption.get();
             if(!trade.getServerUpdateTime().equals(accountingBo.getContent().getTrade().getServerUpdateTime()))
                 throw new BusinessException("订单已经被其他人处理。", ResetApiResult.STATUS_ERROR,5004);
+
+
+            PaymentBo paymentBo=accountingBo.getContent().getPayment();
+
+            Payment existPayment=paymentRepository.findOneByUuid(paymentBo.getUuid());
+            //如果payment已经存在，则不继续保存，证明此时为重试
+            if(existPayment!=null&& org.apache.commons.lang.ObjectUtils.equals(existPayment.getRelateId(),trade.getId()))
+                return;
+
             //删除已存在的支付记录
             paymentRepository.disableExistPaymentByRelateId(trade.getId());
 
             //保存新的payment记录
-            PaymentBo paymentBo=accountingBo.getContent().getPayment();
             paymentBo.setRelateId(trade.getId());
             paymentBo.setRelateUuid(trade.getUuid());
             paymentBo.setBizDate(new Date());
