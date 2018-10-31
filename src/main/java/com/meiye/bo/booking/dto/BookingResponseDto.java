@@ -23,6 +23,6 @@ public class BookingResponseDto implements Serializable {
     private Booking booking;
     private List<BookingTradeItem> bookingTradeItems;
     private List<BookingTradeItemUser> bookingTradeItemUsers;
-    private List<TradeCustomer> tradeCustomers;
+   // private List<TradeCustomer> tradeCustomers;
 
 }

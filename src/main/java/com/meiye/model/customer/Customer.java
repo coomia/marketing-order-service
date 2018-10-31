@@ -12,7 +12,8 @@ import java.io.Serializable;/**
  * table name:  customer
  * author name: ryne
  * create time: 2018-10-30 20:23:12
- */ 
+ * create time: 2018-10-30 23:15:48
+ */
 @Data
 @Entity
 public class Customer extends ParentEntity implements Serializable{

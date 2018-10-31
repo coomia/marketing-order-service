@@ -6,6 +6,7 @@ import com.meiye.bo.booking.BookingBo;
 import com.meiye.bo.booking.BookingTradeItemBo;
 import com.meiye.bo.booking.BookingTradeItemUserBo;
 import com.meiye.bo.booking.dto.*;
+import com.meiye.bo.customer.CustomerApiResult;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.bo.trade.OrderDto.TradeRequestDto;
@@ -81,6 +82,13 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = content.copyTo(Booking.class);
         logger.info("创建预定接口-新增预定记录主单开始");
         logger.info("创建预定接口-预定订单数据："+ JSON.toJSON(booking).toString());
+        try{
+            CustomerApiResult customerApiResult = MeiYeInternalApi.registCustomer(booking.getCommercialName(), booking.getCommercialPhone(), booking.getCommercialGender(), new Long(000));
+            Customer data = customerApiResult.getData();
+            booking.setCommercialId(data.getId());
+        }catch(Exception e){
+            logger.error("创建预定接口-调会员接口失败！");
+        }
         booking = bookingRepository.save(booking);
         bookingResponseDto.setBooking(booking);
         logger.info("创建预定接口-新增预定记录主单结束");
@@ -112,19 +120,19 @@ public class BookingServiceImpl implements BookingService {
             logger.info("创建预定接口-新增预定订单销售员与订单商品关系结束");
         }
         //4.trade_customer  只有一个会员
-        if(tradeCustomerBos!=null &&tradeCustomerBos.size()>0){
-            TradeCustomerBo tradeCustomerBo = tradeCustomerBos.get(0);
-            Customer customer = MeiYeInternalApi.registCustomer(tradeCustomerBo.getCustomerName(), tradeCustomerBo.getCustomerPhone(), tradeCustomerBo.getCustomerSex(), bookingId);
-            tradeCustomerBos.stream().forEach(bo->{
-                bo.setCustomerId(customer.getId());
-            } );
-            logger.info("创建预定接口-新增订单用户开始");
-            logger.info("创建预定接口-新增订单用户开始："+ JSON.toJSON(tradeCustomerBos).toString());
-            List<TradeCustomer> tradeCustomers = this.modifyTradeCustomer(tradeCustomerBos);
-            bookingResponseDto.setTradeCustomers(tradeCustomers);
-            logger.info("创建预定接口-新增订单用户开始");
-
-        }
+//        if(tradeCustomerBos!=null &&tradeCustomerBos.size()>0){
+//            TradeCustomerBo tradeCustomerBo = tradeCustomerBos.get(0);
+//            CustomerApiResult customerApiResult = MeiYeInternalApi.registCustomer(tradeCustomerBo.getCustomerName(), tradeCustomerBo.getCustomerPhone(), tradeCustomerBo.getCustomerSex(), bookingId);
+//            Customer data = customerApiResult.getData();
+//            tradeCustomerBos.stream().forEach(bo->{
+//                bo.setCustomerId(data.getId());
+//            });
+//            logger.info("创建预定接口-新增订单用户开始");
+//            logger.info("创建预定接口-新增订单用户开始："+ JSON.toJSON(tradeCustomerBos).toString());
+//            List<TradeCustomer> tradeCustomers = this.modifyTradeCustomer(tradeCustomerBos);
+//            bookingResponseDto.setTradeCustomers(tradeCustomers);
+//            logger.info("创建预定接口-新增订单用户开始");
+//        }
 
         return bookingResponseDto;
     }
@@ -186,15 +194,15 @@ public class BookingServiceImpl implements BookingService {
             logger.info("修改预定接口-修改预定订单销售员与订单商品关系结束");
         }
         //4.trade_customer  只有一个会员
-        List<TradeCustomer> list = new ArrayList<TradeCustomer>();
-        if(tradeCustomerBos!=null &&tradeCustomerBos.size()>0){
-            for(TradeCustomerBo bo:tradeCustomerBos){
-                TradeCustomer tradeCustomer = bo.copyTo(TradeCustomer.class);
-                tradeCustomer = tradeCustomerRepository.save(tradeCustomer);
-                list.add(tradeCustomer);
-            }
-        }
-        bookingResponseDto.setTradeCustomers(list);
+//        List<TradeCustomer> list = new ArrayList<TradeCustomer>();
+//        if(tradeCustomerBos!=null &&tradeCustomerBos.size()>0){
+//            for(TradeCustomerBo bo:tradeCustomerBos){
+//                TradeCustomer tradeCustomer = bo.copyTo(TradeCustomer.class);
+//                tradeCustomer = tradeCustomerRepository.save(tradeCustomer);
+//                list.add(tradeCustomer);
+//            }
+//        }
+//        bookingResponseDto.setTradeCustomers(list);
         return bookingResponseDto;
     }
 

@@ -227,7 +227,7 @@ public class OrderServiceImpl implements OrderService {
             });
             logger.info("改单接口-修改订单用户关联表开始");
             logger.info("改单接口-订单用户关联表：" + JSON.toJSON(tradeUsers).toString());
-            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
+            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeItems,tradeUsers);
             orderResponseDto.setTradeUsers(tradeUserList);
             logger.info("改单接口-修改订单用户关联表结束");
         }
@@ -369,7 +369,7 @@ public class OrderServiceImpl implements OrderService {
             tradeUsers.stream().forEach(bo -> bo.setTradeId(tradeId));
             logger.info("下单接口-新增订单用户关联表开始");
             logger.info("下单接口-订单用户关联表：" + JSON.toJSON(tradeUsers).toString());
-            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeUsers);
+            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeItems,tradeUsers);
             orderResponseDto.setTradeUsers(tradeUserList);
             logger.info("下单接口-新增订单用户关联表结束");
         }
@@ -771,10 +771,19 @@ public class OrderServiceImpl implements OrderService {
         return customerCardTimeList;
     }
 
-    private List<TradeUser> modifyTradeUser(List<TradeUserBo> tradeUserBos) {
+    private List<TradeUser> modifyTradeUser(List<TradeItemBo> tradeItemBoList,List<TradeUserBo> tradeUserBos) {
         List<TradeUser> tradeUsers = new ArrayList<TradeUser>();
         for (TradeUserBo bo : tradeUserBos) {
             TradeUser tradeUser = bo.copyTo(TradeUser.class);
+            for (TradeItemBo itemBo : tradeItemBoList) {
+                String uuid = itemBo.getUuid();
+                String tradeItemUuid = tradeUser.getTradeItemUuid();
+                if(Objects.nonNull(tradeItemUuid)&&Objects.nonNull(uuid)
+                        &&tradeItemUuid.equals(uuid)){
+                    tradeUser.setTradeItemId(itemBo.getId());
+                    break;
+                }
+            }
             tradeUser = tradeUserRepository.save(tradeUser);
             tradeUsers.add(tradeUser);
         }

@@ -3,6 +3,7 @@ package com.meiye.util;
 import com.alibaba.fastjson.JSON;
 import com.meiye.bo.accounting.InternalApiResult;
 import com.meiye.bo.accounting.WriteOffResultBo;
+import com.meiye.bo.customer.CustomerApiResult;
 import com.meiye.bo.internalapi.CardTimesBuyRequestBo;
 import com.meiye.bo.internalapi.CardTimesDetailRequestBo;
 import com.meiye.bo.system.PosApiResult;
@@ -157,15 +158,15 @@ public class MeiYeInternalApi {
     }
 
     //调会员接口
-    public static Customer registCustomer(String name, String mobile, Integer gender, Long tradeId){
+    public static CustomerApiResult registCustomer(String name, String mobile, Long gender, Long tradeId){
         try {
             String apiUrl = MeiYeIntegerApiUrlPrefix + "/marketing/internal/customer/queryOrAdd";
             Map<String,Object> params=new HashMap<>();
             params.put("name",name);
             params.put("mobile",mobile);
-            params.put("gender",gender);
+            params.put("gender",gender.intValue());
             String result = callInternalApi(apiUrl, params, true, "调会员接口",tradeId);
-            return JSON.parseObject(result, Customer.class);
+            return JSON.parseObject(result, CustomerApiResult.class);
         }catch (Exception exp){
             throw new BusinessException("调用会员接口失败",ResetApiResult.STATUS_ERROR,1003);
         }
