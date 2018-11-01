@@ -34,4 +34,6 @@ public interface DishBrandTypeRepository  extends JpaRepository<DishBrandType,Lo
 
     DishBrandType findByIdAndBrandIdentyAndShopIdenty(Long id,Long brandIdenty,Long shopIdenty);
 
+    List<DishBrandType> findByParentIdAndBrandIdentyAndShopIdenty(Long id,Long brandIdenty,Long shopIdenty);
+
 }
