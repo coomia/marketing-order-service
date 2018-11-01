@@ -30,7 +30,7 @@ public class YiPayApiTest {
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(paymentParamBo,1,"sdssdsdsd","11111111112222332","0",1l);
+        ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(paymentParamBo,1,"sdssdsdsdsdsd","111111111122w22332","0",1l);
         System.out.println(scanPayResponseBo.toString());
     }
 

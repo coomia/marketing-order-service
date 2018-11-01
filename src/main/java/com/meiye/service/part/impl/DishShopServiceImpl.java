@@ -30,6 +30,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Author: ryner
@@ -110,9 +111,11 @@ public class DishShopServiceImpl implements DishShopService{
                     if(dishSetmeals!=null&&!dishSetmeals.isEmpty()){
                         dishSetmeals.forEach(dishSetmeal -> {
                             DishSetmealBo dishSetmealBo=dishSetmeal.copyTo(DishSetmealBo.class);
-                            DishShop subDishShop=dishShopRepository.findById(dishSetmealBo.getChildDishId()).get();
-                            dishSetmealBo.setDishShopBo(subDishShop.copyTo(DishShopBo.class));
-                            dishSetmealBos.add(dishSetmealBo);
+                            Optional<DishShop> subDishShop=dishShopRepository.findById(dishSetmealBo.getChildDishId());
+                            if(subDishShop.isPresent()) {
+                                dishSetmealBo.setDishShopBo(subDishShop.get().copyTo(DishShopBo.class));
+                                dishSetmealBos.add(dishSetmealBo);
+                            }
                         });
                     }
                     dishSetmealGroupBo.setDishSetmealBos(dishSetmealBos);
