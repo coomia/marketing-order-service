@@ -5,14 +5,9 @@ import com.meiye.bo.part.DishSetmealBo;
 import com.meiye.bo.part.DishSetmealGroupBo;
 import com.meiye.bo.part.DishShopBo;
 import com.meiye.exception.BusinessException;
-import com.meiye.model.part.DishProperty;
-import com.meiye.model.part.DishSetmeal;
-import com.meiye.model.part.DishSetmealGroup;
-import com.meiye.model.part.DishShop;
-import com.meiye.repository.part.DishPropertyRepository;
-import com.meiye.repository.part.DishSetmealGroupRepository;
-import com.meiye.repository.part.DishSetmealRepository;
-import com.meiye.repository.part.DishShopRepository;
+import com.meiye.model.part.*;
+import com.meiye.model.store.Brand;
+import com.meiye.repository.part.*;
 import com.meiye.service.part.DishShopService;
 import com.meiye.system.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +48,9 @@ public class DishShopServiceImpl implements DishShopService{
     @Autowired
     DishPropertyRepository dishPropertyRepository;
 
+    @Autowired
+    DishBrandTypeRepository dishBrandTypeRepository;
+
     @Override
     public Page<DishShop> getDishShopPageByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo) {
         Pageable pageable = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "sort");
@@ -70,7 +68,16 @@ public class DishShopServiceImpl implements DishShopService{
                     list.add(criteriaBuilder.equal(root.get("type").as(Long.class), dishShopBo.getType()));
                 }
                 if (null != dishShopBo.getDishTypeId()) {
-                    list.add(criteriaBuilder.equal(root.get("dishTypeId").as(Long.class), dishShopBo.getDishTypeId()));
+                    List<Long> childListByParentId = getChildListByParentId(dishShopBo.getDishTypeId());
+                    if(childListByParentId!=null&&childListByParentId.size()>0){
+                        CriteriaBuilder.In<Object> dishTypeId = criteriaBuilder.in(root.get("dishTypeId"));
+                        for(Long id:childListByParentId){
+                            dishTypeId.value(id);
+                        }
+                        list.add(dishTypeId);
+                    }else{
+                        list.add(criteriaBuilder.equal(root.get("dishTypeId").as(Long.class), dishShopBo.getDishTypeId()));
+                    }
                 }
                 list.add(criteriaBuilder.equal(root.get("statusFlag").as(Long.class), 1));
                 list.add(criteriaBuilder.equal(root.get("shopIdenty").as(Long.class),WebUtil.getCurrentStoreId()));
@@ -217,6 +224,7 @@ public class DishShopServiceImpl implements DishShopService{
         return null;
     }
 
+
     @Override
     @Transactional
     public void deleteDishShop(Long shopId) {
@@ -224,4 +232,22 @@ public class DishShopServiceImpl implements DishShopService{
             dishShopRepository.deleteDishShop(shopId);
         }
     }
+
+    public List<Long> getChildListByParentId(Long dishBrandId){
+       List<Long> childrenIds = new ArrayList<Long>();;
+        List<DishBrandType> dishBrandTypes = new ArrayList<DishBrandType>();
+        try{
+            dishBrandTypes = dishBrandTypeRepository.findByParentIdAndBrandIdentyAndShopIdenty(dishBrandId,WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
+        }catch (Exception e){
+            throw new BusinessException("根据父ID获取子分类失败!");
+        }
+        if(dishBrandTypes.size()>0){
+            for(DishBrandType dishBrandType :dishBrandTypes){
+                Long id = dishBrandType.getId();
+                childrenIds.add(id);
+            }
+        }
+        return childrenIds;
+    }
+
 }
