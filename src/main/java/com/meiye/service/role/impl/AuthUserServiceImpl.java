@@ -63,6 +63,13 @@ public class AuthUserServiceImpl implements AuthUserService {
                 authUser.setPasswordNum(new Sha1Hash(authUser.getPasswordNum(), authUser.getName(), 100).toHex());
             if(ObjectUtil.equals(authUser.getAccount(),existUser.getAccount()))
                 userNameUsedByExistUser=true;
+            if(authUser.getEnabledFlag()==null)
+                authUser.setEnabledFlag(existUser.getEnabledFlag());
+            if(authUser.getSourceFlag()==null)
+                authUser.setSourceFlag(existUser.getSourceFlag());
+        }else{
+            authUser.setEnabledFlag(1);
+            authUser.setSourceFlag(1);
         }
         authUser.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));;
         if(!userNameUsedByExistUser&&Objects.nonNull(authUserRepository.findByAccountAndShopIdenty(authUser.getAccount(), authUser.getShopIdenty()))){
