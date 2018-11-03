@@ -58,7 +58,11 @@ public class AuthUserServiceImpl implements AuthUserService {
         if(Objects.nonNull(authUserRepository.findByAccountAndShopIdenty(authUser.getAccount(), authUser.getShopIdenty()))){
             throw new BusinessException("登录名已被注册，请输入新的登陆账户！");
         }
-        authUserRepository.save(authUser);
+        try {
+             authUserRepository.save(authUser);
+        }catch (Exception e){
+            throw new BusinessException("添加员工到数据库失败!");
+        }
     }
 
     @Override

@@ -44,12 +44,7 @@ public class AuthUserController {
             errorMsg = "请输入正确的身份证号！";
             return ResetApiResult.error("",errorMsg);
         }
-
-        try {
-            authUserService.addAuthUser(authUserBo);
-        }catch (Exception e){
-            throw new BusinessException("添加员工失败!");
-        }
+        authUserService.addAuthUser(authUserBo);
         return ResetApiResult.sucess("");
     }
 
