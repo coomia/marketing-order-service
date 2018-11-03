@@ -31,6 +31,10 @@ public class SyncPayStatusResponseBo {
         return isSuccess()&&"1".equalsIgnoreCase(trade_state);
     }
 
+    public boolean isPayFailed(){
+        return isSuccess()&&("2".equalsIgnoreCase(trade_state)||"4".equalsIgnoreCase(trade_state));
+    }
+
     public boolean isRefundSuccess(){
         return isSuccess()&&"3".equalsIgnoreCase(trade_state);
     }

@@ -495,10 +495,10 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessException("退货订单接口- 订单未支付，不能退货");
             List<Trade> returnTrads=tradeRepository.findByRelateTradeIdAndTradeType(trade.getId(),2);
             if(!ObjectUtils.isEmpty(returnTrads)){
-                for(Trade returnTrade:returnTrads){
-                    if(returnTrade.getTradePayStatus()==4||returnTrade.getTradePayStatus()==5)
-                        throw new BusinessException("存在已退货的订单或正在退款中的退货单");
-                }
+//                for(Trade returnTrade:returnTrads){
+//                    if(returnTrade.getTradePayStatus()==4||returnTrade.getTradePayStatus()==5)
+                throw new BusinessException("存在已退货的订单或正在退款中的退货单");
+//                }
             }
 
             //copy trade and save trade
@@ -535,10 +535,6 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             }
-
-            String result=payService.returnPayment(tradeNew.getId());
-            if(!ObjectUtils.isEmpty(result))
-                throw new BusinessException(result);
             return tradeNew.getId();
         } else {
             throw new BusinessException("退货订单接口- trade数据校验不通过");
@@ -547,9 +543,11 @@ public class OrderServiceImpl implements OrderService {
 
 
     private void returnPayment(Long oldTradeId, Long tradeNewId, String tradeUuid){
-        List<Payment> payments=paymentRepository.findByRelateIdAndStatusFlag(oldTradeId,1);
+        List<Payment> payments=paymentRepository.findByRelateId(oldTradeId);
         if(!ObjectUtils.isEmpty(payments)){
             for(Payment payment:payments){
+                if(ObjectUtil.notEqual(payment.getIsPaid(),1))
+                    continue;
                 Payment newPayment=new Payment();
                 BeanUtils.copyProperties(payment,newPayment);
                 newPayment.setId(null);
@@ -564,30 +562,31 @@ public class OrderServiceImpl implements OrderService {
                 newPayment.setUuid(UUIDUtil.randomUUID());
                 paymentRepository.save(newPayment);
 
-                List<PaymentItem> paymentItems=paymentItemRepository.findByPaymentIdAndStatusFlag(payment.getId(),1);
+                List<PaymentItem> paymentItems=paymentItemRepository.findByPaymentId(payment.getId());
                 if(!ObjectUtils.isEmpty(paymentItems)){
                     for(PaymentItem paymentItem:paymentItems){
+                        if(ObjectUtil.notEqual(paymentItem.getPayStatus(),3))
+                            continue;
+
                         PaymentItem newPaymentItem=new PaymentItem();
                         BeanUtils.copyProperties(paymentItem,newPaymentItem);
                         newPaymentItem.setId(null);
                         newPaymentItem.setPaymentUuid(newPayment.getUuid());
                         newPaymentItem.setPaymentId(newPayment.getId());
                         newPaymentItem.setUuid(UUIDUtil.randomUUID());
-                        if(3==newPaymentItem.getPayStatus())
-                            newPaymentItem.setStatusFlag(4);
+                        newPaymentItem.setReturnCode(UUIDUtil.randomUUID());
                         paymentItemRepository.save(newPaymentItem);
 
-                        List<PaymentItemExtra> paymentItemExtras=paymentItemExtraRepository.findByPaymentItemIdAndStatusFlag(paymentItem.getId(),1);
-                        if(!ObjectUtils.isEmpty(paymentItemExtras)){
-                            for(PaymentItemExtra paymentItemExtra:paymentItemExtras){
-                                PaymentItemExtra newPaymentItemExtra=new PaymentItemExtra();
-                                BeanUtils.copyProperties(paymentItemExtra,newPaymentItemExtra);
-                                newPaymentItemExtra.setId(null);
-                                newPaymentItemExtra.setPaymentItemId(newPaymentItem.getId());
-                                newPaymentItemExtra.setUuid(UUIDUtil.randomUUID());
-                                paymentItemExtraRepository.save(newPaymentItemExtra);
-                            }
+                        PaymentItemExtra paymentItemExtra=paymentItemExtraRepository.findOneByPaymentItemId(paymentItem.getId());
+                        if(!ObjectUtils.isEmpty(paymentItemExtra)){
+                            PaymentItemExtra newPaymentItemExtra=new PaymentItemExtra();
+                            BeanUtils.copyProperties(paymentItemExtra,newPaymentItemExtra);
+                            newPaymentItemExtra.setId(null);
+                            newPaymentItemExtra.setPaymentItemId(newPaymentItem.getId());
+                            newPaymentItemExtra.setUuid(UUIDUtil.randomUUID());
+                            paymentItemExtraRepository.save(newPaymentItemExtra);
                         }
+                        payService.refundByPaymentItemId(newPaymentItem.getId());
                     }
                 }
             }
@@ -641,15 +640,17 @@ public class OrderServiceImpl implements OrderService {
                 List<TradePrivilege> tradePrivileges = order.getTradePrivileges();
                 if (tradePrivileges != null && tradePrivileges.size()>0){
                     tradePrivileges.forEach(tradePrivilege ->{
-                        TradePrivilege newTradePrivilege =  new TradePrivilege();
-                        BeanUtils.copyProperties(tradePrivilege, newTradePrivilege);
-                        newTradePrivilege.setId(null);
-                        newTradePrivilege.setTradeId(tradeNewId);
-                        newTradePrivilege.setTradeUuid(tradeUuid);
-                        newTradePrivilege.setTradeItemId(newTradeItem.getId());
-                        newTradePrivilege.setTradeItemUuid(newTradeItem.getUuid());
-                        newTradePrivilege.setUuid(UUID.randomUUID().toString().substring(0, 32));
-                        tradePrivilegeRepository.save(newTradePrivilege);
+                                if (tradePrivilege.getTradeItemId() == tradeItem.getId()) {
+                                    TradePrivilege newTradePrivilege = new TradePrivilege();
+                                    BeanUtils.copyProperties(tradePrivilege, newTradePrivilege);
+                                    newTradePrivilege.setId(null);
+                                    newTradePrivilege.setTradeId(tradeNewId);
+                                    newTradePrivilege.setTradeUuid(tradeUuid);
+                                    newTradePrivilege.setTradeItemId(newTradeItem.getId());
+                                    newTradePrivilege.setTradeItemUuid(newTradeItem.getUuid());
+                                    newTradePrivilege.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                                    tradePrivilegeRepository.save(newTradePrivilege);
+                                }
                     });
                 }
 
@@ -657,20 +658,50 @@ public class OrderServiceImpl implements OrderService {
                 List<TradeUser> tradeUsers = order.getTradeUsers();
                 if (tradeUsers != null && tradeUsers.size()>0){
                     tradeUsers.forEach(tradeUser ->{
-                        TradeUser newTradeUser = new TradeUser();
-                        BeanUtils.copyProperties(tradeUser, newTradeUser);
-                        newTradeUser.setId(null);
-                        newTradeUser.setTradeId(tradeNewId);
-                        newTradeUser.setTradeUuid(tradeUuid);
-                        newTradeUser.setTradeItemId(newTradeItem.getId());
-                        newTradeUser.setTradeItemUuid(newTradeItem.getUuid());
-                        tradeUserRepository.save(newTradeUser);
+                        if (tradeUser.getTradeItemId() == tradeItem.getId()) {
+                            TradeUser newTradeUser = new TradeUser();
+                            BeanUtils.copyProperties(tradeUser, newTradeUser);
+                            newTradeUser.setId(null);
+                            newTradeUser.setTradeId(tradeNewId);
+                            newTradeUser.setTradeUuid(tradeUuid);
+                            newTradeUser.setTradeItemId(newTradeItem.getId());
+                            newTradeUser.setTradeItemUuid(newTradeItem.getUuid());
+                            tradeUserRepository.save(newTradeUser);
+                        }
                     });
-
                 }
 
             });
         }
+        List<TradePrivilege> tradePrivileges = order.getTradePrivileges();
+        if (tradePrivileges != null && tradePrivileges.size()>0){
+            tradePrivileges.forEach(tradePrivilege ->{
+                if (tradePrivilege.getTradeItemId()==null||tradePrivilege.getTradeItemId()<1l) {
+                    TradePrivilege newTradePrivilege = new TradePrivilege();
+                    BeanUtils.copyProperties(tradePrivilege, newTradePrivilege);
+                    newTradePrivilege.setId(null);
+                    newTradePrivilege.setTradeId(tradeNewId);
+                    newTradePrivilege.setTradeUuid(tradeUuid);
+                    newTradePrivilege.setUuid(UUID.randomUUID().toString().substring(0, 32));
+                    tradePrivilegeRepository.save(newTradePrivilege);
+                }
+            });
+        }
+
+        List<TradeUser> tradeUsers = order.getTradeUsers();
+        if (tradeUsers != null && tradeUsers.size()>0){
+            tradeUsers.forEach(tradeUser ->{
+                if (tradeUser.getTradeItemId()==null||tradeUser.getTradeItemId()<1l) {
+                    TradeUser newTradeUser = new TradeUser();
+                    BeanUtils.copyProperties(tradeUser, newTradeUser);
+                    newTradeUser.setId(null);
+                    newTradeUser.setTradeId(tradeNewId);
+                    newTradeUser.setTradeUuid(tradeUuid);
+                    tradeUserRepository.save(newTradeUser);
+                }
+            });
+        }
+
     }
 
     private void returnTradeTableByCopyAndSave(OrderResponseDto order, Long tradeNewId, String tradeUuid) {

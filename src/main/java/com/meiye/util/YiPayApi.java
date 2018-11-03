@@ -23,56 +23,53 @@ public class YiPayApi {
     private final static String YIPAY_VERSION="V1.0";
 
 
-    public static ScanPayResponseBo scanPay(StorePaymentParamBo paymentParamBo, Integer totalAmount, String authCode, String outTradeNo,String pay_type,Long payItemId){
-        logger.info("Start scan pay for order:"+outTradeNo);
+    public static ScanPayResponseBo scanPay(StorePaymentParamBo paymentParamBo, PrePayBo payBo){
+        logger.info("Start scan pay for order pay item:"+ payBo.getPaymentItemId());
         try {
             ScanPayRequestBo scanPayRequestBo = new ScanPayRequestBo();
             scanPayRequestBo.setAppid(paymentParamBo.getAppid());
-            scanPayRequestBo.setTotal_amount(totalAmount);
-            scanPayRequestBo.setAuth_code(authCode);
-            scanPayRequestBo.setOut_trade_no(outTradeNo);
+            scanPayRequestBo.setTotal_amount(payBo.getTradeAmountInCent());
+            scanPayRequestBo.setAuth_code(payBo.getAuthCode());
+            scanPayRequestBo.setOut_trade_no(payBo.getOutTradeNo());
             scanPayRequestBo.setNonce_str(UUIDUtil.randomUUID());
-            scanPayRequestBo.setPay_type(pay_type);
+            scanPayRequestBo.setPay_type(payBo.getPayType().toString());
             scanPayRequestBo.setVersion(YIPAY_VERSION);
-            if(ObjectUtils.isEmpty(payItemId))
-                throw new BusinessException("payItemId lost.");
-            scanPayRequestBo.setAttach("payItemId="+payItemId);
             String sortString = SortObjectUtil.getSortString(scanPayRequestBo, new String[]{"sign"},true);
             sortString += "&appsecret=" + paymentParamBo.getAppsecret();
             scanPayRequestBo.setSign(DigestUtils.md5Hex(sortString).toUpperCase());
             String result = HttpClientUtils.postParameters(SCAN_PAY_API_URL, ObjectUtil.objectToMapString("",scanPayRequestBo,true));
-            logger.info("Scan pay result for order("+outTradeNo+") is:"+result);
+            logger.info("Scan pay result for order pay item("+payBo.getPaymentItemId()+") is:"+result);
             ScanPayResponseBo responseBo= JSON.parseObject(result,ScanPayResponseBo.class);
             return responseBo;
         }catch (Exception exp){
-            logger.error("Scan pay for order:"+outTradeNo+" face error",exp);
+            logger.error("Scan pay for order pay item:"+payBo.getPaymentItemId()+" face error",exp);
             return null;
         }
     }
 
-    public static MicroAppPayResponseBo microAppPay(StorePaymentParamBo paymentParamBo, Integer totalAmount, String outTradeNo, String wechatAppId, String wechatOpenId, String remoteIp,Long paymentItemId){
-        logger.info("Start micro pay for order:"+outTradeNo);
+    public static MicroAppPayResponseBo microAppPay(StorePaymentParamBo paymentParamBo, PrePayBo payBo,String remoteIp){
+        logger.info("Start micro pay for order pay item:"+payBo.getPaymentItemId());
         try {
             MicroAppPayRequestBo microAppPayRequestBo = new MicroAppPayRequestBo();
             microAppPayRequestBo.setAppid(paymentParamBo.getAppid());
-            microAppPayRequestBo.setTotal_amount(totalAmount);
-            microAppPayRequestBo.setOut_trade_no(outTradeNo);
-            microAppPayRequestBo.setSub_appid(wechatAppId);
-            microAppPayRequestBo.setSub_openid(wechatOpenId);
+            microAppPayRequestBo.setTotal_amount(payBo.getTradeAmountInCent());
+            microAppPayRequestBo.setOut_trade_no(payBo.getOutTradeNo());
+            microAppPayRequestBo.setSub_appid(payBo.getWechatAppid());
+            microAppPayRequestBo.setSub_openid(payBo.getWechatOpenId());
             microAppPayRequestBo.setSpbill_create_ip(remoteIp);
-            microAppPayRequestBo.setReturn_url(paymentParamBo.getContextPath() + MICRO_APP_RETURN_URL+"/"+paymentItemId);
+            microAppPayRequestBo.setReturn_url(paymentParamBo.getContextPath() + MICRO_APP_RETURN_URL);
             microAppPayRequestBo.setNonce_str(UUIDUtil.randomUUID());
             microAppPayRequestBo.setVersion(YIPAY_VERSION);
             String sortString = SortObjectUtil.getSortString(microAppPayRequestBo, new String[]{"sign"}, true);
             sortString += "&appsecret=" + paymentParamBo.getAppsecret();
             microAppPayRequestBo.setSign(DigestUtils.md5Hex(sortString).toUpperCase());
-            logger.info("Micro pay parameter for order("+outTradeNo+") is:"+SortObjectUtil.getSortString(microAppPayRequestBo,null,false));
+            logger.info("Micro pay parameter for order pay item("+payBo.getPaymentItemId()+") is:"+SortObjectUtil.getSortString(microAppPayRequestBo,null,false));
             String result = HttpClientUtils.postParameters(MICRO_APP_PAY_API_URL, ObjectUtil.objectToMapString("", microAppPayRequestBo, true));
-            logger.info("Micro pay result for order("+outTradeNo+") is:"+result);
+            logger.info("Micro pay result for order pay item("+payBo.getPaymentItemId()+") is:"+result);
             MicroAppPayResponseBo responseBo=JSON.parseObject(result,MicroAppPayResponseBo.class);
             return responseBo;
         }catch (Exception exp){
-            logger.error("Micro pay for order:"+outTradeNo+" face error",exp);
+            logger.error("Micro pay for order pay item:"+payBo.getPaymentItemId()+" face error",exp);
             return null;
         }
     }
@@ -149,28 +146,25 @@ public class YiPayApi {
         }
     }
 
-    public  static ScanQrCodePayResponseBo getQrCodeForPay(StorePaymentParamBo paymentParamBo,String outTradeNo,Integer tradeAmount,Long payItemId){
-        logger.info("Start get qr code of order :" + outTradeNo);
+    public  static ScanQrCodePayResponseBo getQrCodeForPay(StorePaymentParamBo paymentParamBo,PrePayBo payBo){
+        logger.info("Start get qr code of order pay item:" + payBo.getPaymentItemId());
         try {
             ScanQrCodePayRequestBo requestBo = new ScanQrCodePayRequestBo();
             requestBo.setAppid(paymentParamBo.getAppid());
-            requestBo.setOut_trade_no(outTradeNo);
-            requestBo.setTotal_amount(tradeAmount);
+            requestBo.setOut_trade_no(payBo.getOutTradeNo());
+            requestBo.setTotal_amount(payBo.getTradeAmountInCent());
             requestBo.setVersion(YIPAY_VERSION);
-            if(ObjectUtils.isEmpty(payItemId))
-                throw new BusinessException("payItemId lost.");
-            requestBo.setAttach("payItemId="+payItemId);
             requestBo.setNonce_str(UUIDUtil.randomUUID());
-            requestBo.setReturn_url(paymentParamBo.getContextPath() + MICRO_APP_RETURN_URL+"/"+payItemId);
+            requestBo.setReturn_url(paymentParamBo.getContextPath() + MICRO_APP_RETURN_URL);
             String sortString = SortObjectUtil.getSortString(requestBo, new String[]{"sign"}, true);
             sortString += "&appsecret=" + paymentParamBo.getAppsecret();
             requestBo.setSign(DigestUtils.md5Hex(sortString).toUpperCase());
             String result = HttpClientUtils.postParameters(SCAN_QRCODE_PAY_API_URL, ObjectUtil.objectToMapString("", requestBo, true));
-            logger.info("End get qr code of order :" + outTradeNo +"is:" + result);
+            logger.info("End get qr code of order pay item:" + payBo.getPaymentItemId() +"is:" + result);
             ScanQrCodePayResponseBo responseBo = JSON.parseObject(result, ScanQrCodePayResponseBo.class);
             return responseBo;
         }catch (Exception exp) {
-            logger.error("Get qr code for order :" + outTradeNo+" face exception", exp);
+            logger.error("Get qr code for order pay item:" + payBo.getPaymentItemId()+" face exception", exp);
             return null;
         }
     }

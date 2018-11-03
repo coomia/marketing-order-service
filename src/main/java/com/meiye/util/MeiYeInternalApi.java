@@ -72,7 +72,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.setScale(2).toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
@@ -91,7 +91,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
@@ -110,7 +110,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());

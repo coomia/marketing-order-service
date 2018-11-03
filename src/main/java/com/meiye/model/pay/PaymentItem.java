@@ -38,5 +38,6 @@ public class PaymentItem extends ParentEntity implements Serializable{
 	private String payMemo;
 	private Integer refundWay;
 	private Integer paySource;
+	private String returnCode;
 }
 

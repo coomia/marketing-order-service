@@ -1,11 +1,14 @@
 package com.meiye.service.pay;
 
 import com.meiye.bo.accounting.AccountingBo;
-import com.meiye.bo.pay.PrePayReturnBo;
+import com.meiye.bo.pay.PaymentItemBo;
+import com.meiye.bo.pay.PrePayBo;
 import com.meiye.bo.pay.StorePaymentParamBo;
+import com.meiye.exception.BusinessException;
 import com.meiye.model.pay.Payment;
 import com.meiye.model.pay.PaymentItem;
 import com.meiye.model.pay.PaymentItemExtra;
+import com.meiye.model.trade.Trade;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,12 +20,10 @@ public interface PayService {
     String getAppSercet(Integer storeId);
 
     @Transactional
-    void yipaySuccess(String tradeNo, String yiPayTradeNo, Long paymentId);
+    void payFailed(String outTradeNo);
 
     @Transactional
-    void paySuccess(Long tradeId, Long paymentId, String yiPayTradeNo);
-
-    String returnPayment(Long tradeId);
+    void paySuccess(String outTradeNo, String yiPayTradeNo);
 
     void refundSuccessful(Long tradeId);
 
@@ -30,7 +31,8 @@ public interface PayService {
 
     void afterPaySucess(Long tradeId);
 
-    void savePaymentData(AccountingBo accountingBo);
+    @Transactional
+    PrePayBo savePaymentData(AccountingBo accountingBo, String payRequestType);
 
     List<Payment> findPaymentsByTradeId(Long relateId, boolean includeInactive);
 
@@ -38,10 +40,22 @@ public interface PayService {
 
     List<PaymentItemExtra> findPaymentItemExtraByPamentItemId(List<Long> paymentItemIds, boolean includeInactive);
 
-    @Transactional
-    PrePayReturnBo prePay(AccountingBo accountingBo, String payRequestType);
-
     StorePaymentParamBo getStorePaymentParamBo(long storeId);
 
     String getStoreWechatAppId(long storeId);
+
+    @Transactional(noRollbackFor = BusinessException.class)
+    Trade refundPayment(Long paymentItemId);
+
+    Trade refundByPaymentItemId(Long paymentItemId);
+
+    @Transactional
+    void updateRefundStatus(String refundNo, boolean refundSucess);
+
+    @Transactional
+    void updateRefundStatus(Long paymentItemId, boolean refundSucess);
+
+    List<PaymentItemBo> getAllPaymentItemListByTradeId(Long tradeId, List<Long> paymentItemIds);
+
+    void updateRefundTradeStatus(Long tradeId);
 }

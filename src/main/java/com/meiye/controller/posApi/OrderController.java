@@ -98,6 +98,7 @@ public class OrderController {
     public PosApiResult returnOrderData(@RequestBody CancelTradeBo cancelTradeBo){
         try {
             Long newTradeId = orderService.returnTrade(cancelTradeBo);
+            payService.updateRefundTradeStatus(newTradeId);
             OrderResponseDto orderResponseDto=orderService.getOrderResponse(newTradeId, false);
             return PosApiResult.sucess(orderResponseDto);
         }catch (BusinessException b){
