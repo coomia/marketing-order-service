@@ -8,7 +8,6 @@ import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.bo.trade.TradeBo;
-import com.meiye.controller.posApi.PaymentController;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.pay.Payment;
 import com.meiye.model.pay.PaymentItem;
@@ -17,7 +16,6 @@ import com.meiye.model.setting.Tables;
 import com.meiye.model.trade.Trade;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
-import com.meiye.system.util.WebUtil;
 import com.meiye.util.MeiYeInternalApi;
 import com.meiye.util.YiPayApi;
 import org.slf4j.Logger;
@@ -47,20 +45,19 @@ public class AbstractPayController {
 
 
 
-    protected PosApiResult pay(AccountingBo accountingBo, String payRequestType, HttpServletRequest request){
+    protected PosApiResult pay(AccountingBo accountingBo, String payRequestType){
         try {
             Map<String,Object> payResult=new HashMap<>();
-            payService.savePaymentData(accountingBo);
+            PrePayBo payReturnBo =payService.savePaymentData(accountingBo,payRequestType);
             Long orderId=accountingBo.getContent().getTrade().getId();
             //开始调用核销程序
             WriteOffResultBo resultBo= MeiYeInternalApi.writeOff(orderId,accountingBo.getBrandId(),accountingBo.getShopId());
             if(resultBo.isSuccess()){
                 try {
-                    PrePayReturnBo payReturnBo = payService.prePay(accountingBo, payRequestType);
-                    if(payReturnBo.getBanlancePayAmount()!=null&&payReturnBo.getBanlancePayAmount()>0d){
+                    if(payReturnBo.isBanlancePay()){
                         Long customerId=orderService.getCustomerIdByType(orderId,3);
                         TradeBo trade=orderService.getTradeByTradeId(orderId);
-                        InternalApiResult internalApiResult=MeiYeInternalApi.expense(customerId,orderId,payReturnBo.getPayItemId(),payReturnBo.getBanlancePayAmount(),trade.getShopIdenty(),trade.getBrandIdenty(),trade.getCreatorId(),trade.getCreatorName());
+                        InternalApiResult internalApiResult=MeiYeInternalApi.expense(customerId,orderId,payReturnBo.getPaymentItemId(),payReturnBo.getTradeAmount(),trade.getShopIdenty(),trade.getBrandIdenty(),trade.getCreatorId(),trade.getCreatorName());
                         if(!internalApiResult.isSuccess()){
                             throw new BusinessException("余额扣款失败", ResetApiResult.STATUS_ERROR,1003);
                         }
@@ -70,15 +67,15 @@ public class AbstractPayController {
                         StorePaymentParamBo storePaymentParamBo=payService.getStorePaymentParamBo(accountingBo.getShopId());
                         //如果需要调用翼支付，则发起翼支付的调用
                         if("ScanPay".equalsIgnoreCase(payRequestType)){
-                            ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(storePaymentParamBo,payReturnBo.getTradeAmout(),payReturnBo.getAuthCode(),payReturnBo.getOutTradeNo(),payReturnBo.getPayType(),payReturnBo.getPayItemId());
+                            ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(storePaymentParamBo,payReturnBo);
                             if(scanPayResponseBo.isPaySuccess()){
-                                payService.paySuccess(orderId,payReturnBo.getPayItemId(),scanPayResponseBo.getTrade_id());
+                                payService.paySuccess(payReturnBo.getOutTradeNo(),scanPayResponseBo.getTrade_id());
                                 payService.afterPaySucess(orderId);
                                 payResult.putAll(getOrderPaymentData(orderId));
                             }else
-                                throw new BusinessException("扫码支付失败,请手工同步订单状态",ResetApiResult.STATUS_ERROR,1003);
+                                throw new BusinessException("扫码支付失败,请手工同步订单状态",ResetApiResult.STATUS_ERROR,1010);
                         }else if("ScanQrPay".equalsIgnoreCase(payRequestType)){
-                            ScanQrCodePayResponseBo scanQrCodePayResponseBo=YiPayApi.getQrCodeForPay(storePaymentParamBo,payReturnBo.getOutTradeNo(),payReturnBo.getTradeAmout(),payReturnBo.getPayItemId());
+                            ScanQrCodePayResponseBo scanQrCodePayResponseBo=YiPayApi.getQrCodeForPay(storePaymentParamBo,payReturnBo);
                             if(scanQrCodePayResponseBo.isSuccess())
                                 payResult.put("qrcodeUrl",scanQrCodePayResponseBo.getQrcode_url());
                             else
@@ -86,7 +83,7 @@ public class AbstractPayController {
                         }
                     } else {
                         //不需要翼支付，则开始修改订单状态为支付完成
-                        payService.paySuccess(orderId,payReturnBo.getPayItemId(),null);
+                        payService.paySuccess(payReturnBo.getOutTradeNo(),null);
                         payService.afterPaySucess(orderId);
                         payResult.putAll(getOrderPaymentData(orderId));
                     }
@@ -95,9 +92,9 @@ public class AbstractPayController {
                     String message="支付失败:"+exp.getMessage();
                     WriteOffResultBo returnPrivilege=MeiYeInternalApi.returnPrivilege(orderId,accountingBo.getBrandId(),accountingBo.getShopId());
                     if(returnPrivilege.isSuccess())
-                        throw new BusinessException(message, ResetApiResult.STATUS_ERROR,1003);
+                        throw new BusinessException(message, ResetApiResult.STATUS_ERROR,exp.getStatusCode());
                     else
-                        throw new BusinessException(message+"，调用反核销程序失败："+returnPrivilege.getMsg(),ResetApiResult.STATUS_ERROR,1003);
+                        throw new BusinessException(message+"，调用反核销程序失败："+returnPrivilege.getMsg(),ResetApiResult.STATUS_ERROR,exp.getStatusCode());
                 } catch (Exception exp){
                     logger.error("支付失败",exp);
                     WriteOffResultBo returnPrivilege=MeiYeInternalApi.returnPrivilege(orderId,accountingBo.getBrandId(),accountingBo.getShopId());
