@@ -24,6 +24,9 @@ public class ResetApiResult extends ApiResult {
     public static final int STATUS_CODE_403=403;
     public static final int STATUS_CODE_401=401;
     public static final int STATUS_CODE_500=500;
+
+    public static final int POS_TRADE_CHANGED=10001000;
+    public static final int YIPAY_API_CALL_FAILED=10001001;
     private ResetApiResult(){}
 
     public ResetApiResult(String message,String messageType,Integer statusCode,Object data){

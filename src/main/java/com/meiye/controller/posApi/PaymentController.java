@@ -48,7 +48,7 @@ public class PaymentController extends AbstractPayController {
     }
 
 
-    @GetMapping("/refund/{paymentItemIds}")
+    @GetMapping("/refund/{paymentItemId}")
     public PosApiResult refundPayment(@PathVariable Long paymentItemId){
         try {
             Trade trade=payService.refundPayment(paymentItemId);
@@ -149,9 +149,6 @@ public class PaymentController extends AbstractPayController {
         if(ObjectUtils.isEmpty(queryTradePaymentBo)||ObjectUtils.isEmpty(queryTradePaymentBo.getContent()))
             return PosApiResult.error(null,1003,"查询参数错误");
         Long tradeId=queryTradePaymentBo.getContent().getTradeId();
-        if(tradeId==null)
-            //TODO　Base on paymentItemIds to get tradeId
-            logger.debug("请处理通过其它方式查询TradeId的逻辑");
         if(tradeId==null)
             return PosApiResult.error(null,1003,"查询参数错误");
         TradeBo tradeBo=orderService.getTradeByTradeId(tradeId);

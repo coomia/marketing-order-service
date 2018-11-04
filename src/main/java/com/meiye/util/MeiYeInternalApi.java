@@ -28,8 +28,9 @@ import java.util.Map;
  */
 public class MeiYeInternalApi {
     static Logger logger= LoggerFactory.getLogger(MeiYeInternalApi.class);
-    public final static String MeiYeIntegerApiUrlPrefix="http://172.31.144.129:8080/";
-//    public final static String MeiYeIntegerApiUrlPrefix="http://47.105.100.99:8080";
+//    public final static String MeiYeIntegerApiUrlPrefix="http://172.31.144.129:8080/";
+//    public final static String MeiYeIntegerApiUrlPrefix="http://47.105.100.99:8080/marketing";
+    public final static String MeiYeIntegerApiUrlPrefix="http://192.168.14.134:8080/marketing";
 //    public final static String MeiYeIntegerApiUrlPrefix="http://zhongmeiyunfu.com:8080";
 
     //核销
@@ -72,7 +73,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.setScale(2).toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
@@ -91,7 +92,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
@@ -110,7 +111,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());

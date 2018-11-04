@@ -65,7 +65,6 @@ public class PrePayBo {
 
     public void setTradeAmountInCent(Integer tradeAmountInCent){
         this.tradeAmountInCent=tradeAmountInCent;
-        this.setTradeAmount(tradeAmountInCent==null?null:tradeAmountInCent/100d);
     }
 
 }

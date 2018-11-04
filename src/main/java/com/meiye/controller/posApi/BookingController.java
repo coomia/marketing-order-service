@@ -155,6 +155,7 @@ public class BookingController {
             Booking booking = bookingService.updateWxBookingStatus(wxBookingRequestDto);
             return PosApiResult.sucess(booking);
         }catch (BusinessException b){
+
             throw new BusinessException(b.getMessage());
         }catch (Exception e){
             throw new BusinessException("更新微信预订单接口- 更新微信预订单失败！");

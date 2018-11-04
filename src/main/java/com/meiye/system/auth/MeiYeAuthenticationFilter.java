@@ -135,6 +135,7 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
                 String deviceId = request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-device-id");
                 Long brandId = Long.parseLong(request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-brand-id"));
                 Long shopId = Long.parseLong(request.getHeader(WebUtil.getPosRequestHeaderPrefix() + "-api-shop-id"));
+
                 userBo.setStoreBo(storeService.findStoreById(shopId));
                 userBo.setRequestMsgId(msgId);
                 userBo.setDeviceId(deviceId);

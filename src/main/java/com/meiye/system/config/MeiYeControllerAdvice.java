@@ -30,9 +30,9 @@ public class MeiYeControllerAdvice extends FastJsonViewResponseBodyAdvice {
     @ExceptionHandler(value = Exception.class)
     public ApiResult errorHandler(Exception ex, HttpServletRequest request, HttpServletResponse response) {
         logger.error(ex.getMessage(),ex);
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         if(ex instanceof BusinessException){
             if(WebUtil.isMsApiPath(request)) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 BusinessException businessException = (BusinessException) ex;
                 return new ResetApiResult(businessException.getMessage(), businessException.getMessageType(), businessException.getStatusCode(), null);
             }else if(WebUtil.isPosApiPath(request)||WebUtil.isInternalApiPath(request)) {
@@ -45,6 +45,7 @@ public class MeiYeControllerAdvice extends FastJsonViewResponseBodyAdvice {
             }
         }else{
             if(WebUtil.isMsApiPath(request)) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return ResetApiResult.user("未知错误",ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_500,null);
             }else if(WebUtil.isPosApiPath(request)||WebUtil.isInternalApiPath(request)) {
                 return PosApiResult.error(null,"系统未知错误.");

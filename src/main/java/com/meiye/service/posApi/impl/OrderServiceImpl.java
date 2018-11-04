@@ -1,6 +1,7 @@
 package com.meiye.service.posApi.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.*;
 import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
 import com.meiye.bo.trade.CancelTrade.ReturnInventoryItem;
@@ -131,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
             trade.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
         } else {
             logger.error("改单接口-版本校验失败！");
-            throw new BusinessException("改单接口-版本校验失败！");
+            throw new BusinessException("订单已经被其他人处理。", ResetApiResult.STATUS_ERROR,ResetApiResult.POS_TRADE_CHANGED);
         }
 
         //1.修改 交易记录主单 数据
@@ -746,6 +747,7 @@ public class OrderServiceImpl implements OrderService {
         String newTradeNo=oldTradeNo.substring(0,3)+ StringUtil.getCurrentTime(null)+oldTradeNo.substring(oldTradeNo.length()-7);
         tradeNew.setUuid(UUIDUtil.randomUUID());
         tradeNew.setTradeNo(newTradeNo);
+        tradeNew.setTradeStatus(5);
         tradeRepository.save(tradeNew);
         return tradeNew;
     }

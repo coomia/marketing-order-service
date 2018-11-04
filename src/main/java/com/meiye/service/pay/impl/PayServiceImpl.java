@@ -294,7 +294,7 @@ public class PayServiceImpl implements PayService {
                 throw new BusinessException("销货单不存在。", ResetApiResult.STATUS_ERROR,1001);
             Trade trade=tradeOption.get();
             if(!trade.getServerUpdateTime().equals(accountingBo.getContent().getTrade().getServerUpdateTime()))
-                throw new BusinessException("销货单已经被其他人处理。", ResetApiResult.STATUS_ERROR,5004);
+                throw new BusinessException("销货单已经被其他人处理。", ResetApiResult.STATUS_ERROR,ResetApiResult.POS_TRADE_CHANGED);
             if(!trade.getTradeType().equals(1))
                 throw new BusinessException("销货单不存在。", ResetApiResult.STATUS_ERROR,1001);
 
@@ -402,7 +402,7 @@ public class PayServiceImpl implements PayService {
             prePayBo.setNeedYiPay(true);
         }else if(paymentItem.getPayModeId().equals(1l)){
             prePayBo.setBanlancePay();
-        }else if(paymentItem.getPayModeId().equals(2l)){
+        }else if(paymentItem.getPayModeId().equals(2l)||paymentItem.getPayModeId().equals(3l)){
             prePayBo.setCashPay();
         }else
             throw new BusinessException("销货单不支持的支付类型.", ResetApiResult.STATUS_ERROR,1001);
@@ -421,18 +421,23 @@ public class PayServiceImpl implements PayService {
 
     @Override
     public StorePaymentParamBo getStorePaymentParamBo(long storeId){
-        StorePaymentParamBo storePaymentParamBo=new StorePaymentParamBo();
-        CommercialPaySetting commercialPaySetting=commercialPaySettingRepository.findOneByShopIdentyAndTypeAndStatusFlag(storeId,2,1);
-        if(ObjectUtils.isEmpty(commercialPaySetting)||ObjectUtils.isEmpty(commercialPaySetting.getAppid())||ObjectUtils.isEmpty(commercialPaySetting.getAppsecret()))
-            throw new BusinessException("支付设置错误,请联系管理员检查.");
+        try {
+            StorePaymentParamBo storePaymentParamBo = new StorePaymentParamBo();
+            CommercialPaySetting commercialPaySetting = commercialPaySettingRepository.findOneByShopIdentyAndTypeAndStatusFlag(storeId, 2, 1);
+            if (ObjectUtils.isEmpty(commercialPaySetting) || ObjectUtils.isEmpty(commercialPaySetting.getAppid()) || ObjectUtils.isEmpty(commercialPaySetting.getAppsecret()))
+                throw new BusinessException("支付设置错误,请联系管理员检查.");
 
-        storePaymentParamBo.setAppid(commercialPaySetting.getAppid());
-        storePaymentParamBo.setAppsecret(commercialPaySetting.getAppsecret());
+            storePaymentParamBo.setAppid(commercialPaySetting.getAppid());
+            storePaymentParamBo.setAppsecret(commercialPaySetting.getAppsecret());
 //        storePaymentParamBo.setAppid("hf163356826045OA");
 //        storePaymentParamBo.setAppsecret("MgAtKIRKPMMbbfycOw5b87U6NP024kWA");
-        String callbackContextPath="http://b.zhongmeiyunfu.com/MeiYe";
-        storePaymentParamBo.setContextPath(callbackContextPath);
-        return storePaymentParamBo;
+            String callbackContextPath = "http://b.zhongmeiyunfu.com/MeiYe";
+            storePaymentParamBo.setContextPath(callbackContextPath);
+            return storePaymentParamBo;
+        }catch(Exception exp){
+            logger.info("支付设置错误,请联系管理员检查.",exp);
+            throw new BusinessException("支付设置错误,请联系管理员检查.");
+        }
     }
 
 
@@ -490,7 +495,7 @@ public class PayServiceImpl implements PayService {
                 paymentItem.setPayStatus(6);
                 errorMessage="余额支付退还失败.";
             }
-        }else if(ObjectUtil.equals(paymentItem.getPayModeId(),2l)){
+        }else if(ObjectUtil.equals(paymentItem.getPayModeId(),2l)||paymentItem.getPayModeId().equals(3l)){
             paymentItem.setPayStatus(5);
         }else if(ObjectUtil.equals(paymentItem.getPayModeId(),4l)||ObjectUtil.equals(paymentItem.getPayModeId(),5l)){
             Integer returnAmt = new Double(paymentItem.getUsefulAmount() * 100).intValue();

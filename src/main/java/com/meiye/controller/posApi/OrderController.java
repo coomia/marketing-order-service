@@ -9,6 +9,7 @@ import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.exception.BusinessException;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
+import com.meiye.util.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,12 @@ public class OrderController {
             OrderResponseDto orderResponseDto =orderService.getOrderResponse(modifyOrderBo.getContent().getTradeRequest().getId(),true);
             return PosApiResult.sucess(orderResponseDto);
         }catch (BusinessException b){
-            throw new BusinessException(b.getMessage());
+            if(ObjectUtil.equals( b.getStatusCode(),ResetApiResult.POS_TRADE_CHANGED)) {
+                logger.info("改单接口 - 改单失败",b);
+                return PosApiResult.error(null, b.getStatusCode(), b.getMessage());
+            }
+            else
+                throw new BusinessException(b.getMessage());
         }catch (Exception e){
             throw new BusinessException("改单接口- 改单失败！");
         }
@@ -72,8 +78,10 @@ public class OrderController {
             OrderResponseDto orderResponseDtoNew = orderService.getOrderResponse(orderResponseDto.getTrade().getId(),false);
             return PosApiResult.sucess(orderResponseDtoNew);
         }catch (BusinessException b){
+            logger.info("下单接口- 下单失败！",b);
             throw new BusinessException(b.getMessage());
         }catch (Exception e){
+            logger.info("下单接口- 下单失败！",e);
             throw new BusinessException("下单接口- 下单失败！");
         }
     }
