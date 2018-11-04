@@ -159,13 +159,17 @@ public class MeiYeInternalApi {
     }
 
     //调会员接口
-    public static CustomerApiResult registCustomer(String name, String mobile, Long gender, Long tradeId){
+    public static CustomerApiResult registCustomer(Long brandId,Long shipId,Long createId,String createName,String name, String mobile, Long gender, Long tradeId){
         try {
             String apiUrl = MeiYeIntegerApiUrlPrefix + "/marketing/internal/customer/queryOrAdd";
             Map<String,Object> params=new HashMap<>();
             params.put("name",name);
             params.put("mobile",mobile);
             params.put("gender",gender.intValue());
+            params.put("brandIdenty",brandId);
+            params.put("shopIdenty",shipId);
+            params.put("creatorId",createId);
+            params.put("creatorName",createName);
             String result = callInternalApi(apiUrl, params, true, "调会员接口",tradeId);
             return JSON.parseObject(result, CustomerApiResult.class);
         }catch (Exception exp){

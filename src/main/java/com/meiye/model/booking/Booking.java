@@ -20,6 +20,7 @@ public class Booking extends ParentEntity implements Serializable{
 	 @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+	private Long creatorId;
 	private String uuid;
 	private Long commercialId;
 	private String commercialName;
