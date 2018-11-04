@@ -22,7 +22,7 @@ public class BookingTradeItemUserBo extends BusinessParentBo implements Serializ
 	private Long userId;
 	private String userName;
 	private Integer roleId;
-	private Integer roleName;
+	private String roleName;
 	private Integer isAssign;
 }
 

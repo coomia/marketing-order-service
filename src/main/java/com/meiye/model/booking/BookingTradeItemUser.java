@@ -26,7 +26,7 @@ public class BookingTradeItemUser extends ParentEntity implements Serializable{
 	private Long userId;
 	private String userName;
 	private Integer roleId;
-	private Integer roleName;
+	private String roleName;
 	private Long brandIdenty;
 	private Long shopIdenty;
 	private Integer isAssign;
