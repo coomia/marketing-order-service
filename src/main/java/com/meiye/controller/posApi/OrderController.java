@@ -110,6 +110,7 @@ public class OrderController {
             OrderResponseDto orderResponseDto=orderService.getOrderResponse(newTradeId, false);
             return PosApiResult.sucess(orderResponseDto);
         }catch (BusinessException b){
+            logger.info("退货失败：",b);
             throw new BusinessException(b.getMessage());
         }catch (Exception e){
             throw new BusinessException("退换订单接口- 退换订单失败！");

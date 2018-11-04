@@ -99,8 +99,8 @@ public class YiPayApiTest {
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        String outRefundId="bd7fcdb704e44b859515be3e16bb440f";
-        QueryYiPayRefundStatusResponseBo refundResponseBo=YiPayApi.queryRefundStatus(paymentParamBo,outRefundId,null);
+        String outRefundId="b14572ba2a744dc7a32ddf1537ea0e99";
+        QueryYiPayRefundStatusResponseBo refundResponseBo=YiPayApi.queryRefundStatus(paymentParamBo,null,"201811041739457380450950");
         System.out.println("Refund id is: 20180920002233621701404062480");
         System.out.println("Out refund no is:"+outRefundId);
         System.out.println(refundResponseBo.toString());

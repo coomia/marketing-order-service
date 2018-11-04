@@ -48,15 +48,15 @@ public class PaymentController extends AbstractPayController {
     }
 
 
-    @GetMapping("/refund/{paymentItemId}")
+    @PostMapping("/refund/{paymentItemId}")
     public PosApiResult refundPayment(@PathVariable Long paymentItemId){
         try {
             Trade trade=payService.refundPayment(paymentItemId);
             if(ObjectUtil.equals(trade.getTradeType(),2))
                 payService.updateRefundTradeStatus(trade.getRelateTradeId());
-            OrderResponseDto orderResponseDto=orderService.getOrderResponse(trade.getId(), false);
-            return PosApiResult.sucess(orderResponseDto);
+            return PosApiResult.sucess(getOrderPaymentData(trade.getId()));
         }catch (BusinessException b){
+            logger.info("退款失败:",b);
             throw new BusinessException(b.getMessage());
         }catch (Exception e){
             throw new BusinessException("退换订单接口- 退换订单失败！");
@@ -81,8 +81,8 @@ public class PaymentController extends AbstractPayController {
                 List<PaymentItemBo> paymentItemBos = null;
                 if (tradeBo.getTradePayStatus().equals(1) || tradeBo.getTradePayStatus().equals(2)) {
                     paymentItemBos = payService.getAllPaymentItemListByTradeId(tradeId, null);
-                } else if(!ObjectUtils.isEmpty(queryTradePaymentBo.getContent().getPaymentItemIds()))
-                    paymentItemBos = payService.getAllPaymentItemListByTradeId(tradeId, queryTradePaymentBo.getContent().getPaymentItemIds());
+                } else if(!ObjectUtils.isEmpty(queryTradePaymentBo.getContent().getPaymentItemId()))
+                    paymentItemBos = payService.getAllPaymentItemListByTradeId(tradeId, queryTradePaymentBo.getContent().getPaymentItemId());
                 if(!ObjectUtils.isEmpty(paymentItemBos)) {
                     for (PaymentItemBo paymentItem : paymentItemBos) {
                         if(ObjectUtil.equals(paymentItem.getPayStatus(),1)||ObjectUtil.equals(paymentItem.getPayStatus(),2)) {
@@ -101,7 +101,7 @@ public class PaymentController extends AbstractPayController {
                     }
                 }
             } else if (tradeBo.getTradeType() == 2) {
-                List<PaymentItemBo> paymentItemBos=payService.getAllPaymentItemListByTradeId(tradeId,queryTradePaymentBo.getContent().getPaymentItemIds());
+                List<PaymentItemBo> paymentItemBos=payService.getAllPaymentItemListByTradeId(tradeId,queryTradePaymentBo.getContent().getPaymentItemId());
                 if(!ObjectUtils.isEmpty(paymentItemBos)){
                     for(PaymentItemBo paymentItem:paymentItemBos) {
                         syncRefundPayItemStatus(paymentItem,tradeBo,storePaymentParamBo);
@@ -134,7 +134,7 @@ public class PaymentController extends AbstractPayController {
                 payService.updateRefundStatus(paymentItem.getId(), true);
             } else if (ObjectUtil.equals(paymentItem.getPayModeId(), 4l) || ObjectUtil.equals(paymentItem.getPayModeId(), 5l)) {
                 PaymentItemExtraBo paymentItemExtraBo = ObjectUtils.isEmpty(paymentItem.getPaymentItemExtra()) ? null : paymentItem.getPaymentItemExtra().get(0);
-                QueryYiPayRefundStatusResponseBo queryYiPayRefundStatusResponseBo = YiPayApi.queryRefundStatus(storePaymentParamBo, paymentItem.getReturnCode(), paymentItemExtraBo == null ? null : paymentItemExtraBo.getRefundTradeNo());
+                QueryYiPayRefundStatusResponseBo queryYiPayRefundStatusResponseBo = YiPayApi.queryRefundStatus(storePaymentParamBo, paymentItem.getReturnCode(), null);
                 if (queryYiPayRefundStatusResponseBo.refundStatus() < 0)
                     payService.updateRefundStatus(paymentItem.getId(), false);
                 else if (queryYiPayRefundStatusResponseBo.refundStatus() == 0)

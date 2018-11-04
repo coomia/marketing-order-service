@@ -10,6 +10,6 @@ import java.util.List;
  */
 @Data
 public class QueryTradePaymentContentBo {
-    List<Long> paymentItemIds;
+    Long paymentItemId;
     Long tradeId;
 }

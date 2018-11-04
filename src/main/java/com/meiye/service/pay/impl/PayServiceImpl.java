@@ -480,7 +480,10 @@ public class PayServiceImpl implements PayService {
         //如果是退款失败，再次退款的时候，需要更新退款单号
         if(ObjectUtil.equals(paymentItem.getPayStatus(),6))
             paymentItem.setReturnCode(UUIDUtil.randomUUID());
+        if(ObjectUtils.isEmpty(paymentItem.getReturnCode()))
+            paymentItem.setReturnCode(UUIDUtil.randomUUID());
         paymentItem.setPayStatus(4); //退款中
+        paymentItem.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
 
 
         if (ObjectUtil.equals(paymentItem.getPayModeId(),1l)) {
@@ -502,9 +505,9 @@ public class PayServiceImpl implements PayService {
             YiPayRefundResponseBo yiPayRefundResponseBo =null;
             PaymentItemExtra paymentItemExtra=paymentItemExtraRepository.findOneByPaymentItemId(paymentItem.getId());
             if(ObjectUtil.equals(trade.getTradeType(),1))  //销货单
-                YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, paymentItem.getUuid(), paymentItemExtra.getPayTranNo(), paymentItem.getReturnCode());
+                yiPayRefundResponseBo=YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, paymentItem.getUuid(), paymentItemExtra.getPayTranNo(), paymentItem.getReturnCode());
             else //退货单
-                YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, null, paymentItemExtra.getPayTranNo(), paymentItem.getReturnCode());
+                yiPayRefundResponseBo=YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, null, paymentItemExtra.getPayTranNo(), paymentItem.getReturnCode());
 
             if (yiPayRefundResponseBo == null || !yiPayRefundResponseBo.isSuccess()) {
                 errorMessage += "翼支付退款失败";
@@ -550,9 +553,9 @@ public class PayServiceImpl implements PayService {
     }
 
     @Override
-    public List<PaymentItemBo> getAllPaymentItemListByTradeId(Long tradeId, List<Long> paymentItemIds) {
+    public List<PaymentItemBo> getAllPaymentItemListByTradeId(Long tradeId, Long paymentItemId) {
         List<PaymentItem> paymentItems = null;
-        if (ObjectUtils.isEmpty(paymentItemIds)) {
+        if (ObjectUtils.isEmpty(paymentItemId)) {
             Optional<Trade> tradeOptional = tradeRepository.findById(tradeId);
             if (!tradeOptional.isPresent())
                 throw new BusinessException("售货单/退货单不存在.");
@@ -562,9 +565,11 @@ public class PayServiceImpl implements PayService {
                 List<Long> paymentIds = payments.stream().map(Payment::getId).distinct().collect(Collectors.toList());
                 paymentItems = paymentItemRepository.findByPaymentIdIn(paymentIds);
             }
-        } else
-            paymentItems = paymentItemRepository.findAllById(paymentItemIds);
-
+        } else {
+            List<Long> ids=new ArrayList<>();
+            ids.add(paymentItemId);
+            paymentItems = paymentItemRepository.findAllById(ids);
+        }
         if (!ObjectUtils.isEmpty(paymentItems)) {
             List<PaymentItemBo> paymentItemBos = new ArrayList<>();
             for (PaymentItem paymentItem : paymentItems) {
@@ -614,6 +619,7 @@ public class PayServiceImpl implements PayService {
         }else if(!refundSucess){
             trade.setTradePayStatus(4);
         }
+        trade.setServerUpdateTime(new Timestamp(Calendar.getInstance().getTimeInMillis()));
         tradeRepository.save(trade);
     }
 

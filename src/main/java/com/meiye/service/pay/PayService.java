@@ -55,7 +55,7 @@ public interface PayService {
     @Transactional
     void updateRefundStatus(Long paymentItemId, boolean refundSucess);
 
-    List<PaymentItemBo> getAllPaymentItemListByTradeId(Long tradeId, List<Long> paymentItemIds);
+    List<PaymentItemBo> getAllPaymentItemListByTradeId(Long tradeId, Long paymentItemId);
 
     void updateRefundTradeStatus(Long tradeId);
 }
