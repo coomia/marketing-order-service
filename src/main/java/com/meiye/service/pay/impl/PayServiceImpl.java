@@ -71,63 +71,81 @@ public class PayServiceImpl implements PayService {
         return "test";
     }
 
-
-    //TODO 验证支付
-    public void prePay(){
-
-    }
-
     @Override
     @Transactional
-    public void yipaySuccess(String tradeNo, String yiPayTradeNo, Long paymentId){
-        Trade trade=orderService.getTradeByTradeNo(tradeNo);
-        if(trade==null)
-            throw new BusinessException("交易记录不存在.");
-        this.paySuccess(trade.getId(),paymentId,yiPayTradeNo);
-    }
-
-    @Override
-    @Transactional
-    public void paySuccess(Long tradeId, Long paymentItemId, String yiPayTradeNo){
-        Optional<Trade> tradeOption=tradeRepository.findById(tradeId);
-        if(!tradeOption.isPresent())
-            throw new BusinessException("交易记录不存在.");
-        Trade trade=tradeOption.get();
-        if(!trade.getTradePayStatus().equals(1)&&!trade.getTradePayStatus().equals(2))
+    public void payFailed(String outTradeNo){
+        PaymentItem paymentItem=paymentItemRepository.findOneByUuid(outTradeNo);
+        if(paymentItem==null)
+            throw new BusinessException("支付记录不存在");
+        if(paymentItem.getPayStatus()!=null&&!paymentItem.getPayStatus().equals(1)&&!paymentItem.getPayStatus().equals(2))
             return;
-        trade.setTradePayStatus(3);
-        trade.setTradeStatus(4);
+
         Timestamp now=new Timestamp(Calendar.getInstance().getTimeInMillis());
+        paymentItem.setPayStatus(9);
+        paymentItem.setServerUpdateTime(now);
+        paymentItemRepository.save(paymentItem);
+
+        Optional<Payment> paymentOptional = paymentRepository.findById(paymentItem.getPaymentId());
+        if (!paymentOptional.isPresent())
+            throw new BusinessException("支付记录不存在");
+        Payment payment = paymentOptional.get();
+        payment.setIsPaid(2);
+        payment.setServerUpdateTime(now);
+        paymentRepository.save(payment);
+
+
+        Optional<Trade> tradeOption=tradeRepository.findById(payment.getRelateId());
+        if(!tradeOption.isPresent())
+            throw new BusinessException("销货单不存在.");
+
+        Trade trade=tradeOption.get();
+        if(!trade.getTradeType().equals(1))
+            throw new BusinessException("销货单不存在.");
+        if(trade.getTradePayStatus().equals(1)||trade.getTradePayStatus().equals(2)) {
+            trade.setTradePayStatus(9);
+            trade.setTradeStatus(4);//支付失败订单状态该是什么？
+        }
         trade.setServerUpdateTime(now);
         tradeRepository.save(trade);
-        List<Payment> payments=this.findPaymentsByTradeId(trade.getId(),false);
-        for(Payment payment:payments){
-            payment.setIsPaid(1);
-            payment.setServerUpdateTime(now);
-        }
-        paymentRepository.saveAll(payments);
+    }
 
-        List<Long> paymentIds=payments.stream().map(Payment::getId).distinct().collect(Collectors.toList());
-        List<PaymentItem> paymentItems=this.findPaymentItemsByPamentId(paymentIds,false);
-        for(PaymentItem paymentItem:paymentItems){
-            paymentItem.setPayStatus(3);
-            paymentItem.setServerUpdateTime(now);
-        }
-        paymentItemRepository.saveAll(paymentItems);
 
-        if(paymentItemId!=null) {
-            Optional<PaymentItem> paymentItemOptional = paymentItemRepository.findById(paymentItemId);
-            if (paymentItemOptional.isPresent()) {
-                PaymentItem paymentItem = paymentItemOptional.get();
-                paymentItem.setPayStatus(3);
-                paymentItem.setServerUpdateTime(now);
-                paymentItemRepository.saveAll(paymentItems);
-            }
-        }
+    @Override
+    @Transactional
+    public void paySuccess(String outTradeNo, String yiPayTradeNo){
+        PaymentItem paymentItem=paymentItemRepository.findOneByUuid(outTradeNo);
+        if(paymentItem==null)
+            throw new BusinessException("支付记录不存在");
+        if(paymentItem.getPayStatus()!=null&&!paymentItem.getPayStatus().equals(1)&&!paymentItem.getPayStatus().equals(2))
+            return;
+
+        Timestamp now=new Timestamp(Calendar.getInstance().getTimeInMillis());
+        paymentItem.setPayStatus(3);
+        paymentItem.setServerUpdateTime(now);
+        paymentItem.setStatusFlag(1);
+        paymentItemRepository.save(paymentItem);
+
+        Optional<Payment> paymentOptional = paymentRepository.findById(paymentItem.getPaymentId());
+        if (!paymentOptional.isPresent())
+            throw new BusinessException("支付记录不存在");
+        Payment payment = paymentOptional.get();
+        payment.setIsPaid(1);
+        payment.setStatusFlag(1);
+        payment.setServerUpdateTime(now);
+        paymentRepository.save(payment);
+
+
+        Optional<Trade> tradeOption=tradeRepository.findById(payment.getRelateId());
+        if(!tradeOption.isPresent())
+            throw new BusinessException("销货单不存在.");
+
+        Trade trade=tradeOption.get();
+        if(!trade.getTradeType().equals(1))
+            throw new BusinessException("销货单不存在.");
 
         //调用过翼支付，并且获取到了翼支付的tradeId
-        if (!ObjectUtils.isEmpty(paymentItemId) && !ObjectUtils.isEmpty(yiPayTradeNo)) {
-            List<PaymentItemExtra> paymentItemExtras=paymentItemExtraRepository.findByPaymentItemIdAndStatusFlag(paymentItemId,1);
+        if (!ObjectUtils.isEmpty(yiPayTradeNo)) {
+            List<PaymentItemExtra> paymentItemExtras=paymentItemExtraRepository.findByPaymentItemIdAndStatusFlag(paymentItem.getId(),1);
             if(!ObjectUtils.isEmpty(paymentItemExtras)){
                 for(PaymentItemExtra paymentItemExtra:paymentItemExtras){
                     paymentItemExtra.setPayTranNo(yiPayTradeNo);
@@ -142,7 +160,7 @@ public class PayServiceImpl implements PayService {
             }else {
                 PaymentItemExtra paymentItemExtra = new PaymentItemExtra();
                 paymentItemExtra.setUuid(UUIDUtil.randomUUID());
-                paymentItemExtra.setPaymentItemId(paymentItemId);
+                paymentItemExtra.setPaymentItemId(paymentItem.getId());
                 paymentItemExtra.setPayTranNo(yiPayTradeNo);
                 paymentItemExtra.setPayCallbackTime(now);
                 paymentItemExtra.setShopIdenty(trade.getShopIdenty());
@@ -158,97 +176,13 @@ public class PayServiceImpl implements PayService {
                 paymentItemExtraRepository.save(paymentItemExtra);
             }
         }
-    }
-
-
-    @Transactional
-    @Override
-    public String returnPayment(Long tradeId){
-        String message="";
-        Trade returnTrade = tradeRepository.findById(tradeId).get();
-        try {
-            Trade oriTrade = tradeRepository.findById(returnTrade.getRelateTradeId()).get();
-            Long oriTradeId=oriTrade.getId();
-            List<Payment> payments = this.findPaymentsByTradeId(tradeId, false);
-            List<Payment> oriPayments=this.findPaymentsByTradeId(oriTradeId, false);
-            WriteOffResultBo resultBo=MeiYeInternalApi.returnPrivilege(oriTradeId, WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId());
-            if(!resultBo.isSuccess())
-                message+="反核销重新和余额退回失败：" + resultBo.getMsg();
-            Integer returnAmt = 0;
-            if(!ObjectUtils.isEmpty(oriPayments)){
-                for (Payment payment : oriPayments) {
-                    if (payment.getIsPaid() == 1) {
-                        List<PaymentItem> paymentItems = paymentItemRepository.findByPaymentIdAndStatusFlag(payment.getId(), 1);
-                        if (!ObjectUtils.isEmpty(paymentItems)) {
-                            for (PaymentItem paymentItem : paymentItems) {
-                                if (paymentItem.getPayStatus() == 4) {
-                                    if (paymentItem.getPayModeId() == 1) {
-                                        InternalApiResult internalApiResult = MeiYeInternalApi.refund(orderService.getCustomerIdByType(oriTradeId, 3), oriTradeId, paymentItem.getId(), paymentItem.getUsefulAmount(), WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId(), paymentItem.getCreatorId(), paymentItem.getCreatorName());
-                                        if (!internalApiResult.isSuccess())
-                                            message += "余额退回失败:" + internalApiResult.getMsg();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            List<PaymentItem> yiPaymentItems = new ArrayList<>();
-            if (!ObjectUtils.isEmpty(payments)) {
-                for (Payment payment : payments) {
-                    if (payment.getIsPaid() == 1) {
-                        List<PaymentItem> paymentItems = paymentItemRepository.findByPaymentIdAndStatusFlag(payment.getId(), 1);
-                        if (!ObjectUtils.isEmpty(paymentItems)) {
-                            for (PaymentItem paymentItem : paymentItems) {
-                                if (paymentItem.getPayStatus() == 4) {
-                                    if (paymentItem.getPayModeId() == 4 || paymentItem.getPayModeId() == 5) {
-                                        yiPaymentItems.add(paymentItem);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (!ObjectUtils.isEmpty(yiPaymentItems)) {
-                returnAmt = new Double(yiPaymentItems.get(0).getUsefulAmount() * 100).intValue();
-                YiPayRefundResponseBo yiPayRefundResponseBo = YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, oriTrade.getTradeNo(), null, returnTrade.getTradeNo());
-                if (yiPayRefundResponseBo == null || !yiPayRefundResponseBo.isSuccess()) {
-                    message+="翼支付退款失败";
-                } else {
-                    PaymentItemExtra paymentItemExtra = new PaymentItemExtra();
-                    paymentItemExtra.setUuid(UUIDUtil.randomUUID());
-                    paymentItemExtra.setPaymentItemId(yiPaymentItems.get(0).getId());
-                    paymentItemExtra.setShopIdenty(oriTrade.getShopIdenty());
-                    paymentItemExtra.setBrandIdenty(oriTrade.getBrandIdenty());
-                    paymentItemExtra.setDeviceIdenty(oriTrade.getDeviceIdenty());
-                    paymentItemExtra.setStatusFlag(1);
-                    paymentItemExtra.setRefundCallbackTime(new Timestamp(System.currentTimeMillis()));
-                    paymentItemExtra.setRefundTradeNo(yiPayRefundResponseBo.getHaipay_refund_id());
-                    paymentItemExtra.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
-                    paymentItemExtra.setServerCreateTime(new Timestamp(System.currentTimeMillis()));
-                    paymentItemExtra.setCreatorId(oriTrade.getCreatorId());
-                    paymentItemExtra.setCreatorName(oriTrade.getCreatorName());
-                    paymentItemExtra.setUpdatorId(oriTrade.getUpdatorId());
-                    paymentItemExtra.setUpdatorName(oriTrade.getUpdatorName());
-                    paymentItemExtraRepository.save(paymentItemExtra);
-                }
-            }else{
-                refundSuccessful(tradeId);
-            }
-        }catch (BusinessException exp){
-            logger.info("订单("+tradeId+")退款失败",exp);
-            message+="订单退款失败:"+exp.getMessage();
-        } catch (Exception exp){
-            logger.info("订单("+tradeId+")退款失败",exp);
-            message+="订单退款失败";
+        if(!trade.getTradePayStatus().equals(3)) {
+            trade.setTradePayStatus(3);
+            trade.setTradeStatus(4);
         }
-        if(!ObjectUtils.isEmpty(message))
-            refundFailed(tradeId);
-        return message;
+        trade.setServerUpdateTime(now);
+        tradeRepository.save(trade);
     }
-
 
     @Transactional
     @Override
@@ -275,7 +209,7 @@ public class PayServiceImpl implements PayService {
             tradeRepository.save(trade);
         }
         //次卡退货不用考虑，不会发生退货
-        MeiYeInternalApi.subtractCommission(trade.getId(),trade.getBrandIdenty(),trade.getShopIdenty());
+        MeiYeInternalApi.subtractCommission(trade.getRelateTradeId(),trade.getBrandIdenty(),trade.getShopIdenty());
     }
 
     @Transactional
@@ -352,43 +286,60 @@ public class PayServiceImpl implements PayService {
 
     @Override
     @Transactional
-    public void savePaymentData(AccountingBo accountingBo){
+    public PrePayBo savePaymentData(AccountingBo accountingBo, String payRequestType){
         try {
-
+            PrePayBo prePayBo =null;
             Optional<Trade> tradeOption=tradeRepository.findById(accountingBo.getContent().getTrade().getId());
             if(!tradeOption.isPresent())
-                throw new BusinessException("订单不存在。", ResetApiResult.STATUS_ERROR,1001);
+                throw new BusinessException("销货单不存在。", ResetApiResult.STATUS_ERROR,1001);
             Trade trade=tradeOption.get();
             if(!trade.getServerUpdateTime().equals(accountingBo.getContent().getTrade().getServerUpdateTime()))
-                throw new BusinessException("订单已经被其他人处理。", ResetApiResult.STATUS_ERROR,5004);
-            //删除已存在的支付记录
-            paymentRepository.disableExistPaymentByRelateId(trade.getId());
+                throw new BusinessException("销货单已经被其他人处理。", ResetApiResult.STATUS_ERROR,5004);
+            if(!trade.getTradeType().equals(1))
+                throw new BusinessException("销货单不存在。", ResetApiResult.STATUS_ERROR,1001);
 
-            //保存新的payment记录
             PaymentBo paymentBo=accountingBo.getContent().getPayment();
-            paymentBo.setRelateId(trade.getId());
-            paymentBo.setRelateUuid(trade.getUuid());
-            paymentBo.setBizDate(new Date());
-            paymentBo.setIsPaid(2);
-            paymentBo.setDeviceIdenty(accountingBo.getDeviceId());
-            Payment payment=paymentBo.copyTo(Payment.class);
-            paymentRepository.save(payment);
 
-            for(PaymentItemBo paymentItemBo:paymentBo.getPaymentItems()){
-                paymentItemBo.setPaymentId(payment.getId());
-                paymentItemBo.setDeviceIdenty(accountingBo.getDeviceId());
-                paymentItemBo.setPaymentUuid(payment.getUuid());
-                PaymentItem paymentItem=paymentItemBo.copyTo(PaymentItem.class);
-                paymentItemRepository.save(paymentItem);
-                if(!ObjectUtils.isEmpty(paymentItemBo.getPaymentItemExtra())) {
+            Payment payment=paymentRepository.findOneByUuid(paymentBo.getUuid());
+            //如果payment不存在，则继续保存payment
+            if(payment==null) {
+                paymentBo.setRelateId(trade.getId());
+                paymentBo.setRelateUuid(trade.getUuid());
+                paymentBo.setBizDate(new Date());
+                paymentBo.setIsPaid(2);
+                paymentBo.setDeviceIdenty(accountingBo.getDeviceId());
+                payment = paymentBo.copyTo(Payment.class);
+                paymentRepository.save(payment);
+            }
+            if(!ObjectUtils.isEmpty(paymentBo.getPaymentItems())){
+                if(paymentBo.getPaymentItems().size()>1)
+                    throw new BusinessException("暂不支持混合支付",ResetApiResult.STATUS_ERROR,1003);
+                PaymentItemBo paymentItemBo=paymentBo.getPaymentItems().get(0);
+                PaymentItem paymentItem=paymentItemRepository.findOneByUuid(paymentItemBo.getUuid());
+                if(paymentItem==null) {
+                    paymentItemBo.setPaymentId(payment.getId());
+                    paymentItemBo.setDeviceIdenty(accountingBo.getDeviceId());
+                    paymentItemBo.setPaymentUuid(payment.getUuid());
+                    paymentItemBo.setPayStatus(1);
+                    paymentItem = paymentItemBo.copyTo(PaymentItem.class);
+                    paymentItemRepository.save(paymentItem);
+                }
+                if (!ObjectUtils.isEmpty(paymentItemBo.getPaymentItemExtra())) {
                     for (PaymentItemExtraBo paymentItemExtraBo : paymentItemBo.getPaymentItemExtra()) {
-                        paymentItemExtraBo.setPaymentItemId(paymentItem.getId());
-                        paymentItemExtraBo.setDeviceIdenty(accountingBo.getDeviceId());
-                        PaymentItemExtra paymentItemExtra = paymentItemExtraBo.copyTo(PaymentItemExtra.class);
-                        paymentItemExtraRepository.save(paymentItemExtra);
+                        PaymentItemExtra paymentItemExtra=paymentItemExtraRepository.findOneByUuid(paymentItemExtraBo.getUuid());
+                        if(paymentItemExtra==null) {
+                            paymentItemExtraBo.setPaymentItemId(paymentItem.getId());
+                            paymentItemExtraBo.setDeviceIdenty(accountingBo.getDeviceId());
+                            paymentItemExtra = paymentItemExtraBo.copyTo(PaymentItemExtra.class);
+                            paymentItemExtraRepository.save(paymentItemExtra);
+                        }
                     }
                 }
-            }
+                prePayBo =prePay(payRequestType,paymentItem,paymentItemBo.getAuthCode(),paymentItemBo.getWechatAppid(),paymentItemBo.getWechatOpenId());
+            }else
+                throw new BusinessException("销货单没有待支付的项.", ResetApiResult.STATUS_ERROR,1001);
+
+            return prePayBo;
         }catch (BusinessException exp){
             logger.error("Save payment data face error:",exp);
             throw exp;
@@ -396,7 +347,6 @@ public class PayServiceImpl implements PayService {
             logger.error("Save payment data face error:",exp);
             throw new BusinessException("保存payment数据失败.",ResetApiResult.STATUS_ERROR,1001);
         }
-
     }
 
     @Override
@@ -430,86 +380,43 @@ public class PayServiceImpl implements PayService {
         return paymentItems;
     }
 
-    @Override
-    @Transactional
-    public PrePayReturnBo prePay(AccountingBo accountingBo, String payRequestType){
-        Optional<Trade> tradeOptional= tradeRepository.findById(accountingBo.getContent().getTrade().getId());
+    public PrePayBo prePay(String payRequestType, PaymentItem paymentItem, String authCode, String wechatAppId, String wechatOpenId){
+        if(paymentItem==null||paymentItem.getId()==null)
+            throw new BusinessException("销货单没有需要支付的项", ResetApiResult.STATUS_ERROR,1001);
+        if(paymentItem.getUsefulAmount()==null||paymentItem.getUsefulAmount()<=0d)
+            throw  new BusinessException("销货单支付金额异常",ResetApiResult.STATUS_ERROR,1003);
 
+        PrePayBo prePayBo =new PrePayBo();
+        prePayBo.setPayRequestType(payRequestType);
+        prePayBo.setPaymentItemId(paymentItem.getId());
+        prePayBo.setOutTradeNo(paymentItem.getUuid());
+        prePayBo.setAuthCode(authCode);
+        prePayBo.setWechatAppid(wechatAppId);
+        prePayBo.setWechatOpenId(wechatOpenId);
 
-        if(!tradeOptional.isPresent())
-            throw new BusinessException("订单不存在。", ResetApiResult.STATUS_ERROR,1001);
-        Trade trade=tradeOptional.get();
-        if(!trade.getServerUpdateTime().equals(accountingBo.getContent().getTrade().getServerUpdateTime()))
-            throw new BusinessException("订单已经被其他人处理。", ResetApiResult.STATUS_ERROR,5004);
-        PrePayReturnBo prePayReturnBo=new PrePayReturnBo();
-        prePayReturnBo.setPayRequestType(payRequestType);
-        prePayReturnBo.setOutTradeNo(trade.getTradeNo());
+        if(paymentItem.getPayModeId().equals(4l)){
+            prePayBo.setWechatPay();
+            prePayBo.setNeedYiPay(true);
+        }else if(paymentItem.getPayModeId().equals(5l)){
+            prePayBo.setAliPay();
+            prePayBo.setNeedYiPay(true);
+        }else if(paymentItem.getPayModeId().equals(1l)){
+            prePayBo.setBanlancePay();
+        }else if(paymentItem.getPayModeId().equals(2l)){
+            prePayBo.setCashPay();
+        }else
+            throw new BusinessException("销货单不支持的支付类型.", ResetApiResult.STATUS_ERROR,1001);
+        prePayBo.setTradeAmount(paymentItem.getUsefulAmount());
 
-        List<Payment> payments=this.findPaymentsByTradeId(accountingBo.getContent().getTrade().getId(),false);
-        List<Long> paymentIds=payments.stream().map(Payment::getId).distinct().collect(Collectors.toList());
-        List<PaymentItem> paymentItems=this.findPaymentItemsByPamentId(paymentIds,false);
-        List<PaymentItem> wechatPayItems=new ArrayList<>();
-        List<PaymentItem> alipayItems=new ArrayList<>();
-        List<PaymentItem> balancePayItems=new ArrayList<>();
-        for(PaymentItem paymentItem:paymentItems){
-            if(paymentItem.getPayModeId().equals(4l)){
-                //4 微信支付，5支付宝支付
-                wechatPayItems.add(paymentItem);
-            }else if(paymentItem.getPayModeId().equals(5l)){
-                alipayItems.add(paymentItem);
-            }else if(paymentItem.getPayModeId().equals(1l)){
-                balancePayItems.add(paymentItem);
-            }
-        }
-        if(!ObjectUtils.isEmpty(wechatPayItems)&&!ObjectUtils.isEmpty(alipayItems)&&!ObjectUtils.isEmpty(balancePayItems))
-            throw new BusinessException("暂不支持混合支付",ResetApiResult.STATUS_ERROR,1003);
-        if(wechatPayItems.size()>1||alipayItems.size()>1||balancePayItems.size()>1)
-            throw new BusinessException("暂不支持混合支付",ResetApiResult.STATUS_ERROR,1003);
-        String payRequestUuid="";
-        if(!ObjectUtils.isEmpty(wechatPayItems)){
-            PaymentItem paymentItem=wechatPayItems.get(0);
-            if(paymentItem.getUsefulAmount()==null||paymentItem.getUsefulAmount()<=0d)
-                throw  new BusinessException("支付金额异常",ResetApiResult.STATUS_ERROR,1003);
-            prePayReturnBo.setTradeAmout(new Double(paymentItem.getUsefulAmount()*100).intValue());
-            prePayReturnBo.setNeedYiPay(true);
-            prePayReturnBo.setPayType("0");
-            prePayReturnBo.setPayItemId(paymentItem.getId());
-            payRequestUuid=paymentItem.getUuid();
-        }else if(!ObjectUtils.isEmpty(alipayItems)){
-            PaymentItem paymentItem=alipayItems.get(0);
-            if(paymentItem.getUsefulAmount()==null||paymentItem.getUsefulAmount()<=0d)
-                throw  new BusinessException("支付金额异常",ResetApiResult.STATUS_ERROR,1003);
-            prePayReturnBo.setTradeAmout(new Double(paymentItem.getUsefulAmount()*100).intValue());
-            prePayReturnBo.setNeedYiPay(true);
-            prePayReturnBo.setPayType("1");
-            payRequestUuid=paymentItem.getUuid();
-            prePayReturnBo.setPayItemId(paymentItem.getId());
-        }else if(!ObjectUtils.isEmpty(balancePayItems)){
-            PaymentItem paymentItem=balancePayItems.get(0);
-            if (paymentItem.getUsefulAmount() == null || paymentItem.getUsefulAmount() <= 0d)
-                throw new BusinessException("支付金额异常", ResetApiResult.STATUS_ERROR, 1003);
-            prePayReturnBo.setPayItemId(paymentItem.getId());
-            prePayReturnBo.setBanlancePayAmount(paymentItem.getUsefulAmount());
-        }
         //如果是POS扫码支付，则需要获取authcode
         if("ScanPay".equalsIgnoreCase(payRequestType)){
-            for(PaymentItemBo paymentItemBo:accountingBo.getContent().getPayment().getPaymentItems()){
-                if(payRequestUuid.equalsIgnoreCase(paymentItemBo.getUuid()))
-                    prePayReturnBo.setAuthCode(paymentItemBo.getAuthCode());
-            }
-            if(prePayReturnBo.isNeedYiPay()&&ObjectUtils.isEmpty(prePayReturnBo.getAuthCode()))
+            if(prePayBo.isNeedYiPay()&&ObjectUtils.isEmpty(prePayBo.getAuthCode()))
                 throw  new BusinessException("用户授权码为空",ResetApiResult.STATUS_ERROR,1003);
         }else if("MicroPay".equalsIgnoreCase(payRequestType)){
-            for(PaymentItemBo paymentItemBo:accountingBo.getContent().getPayment().getPaymentItems()){
-                if(payRequestUuid.equalsIgnoreCase(paymentItemBo.getUuid())) {
-                    prePayReturnBo.setWechatAppid(paymentItemBo.getWechatAppid());
-                    prePayReturnBo.setWechatOpenId(paymentItemBo.getWechatOpenId());
-                }
-            }
-            if(prePayReturnBo.isNeedYiPay()&&(ObjectUtils.isEmpty(prePayReturnBo.getWechatOpenId())||ObjectUtils.isEmpty(prePayReturnBo.getWechatAppid())))
+            if(prePayBo.isNeedYiPay()&&(ObjectUtils.isEmpty(prePayBo.getWechatOpenId())||ObjectUtils.isEmpty(prePayBo.getWechatAppid())))
                 throw  new BusinessException("Appid或Open id为空",ResetApiResult.STATUS_ERROR,1003);
         }
-        return prePayReturnBo;
+        return prePayBo;
     }
 
     @Override
@@ -536,6 +443,173 @@ public class PayServiceImpl implements PayService {
         if(ObjectUtils.isEmpty(commercialPaySetting)||ObjectUtils.isEmpty(commercialPaySetting.getAppid()))
             throw new BusinessException("小程序设置错误,请联系管理员检查.");
         return commercialPaySetting.getAppid();
+    }
+
+
+
+    @Override
+    @Transactional(noRollbackFor = BusinessException.class)
+    public Trade refundPayment(Long paymentItemId){
+        return refundByPaymentItemId(paymentItemId);
+    }
+
+    @Override
+    public Trade refundByPaymentItemId(Long paymentItemId){
+        String errorMessage="";
+        Optional<PaymentItem> paymentItemOptional=paymentItemRepository.findById(paymentItemId);
+        if(!paymentItemOptional.isPresent())
+            throw new BusinessException("支付或退款项不存在.");
+        PaymentItem paymentItem=paymentItemOptional.get();
+        if(ObjectUtil.notEqual(paymentItem.getPayStatus(), 3)&&ObjectUtil.notEqual(paymentItem.getPayStatus(),6))
+            throw new BusinessException("退款状态不正确，不允许退款.");
+
+        Optional<Payment> paymentOptional=paymentRepository.findById(paymentItem.getPaymentId());
+        if(!paymentOptional.isPresent())
+            throw new BusinessException("支付记录不存在.");
+        Payment payment=paymentOptional.get();
+
+        Optional<Trade> tradeOptional=tradeRepository.findById(payment.getRelateId());
+        if(!tradeOptional.isPresent())
+            throw new BusinessException("销货单/退货单不存在.");
+        Trade trade=tradeOptional.get();
+        //如果是退款失败，再次退款的时候，需要更新退款单号
+        if(ObjectUtil.equals(paymentItem.getPayStatus(),6))
+            paymentItem.setReturnCode(UUIDUtil.randomUUID());
+        paymentItem.setPayStatus(4); //退款中
+
+
+        if (ObjectUtil.equals(paymentItem.getPayModeId(),1l)) {
+            InternalApiResult internalApiResult=null;
+            if(ObjectUtil.equals(trade.getTradeType(),1))  //销货单
+                internalApiResult = MeiYeInternalApi.refund(orderService.getCustomerIdByType(trade.getId(), 3), trade.getId(), paymentItem.getId(), paymentItem.getUsefulAmount(), WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId(), paymentItem.getCreatorId(), paymentItem.getCreatorName());
+            else //退货单
+                internalApiResult = MeiYeInternalApi.refund(orderService.getCustomerIdByType(trade.getRelateTradeId(), 3), trade.getRelateTradeId(), paymentItem.getId(), paymentItem.getUsefulAmount(), WebUtil.getCurrentStoreId(), WebUtil.getCurrentBrandId(), paymentItem.getCreatorId(), paymentItem.getCreatorName());
+            if(internalApiResult.isSuccess()) {
+                paymentItem.setPayStatus(5);
+            } else {
+                paymentItem.setPayStatus(6);
+                errorMessage="余额支付退还失败.";
+            }
+        }else if(ObjectUtil.equals(paymentItem.getPayModeId(),2l)){
+            paymentItem.setPayStatus(5);
+        }else if(ObjectUtil.equals(paymentItem.getPayModeId(),4l)||ObjectUtil.equals(paymentItem.getPayModeId(),5l)){
+            Integer returnAmt = new Double(paymentItem.getUsefulAmount() * 100).intValue();
+            YiPayRefundResponseBo yiPayRefundResponseBo =null;
+            PaymentItemExtra paymentItemExtra=paymentItemExtraRepository.findOneByPaymentItemId(paymentItem.getId());
+            if(ObjectUtil.equals(trade.getTradeType(),1))  //销货单
+                YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, paymentItem.getUuid(), paymentItemExtra.getPayTranNo(), paymentItem.getReturnCode());
+            else //退货单
+                YiPayApi.refund(getStorePaymentParamBo(WebUtil.getCurrentStoreId()), returnAmt, null, paymentItemExtra.getPayTranNo(), paymentItem.getReturnCode());
+
+            if (yiPayRefundResponseBo == null || !yiPayRefundResponseBo.isSuccess()) {
+                errorMessage += "翼支付退款失败";
+                paymentItem.setPayStatus(6);
+            }else {
+                paymentItemExtra.setStatusFlag(1);
+                paymentItemExtra.setRefundCallbackTime(new Timestamp(System.currentTimeMillis()));
+                paymentItemExtra.setRefundTradeNo(yiPayRefundResponseBo.getHaipay_refund_id());
+                paymentItemExtra.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));
+                paymentItemExtraRepository.save(paymentItemExtra);
+            }
+        }
+        paymentItemRepository.save(paymentItem);
+        if(!ObjectUtils.isEmpty(errorMessage))
+            throw new BusinessException(errorMessage);
+        return trade;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateRefundStatus(String refundNo, boolean refundSucess){
+        PaymentItem paymentItem=paymentItemRepository.findOneByReturnCode(refundNo);
+        if(ObjectUtil.equals(paymentItem.getPayStatus(),4)){
+            paymentItem.setPayStatus(refundSucess?5:6);
+        }
+
+        paymentItemRepository.save(paymentItem);
+    }
+
+    @Override
+    @Transactional
+    public void updateRefundStatus(Long paymentItemId, boolean refundSucess){
+        Optional<PaymentItem> paymentItemOptional=paymentItemRepository.findById(paymentItemId);
+        if(!paymentItemOptional.isPresent())
+            throw new BusinessException("退款单号未找到");
+        PaymentItem paymentItem=paymentItemOptional.get();
+        if(ObjectUtil.equals(paymentItem.getPayStatus(),4)||ObjectUtil.equals(paymentItem.getPayStatus(),3)){
+            paymentItem.setPayStatus(refundSucess?5:6);
+        }
+
+        paymentItemRepository.save(paymentItem);
+    }
+
+    @Override
+    public List<PaymentItemBo> getAllPaymentItemListByTradeId(Long tradeId, List<Long> paymentItemIds) {
+        List<PaymentItem> paymentItems = null;
+        if (ObjectUtils.isEmpty(paymentItemIds)) {
+            Optional<Trade> tradeOptional = tradeRepository.findById(tradeId);
+            if (!tradeOptional.isPresent())
+                throw new BusinessException("售货单/退货单不存在.");
+            Trade trade = tradeOptional.get();
+            List<Payment> payments = paymentRepository.findByRelateId(trade.getId());
+            if (!ObjectUtils.isEmpty(payments)) {
+                List<Long> paymentIds = payments.stream().map(Payment::getId).distinct().collect(Collectors.toList());
+                paymentItems = paymentItemRepository.findByPaymentIdIn(paymentIds);
+            }
+        } else
+            paymentItems = paymentItemRepository.findAllById(paymentItemIds);
+
+        if (!ObjectUtils.isEmpty(paymentItems)) {
+            List<PaymentItemBo> paymentItemBos = new ArrayList<>();
+            for (PaymentItem paymentItem : paymentItems) {
+                PaymentItemBo paymentItemBo = paymentItem.copyTo(PaymentItemBo.class);
+                PaymentItemExtra paymentItemExtra = paymentItemExtraRepository.findOneByPaymentItemId(paymentItem.getId());
+                List<PaymentItemExtraBo> paymentItemExtraBos = new ArrayList<>();
+                paymentItemExtraBos.add(paymentItemExtra.copyTo(PaymentItemExtraBo.class));
+                paymentItemBo.setPaymentItemExtra(paymentItemExtraBos);
+                paymentItemBos.add(paymentItemBo);
+            }
+            return paymentItemBos;
+        }
+        return null;
+    }
+
+
+    @Override
+    @Transactional
+    public void updateRefundTradeStatus(Long tradeId){
+        Optional<Trade> tradeOptional=tradeRepository.findById(tradeId);
+        if(!tradeOptional.isPresent())
+            throw new BusinessException("退货单不存在.");
+        Trade trade=tradeOptional.get();
+        if(!ObjectUtil.equals(trade.getTradeType(),2))
+            throw new BusinessException("退货单不存在.");
+        List<Payment> payments=paymentRepository.findByRelateId(trade.getId());
+        boolean refundFailed=false;
+        boolean refundSucess=true;
+        if(!ObjectUtils.isEmpty(payments)){
+            List<Long> paymentIds = payments.stream().map(Payment::getId).distinct().collect(Collectors.toList());
+            List<PaymentItem> paymentItems=paymentItemRepository.findByPaymentIdIn(paymentIds);
+            for(PaymentItem paymentItem:paymentItems){
+                if(ObjectUtil.equals(paymentItem.getPayStatus(),6)){
+                    refundFailed=true;
+                    refundSucess=false;
+                    break;
+                }else if (ObjectUtil.notEqual(paymentItem.getPayStatus(),5)){
+                    refundSucess=false;
+                }
+            }
+        }
+        if(refundFailed)
+            trade.setTradePayStatus(6);
+        else if(refundSucess){
+            trade.setTradePayStatus(5);
+            trade.setTradeStatus(5);
+        }else if(!refundSucess){
+            trade.setTradePayStatus(4);
+        }
+        tradeRepository.save(trade);
     }
 
 

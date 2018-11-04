@@ -12,8 +12,8 @@ import java.util.List;
 @Repository
 public interface AuthRoleRepository extends JpaRepository<AuthRole,Long> {
 
-    List<AuthRole> getAuthRoleByStatusFlag(Integer statusFlag);
-    AuthRole findByIdAndStatusFlag(Long id,Integer statusFlag);
+    List<AuthRole> getAuthRoleByStatusFlagAndShopIdenty(Integer statusFlag,Long shopIdenty);
+    AuthRole findByIdAndStatusFlagAndShopIdenty(Long id,Integer statusFlag,Long shopIdenty);
 
     @Modifying
     @Query(value = "update AuthRole ar set ar.statusFlag = 2 where ar.id = ?1")

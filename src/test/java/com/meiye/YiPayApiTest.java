@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class YiPayApiTest {
 //    private final String appid="hf19102035480OVA";
 //    private final String appsecret="nfePmU6VhhCPmEZzuyySvFc0xhEEUWiA";
-    private final String callbackContextPath="http://118.113.202.4:7090/MeiYe";
+    private final String callbackContextPath="http://182.139.217.242:7090/MeiYe";
 
 
     private final String appid="hf19102035480OVA";
@@ -30,7 +30,17 @@ public class YiPayApiTest {
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(paymentParamBo,1,"sdssdsdsd","11111111112222332","0",1l);
+        PrePayBo prePayBo=new PrePayBo();
+        prePayBo.setOutTradeNo( "101181017192442218000000");
+        prePayBo.setTradeAmountInCent(1);
+        prePayBo.setNeedYiPay(true);
+        prePayBo.setAuthCode("asssss");
+        prePayBo.setAliPay();
+//        prePayBo.setWechatPay();
+//        prePayBo.setWechatAppid("");
+//        prePayBo.setWechatOpenId("");
+
+        ScanPayResponseBo scanPayResponseBo=YiPayApi.scanPay(paymentParamBo,prePayBo);
         System.out.println(scanPayResponseBo.toString());
     }
 
@@ -41,9 +51,17 @@ public class YiPayApiTest {
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        String outTradeNo= UUIDUtil.randomUUID();
-        ScanQrCodePayResponseBo scanQrCodePayResponseBo=YiPayApi.getQrCodeForPay(paymentParamBo,outTradeNo,1,1l);
-        System.out.println("Out trade no is:"+outTradeNo);
+        PrePayBo prePayBo=new PrePayBo();
+        prePayBo.setOutTradeNo( "101181017192442218000000");
+        prePayBo.setTradeAmountInCent(1);
+        prePayBo.setNeedYiPay(true);
+        prePayBo.setAuthCode("asssss");
+        prePayBo.setAliPay();
+//        prePayBo.setWechatPay();
+//        prePayBo.setWechatAppid("");
+//        prePayBo.setWechatOpenId("");
+        ScanQrCodePayResponseBo scanQrCodePayResponseBo=YiPayApi.getQrCodeForPay(paymentParamBo,prePayBo);
+        System.out.println("Out trade no is:"+prePayBo.getOutTradeNo());
         System.out.println(scanQrCodePayResponseBo.getQrcode_url());
         System.out.println(scanQrCodePayResponseBo.toString());
     }
@@ -54,7 +72,9 @@ public class YiPayApiTest {
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        SyncPayStatusResponseBo scanQrCodePayResponseBo=YiPayApi.syncPayStatus(paymentParamBo,"8679d86c46bd4320ae7bc5d10d6cab84",null);
+        String outTradeNo= "101181017192442218000000";
+        Long paymentItemId=155l;
+        SyncPayStatusResponseBo scanQrCodePayResponseBo=YiPayApi.syncPayStatus(paymentParamBo,outTradeNo,null);
         System.out.println("Out trade no is:"+scanQrCodePayResponseBo.getOut_trade_no());
         System.out.println(scanQrCodePayResponseBo.toString());
     }
@@ -65,8 +85,9 @@ public class YiPayApiTest {
         paymentParamBo.setAppid(appid);
         paymentParamBo.setAppsecret(appsecret);
         paymentParamBo.setContextPath(callbackContextPath);
-        String outRefundId=UUIDUtil.randomUUID();
-        YiPayRefundResponseBo refundResponseBo=YiPayApi.refund(paymentParamBo,1,"8679d86c46bd4320ae7bc5d10d6cab84",null,outRefundId);
+        String outTradeNo= "101181017192442218000000";
+        String outRefundId="101181017192442218000000";
+        YiPayRefundResponseBo refundResponseBo=YiPayApi.refund(paymentParamBo,1,outTradeNo,null,outRefundId);
         System.out.println("Refund id is:"+refundResponseBo.getHaipay_refund_id());
         System.out.println("Out refund no is:"+outRefundId);
         System.out.println(refundResponseBo.toString());
@@ -91,7 +112,17 @@ public class YiPayApiTest {
         paymentParamBo.setAppid("hf19102035480OVA");
         paymentParamBo.setAppsecret("nfePmU6VhhCPmEZzuyySvFc0xhEEUWiA");
         paymentParamBo.setContextPath(callbackContextPath);
-        MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(paymentParamBo,1,"bd7fcdb704e44b8595s5be3e16443f","wx8ea448dd310b9504","owH5N5aO7aYdMJ0zfT4HlPF-pbsE","118.112.52.34",1l);
+        PrePayBo prePayBo=new PrePayBo();
+        prePayBo.setOutTradeNo( "101181017192442218000000");
+        prePayBo.setTradeAmountInCent(1);
+        prePayBo.setNeedYiPay(true);
+        prePayBo.setAuthCode("asssss");
+        prePayBo.setAliPay();
+//        prePayBo.setWechatPay();
+//        prePayBo.setWechatAppid("");
+//        prePayBo.setWechatOpenId("");
+
+        MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(paymentParamBo,prePayBo,"182.139.217.242");
         System.out.println(microAppPayResponseBo.toString());
     }
 

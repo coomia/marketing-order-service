@@ -17,6 +17,7 @@ public class TradeUserBo extends BusinessParentBo implements Serializable{
 
 	private Long id;
 	private Long tradeId;
+	private String tradeUuid;
 	private Long userId;
 	private String userName;
 	private Integer type;

@@ -1,12 +1,9 @@
 package com.meiye.repository.pay;
 
-import  com.meiye.model.pay.PaymentItem;
+import com.meiye.model.pay.PaymentItem;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +17,9 @@ public interface PaymentItemRepository extends JpaRepository<PaymentItem,Long>{
     public List<PaymentItem> findByPaymentIdIn(List<Long>  paymentId);
     public List<PaymentItem> findByPaymentIdInAndStatusFlag(List<Long> paymentId, Integer statusFlag);
     public List<PaymentItem> findByPaymentIdAndStatusFlag(Long paymentId,Integer statusFlag);
+    public List<PaymentItem> findByPaymentId(Long paymentId);
+    public PaymentItem findOneByUuid(String uuid);
+    public PaymentItem findOneByReturnCode(String returnCode);
 
 }
 

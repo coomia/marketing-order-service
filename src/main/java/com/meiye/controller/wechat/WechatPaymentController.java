@@ -4,6 +4,7 @@ import com.meiye.bo.accounting.AccountingBo;
 import com.meiye.bo.accounting.MicroPayRequestBo;
 import com.meiye.bo.accounting.MicroPayRequestContentBo;
 import com.meiye.bo.pay.MicroAppPayResponseBo;
+import com.meiye.bo.pay.PrePayBo;
 import com.meiye.bo.pay.StorePaymentParamBo;
 import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
@@ -34,7 +35,14 @@ public class WechatPaymentController extends AbstractPayController {
         try {
             StorePaymentParamBo storePaymentParamBo = payService.getStorePaymentParamBo(accountingBo.getShopId());
             MicroPayRequestContentBo paymentContent = accountingBo.getContent();
-            MicroAppPayResponseBo microAppPayResponseBo = YiPayApi.microAppPay(storePaymentParamBo, paymentContent.getTotal_amount(), paymentContent.getOut_trade_no(), ObjectUtils.isEmpty(paymentContent.getSub_appid())?payService.getStoreWechatAppId(accountingBo.getShopId()):paymentContent.getSub_appid(), paymentContent.getSub_openid(), paymentContent.getSpbill_create_ip(), paymentContent.getPayment_item_id());
+            PrePayBo prePayBo=new PrePayBo();
+            prePayBo.setTradeAmountInCent(paymentContent.getTotal_amount());
+            prePayBo.setOutTradeNo(paymentContent.getOut_trade_no());
+            prePayBo.setWechatAppid(ObjectUtils.isEmpty(paymentContent.getSub_appid())?payService.getStoreWechatAppId(accountingBo.getShopId()):paymentContent.getSub_appid());
+            prePayBo.setWechatOpenId(paymentContent.getSub_openid());
+            prePayBo.setPaymentItemId(paymentContent.getPayment_item_id());
+            prePayBo.setPayRequestType("MicroPay");
+            MicroAppPayResponseBo microAppPayResponseBo = YiPayApi.microAppPay(storePaymentParamBo,prePayBo,paymentContent.getSpbill_create_ip());
             if (microAppPayResponseBo.isSuccess())
                 return PosApiResult.sucess(microAppPayResponseBo);
             else

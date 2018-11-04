@@ -10,6 +10,7 @@ import com.meiye.repository.role.AuthPermissionRepository;
 import com.meiye.repository.role.AuthRolePermissionRepository;
 import com.meiye.repository.role.AuthRoleRepository;
 import com.meiye.service.role.AuthRoleService;
+import com.meiye.system.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,11 +78,11 @@ public class AuthRoleServiceImpl implements AuthRoleService {
 
     @Override
     public List<AuthRoleBo> findAll() {
-        List<AuthRole> authRoles = authRoleRepository.getAuthRoleByStatusFlag(1);
+        List<AuthRole> authRoles = authRoleRepository.getAuthRoleByStatusFlagAndShopIdenty(1, WebUtil.getCurrentStoreId());
         if(authRoles != null && authRoles.size()>0){
             List<AuthRoleBo> AuthRoleBos = new ArrayList<>();
             authRoles.forEach(authRole ->{
-                AuthRoleBo authRoleBo = authRole.copyTo(AuthRoleBo.class);
+                AuthRoleBo authRoleBo = findOneById(authRole.getId());
                 AuthRoleBos.add(authRoleBo);
             });
             return AuthRoleBos;
@@ -91,7 +92,7 @@ public class AuthRoleServiceImpl implements AuthRoleService {
 
     @Override
     public AuthRoleBo findOneById(Long id) {
-        AuthRole authRole = authRoleRepository.findByIdAndStatusFlag(id, 1);
+        AuthRole authRole = authRoleRepository.findByIdAndStatusFlagAndShopIdenty(id, 1, WebUtil.getCurrentStoreId());
         if(authRole != null){
             AuthRoleBo authRoleBo = authRole.copyTo(AuthRoleBo.class);
             List<AuthRolePermission> authRolePermissions = authRolePermissionRepository.findByRoleIdAndStatusFlag(id, 1);

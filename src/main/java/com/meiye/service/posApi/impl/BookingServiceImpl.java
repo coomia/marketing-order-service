@@ -1,23 +1,31 @@
 package com.meiye.service.posApi.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.meiye.bo.accounting.InternalApiResult;
 import com.meiye.bo.booking.BookingBo;
 import com.meiye.bo.booking.BookingTradeItemBo;
 import com.meiye.bo.booking.BookingTradeItemUserBo;
 import com.meiye.bo.booking.dto.*;
+import com.meiye.bo.customer.CustomerApiResult;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.bo.trade.OrderDto.TradeRequestDto;
+import com.meiye.bo.trade.TradeCustomerBo;
 import com.meiye.exception.BusinessException;
 import com.meiye.model.booking.Booking;
 import com.meiye.model.booking.BookingTradeItem;
 import com.meiye.model.booking.BookingTradeItemUser;
+import com.meiye.model.customer.Customer;
+import com.meiye.model.trade.TradeCustomer;
 import com.meiye.repository.booking.BookingRepository;
 import com.meiye.repository.booking.BookingTradeItemRepository;
 import com.meiye.repository.booking.BookingTradeItemUserRepository;
+import com.meiye.repository.trade.TradeCustomerRepository;
 import com.meiye.service.posApi.BookingService;
 import com.meiye.service.posApi.OrderService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.Constants;
+import com.meiye.util.MeiYeInternalApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -55,6 +63,8 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     BookingTradeItemRepository bookingTradeItemRepository;
     @Autowired
+    TradeCustomerRepository tradeCustomerRepository;
+    @Autowired
     OrderService orderService;
 
     @Override
@@ -68,10 +78,18 @@ public class BookingServiceImpl implements BookingService {
         }
         List<BookingTradeItemBo> bookingTradeItemBos = content.getBookingTradeItems();
         List<BookingTradeItemUserBo> bookingTradeItemUserBos = content.getBookingTradeItemUsers();
+        List<TradeCustomerBo> tradeCustomerBos = content.getTradeCustomerBos();
         //1.booking
         Booking booking = content.copyTo(Booking.class);
         logger.info("创建预定接口-新增预定记录主单开始");
         logger.info("创建预定接口-预定订单数据："+ JSON.toJSON(booking).toString());
+        try{
+            CustomerApiResult customerApiResult = MeiYeInternalApi.registCustomer(WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId(),booking.getCreatorId(),booking.getCreatorName(),booking.getCommercialName(), booking.getCommercialPhone(), booking.getCommercialGender(), new Long(000));
+            Customer data = customerApiResult.getData();
+            booking.setCommercialId(data.getId());
+        }catch(Exception e){
+            logger.error("创建预定接口-调会员接口失败！");
+        }
         booking = bookingRepository.save(booking);
         bookingResponseDto.setBooking(booking);
         logger.info("创建预定接口-新增预定记录主单结束");
@@ -102,6 +120,20 @@ public class BookingServiceImpl implements BookingService {
             bookingResponseDto.setBookingTradeItemUsers(bookingTradeItemUserList);
             logger.info("创建预定接口-新增预定订单销售员与订单商品关系结束");
         }
+        //4.trade_customer  只有一个会员
+//        if(tradeCustomerBos!=null &&tradeCustomerBos.size()>0){
+//            TradeCustomerBo tradeCustomerBo = tradeCustomerBos.get(0);
+//            CustomerApiResult customerApiResult = MeiYeInternalApi.registCustomer(tradeCustomerBo.getCustomerName(), tradeCustomerBo.getCustomerPhone(), tradeCustomerBo.getCustomerSex(), bookingId);
+//            Customer data = customerApiResult.getData();
+//            tradeCustomerBos.stream().forEach(bo->{
+//                bo.setCustomerId(data.getId());
+//            });
+//            logger.info("创建预定接口-新增订单用户开始");
+//            logger.info("创建预定接口-新增订单用户开始："+ JSON.toJSON(tradeCustomerBos).toString());
+//            List<TradeCustomer> tradeCustomers = this.modifyTradeCustomer(tradeCustomerBos);
+//            bookingResponseDto.setTradeCustomers(tradeCustomers);
+//            logger.info("创建预定接口-新增订单用户开始");
+//        }
 
         return bookingResponseDto;
     }
@@ -117,6 +149,7 @@ public class BookingServiceImpl implements BookingService {
         }
         List<BookingTradeItemBo> bookingTradeItemBos = content.getBookingTradeItems();
         List<BookingTradeItemUserBo> bookingTradeItemUserBos = content.getBookingTradeItemUsers();
+        List<TradeCustomerBo> tradeCustomerBos = content.getTradeCustomerBos();
         Booking booking = content.copyTo(Booking.class);
         //校验版本号
         Long bookingId = booking.getId();
@@ -161,7 +194,16 @@ public class BookingServiceImpl implements BookingService {
             bookingResponseDto.setBookingTradeItemUsers(bookingTradeItemUserList);
             logger.info("修改预定接口-修改预定订单销售员与订单商品关系结束");
         }
-
+        //4.trade_customer  只有一个会员
+//        List<TradeCustomer> list = new ArrayList<TradeCustomer>();
+//        if(tradeCustomerBos!=null &&tradeCustomerBos.size()>0){
+//            for(TradeCustomerBo bo:tradeCustomerBos){
+//                TradeCustomer tradeCustomer = bo.copyTo(TradeCustomer.class);
+//                tradeCustomer = tradeCustomerRepository.save(tradeCustomer);
+//                list.add(tradeCustomer);
+//            }
+//        }
+//        bookingResponseDto.setTradeCustomers(list);
         return bookingResponseDto;
     }
 
@@ -246,6 +288,16 @@ public class BookingServiceImpl implements BookingService {
             bookingTradeItemList.add(bookingTradeItem);
         }
         return bookingTradeItemList;
+    }
+
+    private  List<TradeCustomer>  modifyTradeCustomer( List<TradeCustomerBo> tradeCustomerBos){
+        List<TradeCustomer> list = new ArrayList<TradeCustomer>();
+        for(TradeCustomerBo bo:tradeCustomerBos){
+            TradeCustomer tradeCustomer = bo.copyTo(TradeCustomer.class);
+            tradeCustomer = tradeCustomerRepository.save(tradeCustomer);
+            list.add(tradeCustomer);
+        }
+        return list;
     }
 
     private List<BookingTradeItemUser> modifyBookingTradeItemUserBos(List<BookingTradeItemUserBo> bookingTradeItemBos){

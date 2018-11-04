@@ -8,6 +8,7 @@ import com.meiye.service.role.AuthRoleService;
 import com.meiye.service.role.AuthUserService;
 import com.meiye.system.util.WebUtil;
 import com.meiye.util.Constants;
+import com.meiye.util.ObjectUtil;
 import org.apache.shiro.crypto.hash.Sha1Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @Author: ryner
@@ -47,18 +49,37 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public void addAuthUser(AuthUserBo authUserBo) {
         AuthUser authUser = authUserBo.copyTo(AuthUser.class);
+        boolean userNameUsedByExistUser=false;
         if(authUserBo.getId()!=null&&authUserBo.getId()>0) {
+            Optional<AuthUser> authUserOptional=authUserRepository.findById(authUser.getId());
+            if(!authUserOptional.isPresent())
+                throw new BusinessException("员工不存在");
+            AuthUser existUser=authUserOptional.get();
+            authUser.setPassword(existUser.getPassword());
+            authUser.setPasswordNum(existUser.getPasswordNum());
             if(!ObjectUtils.isEmpty(authUserBo.getPassword()))
                 authUser.setPassword(new Sha1Hash(authUser.getPassword(), authUser.getName(), 100).toHex());
             if(!ObjectUtils.isEmpty(authUserBo.getPasswordNum()))
                 authUser.setPasswordNum(new Sha1Hash(authUser.getPasswordNum(), authUser.getName(), 100).toHex());
-
+            if(ObjectUtil.equals(authUser.getAccount(),existUser.getAccount()))
+                userNameUsedByExistUser=true;
+            if(authUser.getEnabledFlag()==null)
+                authUser.setEnabledFlag(existUser.getEnabledFlag());
+            if(authUser.getSourceFlag()==null)
+                authUser.setSourceFlag(existUser.getSourceFlag());
+        }else{
+            authUser.setEnabledFlag(1);
+            authUser.setSourceFlag(1);
         }
         authUser.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));;
-        if(Objects.nonNull(authUserRepository.findByAccountAndShopIdenty(authUser.getAccount(), authUser.getShopIdenty()))){
+        if(!userNameUsedByExistUser&&Objects.nonNull(authUserRepository.findByAccountAndShopIdenty(authUser.getAccount(), authUser.getShopIdenty()))){
             throw new BusinessException("登录名已被注册，请输入新的登陆账户！");
         }
-        authUserRepository.save(authUser);
+        try {
+             authUserRepository.save(authUser);
+        }catch (Exception e){
+            throw new BusinessException("添加员工到数据库失败!");
+        }
     }
 
     @Override
@@ -108,6 +129,16 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public AuthUserBo getOneById(Long id) {
         AuthUser byIdAndStatusFlag = authUserRepository.findByIdAndStatusFlagAndBrandIdentyAndShopIdenty(id, 1, WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId());
+        if (byIdAndStatusFlag != null){
+            AuthUserBo authUserBo = byIdAndStatusFlag.copyTo(AuthUserBo.class);
+            return authUserBo;
+        }
+        return  null;
+    }
+
+    @Override
+    public AuthUserBo getOneByIdAndShopIdentity(Long id, Long shopIdentity,Long brandIdentity){
+        AuthUser byIdAndStatusFlag = authUserRepository.findByIdAndStatusFlagAndBrandIdentyAndShopIdenty(id, 1,shopIdentity,brandIdentity);
         if (byIdAndStatusFlag != null){
             AuthUserBo authUserBo = byIdAndStatusFlag.copyTo(AuthUserBo.class);
             return authUserBo;

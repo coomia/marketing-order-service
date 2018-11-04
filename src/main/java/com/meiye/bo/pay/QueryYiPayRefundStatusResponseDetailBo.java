@@ -1,5 +1,6 @@
 package com.meiye.bo.pay;
 
+import com.meiye.util.ObjectUtil;
 import lombok.Data;
 
 /**
@@ -12,4 +13,15 @@ public class QueryYiPayRefundStatusResponseDetailBo {
     private String refund_time;
     private Integer refund_amount;//
     private String refund_status;//0--失败；1--成功；2--处理中；3--转入代发
+
+    public boolean refundFailed(){
+        return ObjectUtil.equals(refund_status,"0");
+    }
+    public boolean refundSucess(){
+        return ObjectUtil.equals(refund_status,"1");
+    }
+
+    public boolean refundProcessing(){
+        return !refundFailed()&&!refundSucess();
+    }
 }

@@ -3,6 +3,7 @@ package com.meiye.util;
 import com.alibaba.fastjson.JSON;
 import com.meiye.bo.accounting.InternalApiResult;
 import com.meiye.bo.accounting.WriteOffResultBo;
+import com.meiye.bo.customer.CustomerApiResult;
 import com.meiye.bo.internalapi.CardTimesBuyRequestBo;
 import com.meiye.bo.internalapi.CardTimesDetailRequestBo;
 import com.meiye.bo.system.PosApiResult;
@@ -10,6 +11,7 @@ import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.TradeBo;
 import com.meiye.bo.trade.TradeItemBo;
 import com.meiye.exception.BusinessException;
+import com.meiye.model.customer.Customer;
 import com.meiye.system.util.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +72,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.setScale(2).toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
@@ -89,7 +91,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
@@ -108,7 +110,7 @@ public class MeiYeInternalApi {
             Map<String,String> params=new HashMap<>();
             params.put("customerId",customerId==null?null:customerId.toString());
             params.put("tradeId",tradeId==null?null:tradeId.toString());
-            params.put("paymentItemId",paymentItemId==null?null:paymentItemId.toString());
+            params.put("paymentItemIds",paymentItemId==null?null:paymentItemId.toString());
             params.put("usefulAmount",usefulAmount==null?null:usefulAmount.toString());
             params.put("shopId",shopId==null?null:shopId.toString());
             params.put("brandId",brandId==null?null:brandId.toString());
@@ -154,6 +156,26 @@ public class MeiYeInternalApi {
             return new InternalApiResult("1001",exp.getMessage());
         }
     }
+
+    //调会员接口
+    public static CustomerApiResult registCustomer(Long brandId,Long shipId,Long createId,String createName,String name, String mobile, Long gender, Long tradeId){
+        try {
+            String apiUrl = MeiYeIntegerApiUrlPrefix + "/marketing/internal/customer/queryOrAdd";
+            Map<String,Object> params=new HashMap<>();
+            params.put("name",name);
+            params.put("mobile",mobile);
+            params.put("gender",gender.intValue());
+            params.put("brandIdenty",brandId);
+            params.put("shopIdenty",shipId);
+            params.put("creatorId",createId);
+            params.put("creatorName",createName);
+            String result = callInternalApi(apiUrl, params, true, "调会员接口",tradeId);
+            return JSON.parseObject(result, CustomerApiResult.class);
+        }catch (Exception exp){
+            throw new BusinessException("调用会员接口失败",ResetApiResult.STATUS_ERROR,1003);
+        }
+    }
+
 
     public static String callInternalApiByForm(String apiUrl, Map<String,String> params,boolean post,String apiName,Long tradeId){
         try {

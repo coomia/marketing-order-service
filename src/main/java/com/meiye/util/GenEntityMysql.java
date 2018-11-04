@@ -412,10 +412,10 @@ public class GenEntityMysql {
      */
     public static void main(String[] args) {
         try {
-            INSTANCE.generateTables=new String[]{"commercial_pay_setting"};
-            INSTANCE.packageOutPath = "com.meiye.model.pay";
-            INSTANCE.repostiryPackageOutPath="com.meiye.repository.pay";
-            INSTANCE.boPackageOutPath="com.meiye.bo.pay";
+            INSTANCE.generateTables=new String[]{"trade_customer"};
+            INSTANCE.packageOutPath = "com.meiye.model.customer";
+            INSTANCE.repostiryPackageOutPath="com.meiye.repository.customer";
+            INSTANCE.boPackageOutPath="com.meiye.bo.customer";
             INSTANCE.generate();
             System.out.println("generate classes success!");
         } catch (Exception e) {

@@ -48,13 +48,13 @@ public class YiPayCallBackController {
 //        }
 //    }
 
-    @RequestMapping("/process/{paymentId}")
-    public String processCallBack(HttpServletRequest request, HttpServletResponse response, YiPayCallBackRequestBo yiPayCallBackRequestBo, @PathVariable Long paymentId){
+    @RequestMapping("/process")
+    public String processCallBack(HttpServletRequest request, HttpServletResponse response, YiPayCallBackRequestBo yiPayCallBackRequestBo){
         try {
-            logger.info("Get pay call back for order:" + yiPayCallBackRequestBo.getOut_trade_no() + ",call back parameters is:" + JSON.toJSONString(yiPayCallBackRequestBo));
+            logger.info("Get pay call back for order pay item (pay item uuid is:" + yiPayCallBackRequestBo.getOut_trade_no() + "),call back parameters is:" + JSON.toJSONString(yiPayCallBackRequestBo));
             //ToDo 支付成功后的业务逻辑
             if(yiPayCallBackRequestBo.isPaySuccess()) {
-                payService.yipaySuccess(yiPayCallBackRequestBo.getOut_trade_no(), yiPayCallBackRequestBo.getTrade_id(), paymentId);
+                payService.paySuccess(yiPayCallBackRequestBo.getOut_trade_no(), yiPayCallBackRequestBo.getTrade_id());
                 Trade trade=orderService.getTradeByTradeNo(yiPayCallBackRequestBo.getOut_trade_no());
                 payService.afterPaySucess(trade.getId());
             }

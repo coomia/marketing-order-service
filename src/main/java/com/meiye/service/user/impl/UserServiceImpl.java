@@ -55,9 +55,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserBo getUserById(Long userId, Long shopId) {
-        AuthUserBo authUserBo=authUserService.getOneById(userId);
-        if(authUserBo!=null&& ObjectUtils.equals(shopId, authUserBo.getShopIdenty())) {
+    public UserBo getUserById(Long userId, Long shopId,Long brandIdentity) {
+        AuthUserBo authUserBo=authUserService.getOneByIdAndShopIdentity(userId,shopId,brandIdentity);
+        if(authUserBo!=null) {
             UserBo userBo = new UserBo();
             userBo.setUsername(authUserBo.getAccount());
             userBo.setPassword(authUserBo.getPassword());

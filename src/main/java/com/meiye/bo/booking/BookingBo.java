@@ -5,6 +5,7 @@ import java.util.Date;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.ParentBo;
+import com.meiye.bo.trade.TradeCustomerBo;
 import com.meiye.system.util.WebUtil;
 import lombok.Data;
 import java.io.Serializable;
@@ -20,6 +21,7 @@ public class BookingBo extends BusinessParentBo implements Serializable{
 
 	private Long id;
 	private String uuid;
+	private Long creatorId;
 	private Long commercialId;
 	private String commercialName;
 	private Long commercialGender;
@@ -39,8 +41,9 @@ public class BookingBo extends BusinessParentBo implements Serializable{
 	private Date clientCreateTime;
 	private Date clientUpdateTime;
 	private String  creatorName;
-	private List<BookingTradeItemBo> bookingTradeItems;
 	private List<BookingTradeItemUserBo> bookingTradeItemUsers;
+	private List<TradeCustomerBo> tradeCustomerBos;
+	private List<BookingTradeItemBo> bookingTradeItems;
 
 }
 

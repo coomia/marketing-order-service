@@ -41,5 +41,6 @@ public class PaymentItemBo extends BusinessParentBo implements Serializable{
 	private String authCode;
 	private String wechatAppid;
 	private String wechatOpenId;
+	private String returnCode;
 }
 
