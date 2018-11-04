@@ -88,9 +88,10 @@ public class SalaryServiceImpl implements SalaryService {
         for (int i = 0; i < allSalaryTrade.size(); i++) {
             TradeAndUserBo tradeAndUserBo = allSalaryTrade.get(i);
             SalaryBo salary = new SalaryBo(salaryBo.getBrandIdenty(),salaryBo.getShopIdenty(),
-                    tradeAndUserBo.getUserId(),tradeAndUserBo.getUserName(),salaryBo.getStarDate(),salaryBo.getEndDate(),new BigDecimal(tradeAndUserBo.getSalaryBase()));
+                    tradeAndUserBo.getUserId(),tradeAndUserBo.getUserName(),salaryBo.getStarDate(),salaryBo.getEndDate(),new BigDecimal(tradeAndUserBo.getSalaryBase()==null?"0":tradeAndUserBo.getSalaryBase()));
             userIdSalaryBoMap.put(tradeAndUserBo.getUserId(),salary);
-            if(tradeAndUserBo.getTradeId() == null){
+            if(tradeAndUserBo.getTradeId() == null || tradeAndUserBo.getBusinessType() ==null
+               || tradeAndUserBo.getTradePayStatus() ==null || tradeAndUserBo.getTradeStatus() == null){
                 continue;
             }
             if (tradeAndUserBo.getBusinessType() == 1){
