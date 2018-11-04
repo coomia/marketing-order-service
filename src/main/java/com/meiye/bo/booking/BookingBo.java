@@ -21,6 +21,7 @@ public class BookingBo extends BusinessParentBo implements Serializable{
 
 	private Long id;
 	private String uuid;
+	private Long creatorId;
 	private Long commercialId;
 	private String commercialName;
 	private Long commercialGender;

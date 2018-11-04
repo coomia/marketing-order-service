@@ -23,6 +23,7 @@ import com.meiye.repository.booking.BookingTradeItemUserRepository;
 import com.meiye.repository.trade.TradeCustomerRepository;
 import com.meiye.service.posApi.BookingService;
 import com.meiye.service.posApi.OrderService;
+import com.meiye.system.util.WebUtil;
 import com.meiye.util.Constants;
 import com.meiye.util.MeiYeInternalApi;
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
         logger.info("创建预定接口-新增预定记录主单开始");
         logger.info("创建预定接口-预定订单数据："+ JSON.toJSON(booking).toString());
         try{
-            CustomerApiResult customerApiResult = MeiYeInternalApi.registCustomer(booking.getCommercialName(), booking.getCommercialPhone(), booking.getCommercialGender(), new Long(000));
+            CustomerApiResult customerApiResult = MeiYeInternalApi.registCustomer(WebUtil.getCurrentBrandId(),WebUtil.getCurrentStoreId(),booking.getCreatorId(),booking.getCreatorName(),booking.getCommercialName(), booking.getCommercialPhone(), booking.getCommercialGender(), new Long(000));
             Customer data = customerApiResult.getData();
             booking.setCommercialId(data.getId());
         }catch(Exception e){
