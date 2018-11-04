@@ -19,7 +19,7 @@ import java.io.Serializable;/**
 @Entity
 public class TradeItem extends BusinessParentEntity implements Serializable{
 
-	 @Id
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private Long tradeId;

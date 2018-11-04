@@ -2,6 +2,7 @@ package com.meiye.bo.salary;
 
 import com.meiye.bo.BusinessParentBo;
 import com.meiye.bo.trade.TradeUserBo;
+import com.meiye.model.trade.TradeItem;
 import com.meiye.system.util.WebUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,6 +35,7 @@ public class SalaryBo  implements Serializable{
     private String saveCommissionsDetail;
     private BigDecimal projectCommissions;
     private BigDecimal salarySum;
+    private List<ProjectCommionsDetailBo> ProjectCommionsDetailBos = new ArrayList<>();
 
     public SalaryBo(Long brandIdenty, Long shopIdenty, Long userId, String userName, Date starDate, Date endDate, BigDecimal baseSalary) {
         this.brandIdenty = brandIdenty;
@@ -42,7 +44,7 @@ public class SalaryBo  implements Serializable{
         this.userName = userName;
         this.starDate = starDate;
         this.endDate = endDate;
-        this.baseSalary = baseSalary;
+        this.baseSalary = baseSalary == null? new BigDecimal(0):baseSalary;
     }
 
 
