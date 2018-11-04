@@ -142,6 +142,7 @@ public class OrderServiceImpl implements OrderService {
         logger.info("改单接口-修改交易记录主单结束");
 
         //2.修改 交易明细 数据
+        List<TradeItem> tradeItemList = new ArrayList<TradeItem>();
         if (Objects.nonNull(tradeItems) && tradeItems.size() > 0) {
             tradeItems.stream().forEach(bo -> {
                         if(Objects.isNull(bo.getTradeId())){
@@ -157,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
             );
             logger.info("改单接口-修改交易明细开始");
             logger.info("改单接口-交易记录主单：" + JSON.toJSON(tradeItems).toString());
-            List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
+            tradeItemList = this.modifyTradeItem(tradeItems);
             orderResponseDto.setTradeItems(tradeItemList);
             logger.info("改单接口-修改交易明细结束");
         }
@@ -227,7 +228,7 @@ public class OrderServiceImpl implements OrderService {
             });
             logger.info("改单接口-修改订单用户关联表开始");
             logger.info("改单接口-订单用户关联表：" + JSON.toJSON(tradeUsers).toString());
-            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeItems,tradeUsers);
+            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeItemList,tradeUsers);
             orderResponseDto.setTradeUsers(tradeUserList);
             logger.info("改单接口-修改订单用户关联表结束");
         }
@@ -306,6 +307,7 @@ public class OrderServiceImpl implements OrderService {
         Long tradeId = trade.getId();
 
         //2.新增 交易明细 数据
+        List<TradeItem> tradeItemList = new ArrayList<TradeItem>();
         if (Objects.nonNull(tradeItems) && tradeItems.size() > 0) {
             tradeItems.stream().forEach(bo -> {
                         bo.setTradeId(tradeId);
@@ -319,7 +321,7 @@ public class OrderServiceImpl implements OrderService {
             );
             logger.info("下单接口-新增交易明细开始");
             logger.info("下单接口-交易记录主单：" + JSON.toJSON(tradeItems).toString());
-            List<TradeItem> tradeItemList = this.modifyTradeItem(tradeItems);
+            tradeItemList = this.modifyTradeItem(tradeItems);
             orderResponseDto.setTradeItems(tradeItemList);
             logger.info("下单接口-新增交易明细结束");
         }
@@ -369,7 +371,7 @@ public class OrderServiceImpl implements OrderService {
             tradeUsers.stream().forEach(bo -> bo.setTradeId(tradeId));
             logger.info("下单接口-新增订单用户关联表开始");
             logger.info("下单接口-订单用户关联表：" + JSON.toJSON(tradeUsers).toString());
-            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeItems,tradeUsers);
+            List<TradeUser> tradeUserList = this.modifyTradeUser(tradeItemList,tradeUsers);
             orderResponseDto.setTradeUsers(tradeUserList);
             logger.info("下单接口-新增订单用户关联表结束");
         }
@@ -802,16 +804,16 @@ public class OrderServiceImpl implements OrderService {
         return customerCardTimeList;
     }
 
-    private List<TradeUser> modifyTradeUser(List<TradeItemBo> tradeItemBoList,List<TradeUserBo> tradeUserBos) {
+    private List<TradeUser> modifyTradeUser(List<TradeItem> tradeItemList ,List<TradeUserBo> tradeUserBos) {
         List<TradeUser> tradeUsers = new ArrayList<TradeUser>();
         for (TradeUserBo bo : tradeUserBos) {
             TradeUser tradeUser = bo.copyTo(TradeUser.class);
-            for (TradeItemBo itemBo : tradeItemBoList) {
-                String uuid = itemBo.getUuid();
+            for (TradeItem item : tradeItemList) {
+                String uuid = item.getUuid();
                 String tradeItemUuid = tradeUser.getTradeItemUuid();
                 if(Objects.nonNull(tradeItemUuid)&&Objects.nonNull(uuid)
                         &&tradeItemUuid.equals(uuid)){
-                    tradeUser.setTradeItemId(itemBo.getId());
+                    tradeUser.setTradeItemId(item.getId());
                     break;
                 }
             }
