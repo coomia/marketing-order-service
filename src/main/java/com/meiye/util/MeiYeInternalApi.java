@@ -161,7 +161,7 @@ public class MeiYeInternalApi {
     //调会员接口
     public static CustomerApiResult registCustomer(Long brandId,Long shipId,Long createId,String createName,String name, String mobile, Long gender, Long tradeId){
         try {
-            String apiUrl = MeiYeIntegerApiUrlPrefix + "/marketing/internal/customer/queryOrAdd";
+            String apiUrl = MeiYeIntegerApiUrlPrefix + "/internal/customer/queryOrAdd";
             Map<String,Object> params=new HashMap<>();
             params.put("name",name);
             params.put("mobile",mobile);

@@ -88,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
             Customer data = customerApiResult.getData();
             booking.setCommercialId(data.getId());
         }catch(Exception e){
-            logger.error("创建预定接口-调会员接口失败！");
+            logger.error("创建预定接口-调会员接口失败！"+e.getMessage());
         }
         booking = bookingRepository.save(booking);
         bookingResponseDto.setBooking(booking);
@@ -179,10 +179,11 @@ public class BookingServiceImpl implements BookingService {
         bookingResponseDto.setBooking(booking);
         logger.info("修改预定接口-修改预定记录主单结束");
         //2.booking trade item
+        List<BookingTradeItem> bookingTradeItems = null;
         if(bookingTradeItemBos!=null &&bookingTradeItemBos.size()>0){
             logger.info("修改预定接口-修改预定交易明细开始");
             logger.info("修改预定接口-预定交易明细数据："+ JSON.toJSON(bookingTradeItemBos).toString());
-            List<BookingTradeItem> bookingTradeItems = this.modifyBookingTradeItemBos(bookingTradeItemBos);
+            bookingTradeItems = this.modifyBookingTradeItemBos(bookingTradeItemBos);
             bookingResponseDto.setBookingTradeItems(bookingTradeItems);
             logger.info("修改预定接口-修改预定记录明细结束");
         }
@@ -190,6 +191,16 @@ public class BookingServiceImpl implements BookingService {
         if(bookingTradeItemUserBos!=null &&bookingTradeItemUserBos.size()>0){
             logger.info("修改预定接口-修改预定订单销售员与订单商品关系开始");
             logger.info("修改预定接口-预定订单销售员与订单商品关系数据："+ JSON.toJSON(bookingTradeItemUserBos).toString());
+            List<BookingTradeItem> finalBookingTradeItems = bookingTradeItems;
+            bookingTradeItemUserBos.stream().forEach(bo->{
+                if(Objects.isNull(bo.getBookingTradeItemId())){
+                    bo.setBookingId(bookingId);
+                    String bookingTradeItemUuid = bo.getBookingTradeItemUuid();
+                    BookingTradeItem bookIngTradeItemByUuid = findBookIngTradeItemByUuid(finalBookingTradeItems, bookingTradeItemUuid);
+                    bo.setBookingTradeItemId(bookIngTradeItemByUuid.getId());
+                }
+            });
+
             List<BookingTradeItemUser> bookingTradeItemUserList = this.modifyBookingTradeItemUserBos(bookingTradeItemUserBos);
             bookingResponseDto.setBookingTradeItemUsers(bookingTradeItemUserList);
             logger.info("修改预定接口-修改预定订单销售员与订单商品关系结束");

@@ -35,4 +35,7 @@ public interface AuthUserService {
     AuthUserBo getOneByIdAndShopIdentity(Long id, Long shopIdentity, Long brandIdentity);
 
     void delete(Long id);
+
+
+    void updateEnableFlag(Long id,Integer enableFlag);
 }

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Objects;
 
 /**
  * @Author: ryner
@@ -66,6 +67,18 @@ public class AuthUserController {
             return ResetApiResult.sucess(authUserService.getOneById(id));
         }catch (Exception e){
             throw new BusinessException("获取员工失败!");
+        }
+    }
+
+    @GetMapping("/updateEnable/id/{id}/enableFlag/{enableFlag}")
+    public ResetApiResult updateEnable(@PathVariable Long id,@PathVariable Integer enableFlag){
+        try {
+            if(Objects.isNull(id)||Objects.isNull(enableFlag))
+                throw new BusinessException("参数为空!");
+            authUserService.updateEnableFlag(id, enableFlag);
+            return ResetApiResult.sucess("");
+        }catch (Exception e){
+            throw new BusinessException("修改员工状态失败!");
         }
     }
 

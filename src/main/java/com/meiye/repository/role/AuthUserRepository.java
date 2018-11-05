@@ -36,4 +36,8 @@ public interface AuthUserRepository extends JpaRepository<AuthUser,Long>,JpaSpec
     @Modifying
     @Query(value = "update AuthUser au set au.statusFlag = 2 where au.id = ?1")
     void deleteById(Long id);
+
+    @Modifying
+    @Query(value = "update AuthUser au set au.enabledFlag = ?2 where au.id = ?1")
+    void updateEnableById(Long id,Integer enable);
 }

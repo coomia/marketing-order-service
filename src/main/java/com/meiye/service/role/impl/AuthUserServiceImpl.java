@@ -151,4 +151,10 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUserRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional(rollbackOn = {Exception.class})
+    public void updateEnableFlag(Long id, Integer enableFlag) {
+        authUserRepository.updateEnableById(id,enableFlag);
+    }
+
 }
