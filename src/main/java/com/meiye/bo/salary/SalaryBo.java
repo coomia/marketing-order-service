@@ -47,5 +47,7 @@ public class SalaryBo  implements Serializable{
         this.baseSalary = baseSalary == null? new BigDecimal(0):baseSalary;
     }
 
+    public SalaryBo(){}
+
 
 }
