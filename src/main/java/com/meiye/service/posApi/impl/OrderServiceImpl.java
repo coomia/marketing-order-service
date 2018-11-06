@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
             });
             logger.info("改单接口-修改优惠信息开始");
             logger.info("改单接口-优惠信息：" + JSON.toJSON(tradePrivileges).toString());
-            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradeItems,tradePrivileges);
+            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradeItemList,tradePrivileges);
             orderResponseDto.setTradePrivileges(tradePrivilegeList);
             logger.info("改单接口-修改优惠信息结束");
         }
@@ -352,7 +352,7 @@ public class OrderServiceImpl implements OrderService {
             tradePrivileges.stream().forEach(bo -> bo.setTradeId(tradeId));
             logger.info("下单接口-新增优惠信息开始");
             logger.info("下单接口-优惠信息：" + JSON.toJSON(tradePrivileges).toString());
-            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradeItems,tradePrivileges);
+            List<TradePrivilege> tradePrivilegeList = this.modifyTradePrivileges(tradeItemList,tradePrivileges);
             orderResponseDto.setTradePrivileges(tradePrivilegeList);
             logger.info("下单接口-新增优惠信息结束");
         }
@@ -864,16 +864,16 @@ public class OrderServiceImpl implements OrderService {
         return tradeCustomerList;
     }
 
-    private List<TradePrivilege> modifyTradePrivileges(List<TradeItemBo> tradeItemBoList,List<TradePrivilegeBo> tradePrivilegeBos) {
+    private List<TradePrivilege> modifyTradePrivileges(List<TradeItem> tradeItemBoList,List<TradePrivilegeBo> tradePrivilegeBos) {
         List<TradePrivilege> tradePrivileges = new ArrayList<TradePrivilege>();
         for (TradePrivilegeBo bo : tradePrivilegeBos) {
             TradePrivilege tradePrivilege = bo.copyTo(TradePrivilege.class);
-            for (TradeItemBo itemBo : tradeItemBoList) {
-                String uuid = itemBo.getUuid();
+            for (TradeItem item : tradeItemBoList) {
+                String uuid = item.getUuid();
                 String tradeItemUuid = tradePrivilege.getTradeItemUuid();
                 if(Objects.nonNull(tradeItemUuid)&&Objects.nonNull(uuid)
                         &&tradeItemUuid.equals(uuid)){
-                    tradePrivilege.setTradeItemId(itemBo.getId());
+                    tradePrivilege.setTradeItemId(item.getId());
                     break;
                 }
             }
