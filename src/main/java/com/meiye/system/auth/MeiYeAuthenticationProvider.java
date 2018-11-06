@@ -52,7 +52,7 @@ public class MeiYeAuthenticationProvider implements AuthenticationProvider {
         }
         // 认证逻辑
         if (userBo == null || StringUtils.isEmpty(name) || StringUtils.isEmpty(password) || StringUtils.isEmpty(userBo.getUsername())) {
-            throw new UsernameNotFoundException("用户不存在");
+            throw new UsernameNotFoundException("用户不存在或已停用.");
         } else if (userBo != null && name.equals(userBo.getUsername()) && password.equals(userBo.getPassword())) {
             // 生成令牌
             userBo.setPassword(null);

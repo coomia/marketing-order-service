@@ -92,9 +92,11 @@ public class AuthUserServiceImpl implements AuthUserService {
     public AuthUserBo getAuthUserBo(String userName, Long shopId){
         if(userName!=null){
             AuthUser authUser=authUserRepository.findByAccountAndShopIdenty(userName,shopId);
+            if(authUser.getStatusFlag()!=1 || authUser.getEnabledFlag()!=1)
+                return null;
             AuthUserBo authUserBo=authUser==null?null:authUser.copyTo(AuthUserBo.class);
             if(authUserBo!=null){
-                authUserBo.setRoleBo(authRoleService.findOneById(authUserBo.getRoleId()));
+                authUserBo.setRoleBo(authRoleService.getAuthRole(authUserBo.getRoleId()));
             }
             return authUserBo;
         }

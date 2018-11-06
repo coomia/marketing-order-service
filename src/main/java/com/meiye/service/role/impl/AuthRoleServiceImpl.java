@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthRoleServiceImpl implements AuthRoleService {
@@ -86,6 +87,29 @@ public class AuthRoleServiceImpl implements AuthRoleService {
                 AuthRoleBos.add(authRoleBo);
             });
             return AuthRoleBos;
+        }
+        return null;
+    }
+
+    @Override
+    public AuthRoleBo getAuthRole(Long id){
+        Optional<AuthRole> authRole=authRoleRepository.findById(id);
+        if(authRole.isPresent()){
+            AuthRoleBo authRoleBo = authRole.get().copyTo(AuthRoleBo.class);
+            if(authRoleBo != null&&authRoleBo.getStatusFlag()==1){
+                List<AuthRolePermission> authRolePermissions = authRolePermissionRepository.findByRoleIdAndStatusFlag(id, 1);
+                if(authRolePermissions != null  && authRolePermissions.size()>0){
+                    List<AuthRolePermissionBo> authRolePermissionBos = new ArrayList<>();
+                    authRolePermissions.forEach(authRolePermission->{
+                        AuthRolePermissionBo authRolePermissionBo = authRolePermission.copyTo(AuthRolePermissionBo.class);
+                        AuthPermission authPermission=authPermissionRepository.findById(authRolePermission.getPermissionId()).get();
+                        authRolePermissionBo.setAuthPermissionBo(authPermission==null?null:authPermission.copyTo(AuthPermissionBo.class));
+                        authRolePermissionBos.add(authRolePermissionBo);
+                    });
+                    authRoleBo.setAuthRolePermissions(authRolePermissionBos);
+                }
+                return authRoleBo;
+            }
         }
         return null;
     }

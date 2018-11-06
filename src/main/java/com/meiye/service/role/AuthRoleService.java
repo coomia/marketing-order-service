@@ -10,6 +10,9 @@ public interface AuthRoleService {
     void update(AuthRoleBo authRoleBo);
     void delete(Long id);
     List<AuthRoleBo> findAll();
+
+    AuthRoleBo getAuthRole(Long id);
+
     AuthRoleBo findOneById(Long id);
 
 }
