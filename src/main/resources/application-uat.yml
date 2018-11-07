@@ -31,6 +31,7 @@ server:
   port: 8090
   servlet:
     context-path: /MeiYe
+  max-http-header-size: 16384000
 jwt:
   configuration:
     secret: MeiYe_York

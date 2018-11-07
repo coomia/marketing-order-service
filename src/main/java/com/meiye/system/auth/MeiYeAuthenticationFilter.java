@@ -64,17 +64,17 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(httpServletRequest,httpServletResponse);
         }catch (ExpiredJwtException exp){
             logger.error(exp.getMessage(),exp);
-            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.user("登录已过期，请重新登录!",ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_401,null), WebUtil.getFastJsonSerializerFeature()));
         }catch (AuthenticationCredentialsNotFoundException exp){
             logger.error(exp.getMessage(),exp);
-            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.user("登录信息不存在!",ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_401,null), WebUtil.getFastJsonSerializerFeature()));
         }catch (BusinessException exp){
             logger.error(exp.getMessage(),exp);
             if(WebUtil.isMsApiPath(httpServletRequest)) {
-                httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.user(exp.getMessage(),ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_500,null), WebUtil.getFastJsonSerializerFeature()));
+//                httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.user(exp.getMessage(),ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_200,null), WebUtil.getFastJsonSerializerFeature()));
             }else if(WebUtil.isPosApiPath(httpServletRequest)) {
                 httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }else if(WebUtil.isInternalApiPath(httpServletRequest)){
@@ -86,9 +86,9 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (Exception exp){
             logger.error(exp.getMessage(),exp);
-            httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//            httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             if(WebUtil.isMsApiPath(httpServletRequest))
-                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.user("系统错误!",ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_500,null), WebUtil.getFastJsonSerializerFeature()));
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.user("系统错误!",ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_200,null), WebUtil.getFastJsonSerializerFeature()));
             else if(WebUtil.isPosApiPath(httpServletRequest)) {
                 httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }else if(WebUtil.isInternalApiPath(httpServletRequest)){

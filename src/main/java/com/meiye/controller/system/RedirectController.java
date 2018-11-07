@@ -55,12 +55,12 @@ public class RedirectController {
         }catch (BusinessException exp){
             logger.error("请求内部页面失败",exp);
             ResetApiResult resetApiResult= ResetApiResult.error(null,exp.getMessage());
-            resetApiResult.setStatusCode(ResetApiResult.STATUS_CODE_404);
+            resetApiResult.setStatusCode(ResetApiResult.STATUS_CODE_200);
             return resetApiResult;
         } catch (Exception exp){
             logger.error("请求内部页面失败",exp);
             ResetApiResult resetApiResult= ResetApiResult.error(null,"跳转页面失败");
-            resetApiResult.setStatusCode(ResetApiResult.STATUS_CODE_500);
+            resetApiResult.setStatusCode(ResetApiResult.STATUS_CODE_200);
             return resetApiResult;
         }
     }

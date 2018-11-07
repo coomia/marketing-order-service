@@ -14,7 +14,8 @@ public class ResetApiResult extends ApiResult {
     private Object data;
     private String dataType="JSON";
 
-    public static final String STATUS_SUCCESS="info";
+    public static final String STATUS_SUCCESS="success";
+    public static final String STATUS_INFO="info";
     public static final String STATUS_ERROR="error";
     public static final String STATUS_WARNING="warning";
     public static final String STATUS_IGNORE="ignore";
@@ -78,7 +79,7 @@ public class ResetApiResult extends ApiResult {
         ResetApiResult resetApiResult =new ResetApiResult();
         resetApiResult.setData(data==null?new Object():data);
         resetApiResult.setMessage(tips);
-        resetApiResult.setMessageType(STATUS_SUCCESS);
+        resetApiResult.setMessageType(STATUS_INFO);
         resetApiResult.setStatusCode(STATUS_CODE_200);
         return resetApiResult;
     }
