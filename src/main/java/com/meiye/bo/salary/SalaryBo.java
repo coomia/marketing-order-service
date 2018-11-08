@@ -26,7 +26,7 @@ public class SalaryBo  implements Serializable{
     protected Long shopIdenty=WebUtil.getCurrentStoreId();
     private Long userId;
     private String userName;
-    private Date starDate;
+    private Date startDate;
     private Date endDate;
     private BigDecimal baseSalary; //基本工资+岗位工资
     private BigDecimal salesCommissions;
@@ -37,12 +37,12 @@ public class SalaryBo  implements Serializable{
     private BigDecimal salarySum;
     private List<ProjectCommionsDetailBo> ProjectCommionsDetailBos = new ArrayList<>();
 
-    public SalaryBo(Long brandIdenty, Long shopIdenty, Long userId, String userName, Date starDate, Date endDate, BigDecimal baseSalary) {
+    public SalaryBo(Long brandIdenty, Long shopIdenty, Long userId, String userName, Date startDate, Date endDate, BigDecimal baseSalary) {
         this.brandIdenty = brandIdenty;
         this.shopIdenty = shopIdenty;
         this.userId = userId;
         this.userName = userName;
-        this.starDate = starDate;
+        this.startDate = startDate;
         this.endDate = endDate;
         this.baseSalary = baseSalary == null? new BigDecimal(0):baseSalary;
     }

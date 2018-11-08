@@ -62,7 +62,7 @@ public class SalaryServiceImpl implements SalaryService {
     @Override
     public List<SalaryBo> getAllSalary(SalaryBo salaryBo) {
         //得到订单相关的信息
-        List<TradeAndUserBo> allSalaryTrade = tradeRepository.getAllSalaryTrade(salaryBo.getStarDate(), salaryBo.getEndDate(), salaryBo.getShopIdenty(), salaryBo.getBrandIdenty());
+        List<TradeAndUserBo> allSalaryTrade = tradeRepository.getAllSalaryTrade(salaryBo.getStartDate(), salaryBo.getEndDate(), salaryBo.getShopIdenty(), salaryBo.getBrandIdenty());
 
         //获得销售金额
         if (allSalaryTrade == null || allSalaryTrade.size()==0){
@@ -79,7 +79,7 @@ public class SalaryServiceImpl implements SalaryService {
         Map<Long,List<UserAndTradeItm>> userIdTradeItems = new HashMap<>();
         Map<Long,SalaryBo> userIdSalaryBoMap = new HashMap<>();
 
-        List<UserAndTradeItm> tradeItems = tradeItemRepository.getUserItem(salaryBo.getStarDate(), salaryBo.getEndDate(), salaryBo.getShopIdenty(), salaryBo.getBrandIdenty());
+        List<UserAndTradeItm> tradeItems = tradeItemRepository.getUserItem(salaryBo.getStartDate(), salaryBo.getEndDate(), salaryBo.getShopIdenty(), salaryBo.getBrandIdenty());
         userIdSet.forEach(userid ->{
             List<UserAndTradeItm> UserAndTradeItm = tradeItems.stream().filter(tradeItem -> tradeItem.getUserId() == userid).collect(Collectors.toList());
             userIdTradeItems.put(userid,UserAndTradeItm);
@@ -88,7 +88,7 @@ public class SalaryServiceImpl implements SalaryService {
         for (int i = 0; i < allSalaryTrade.size(); i++) {
             TradeAndUserBo tradeAndUserBo = allSalaryTrade.get(i);
             SalaryBo salary = new SalaryBo(salaryBo.getBrandIdenty(),salaryBo.getShopIdenty(),
-                    tradeAndUserBo.getUserId(),tradeAndUserBo.getUserName(),salaryBo.getStarDate(),salaryBo.getEndDate(),new BigDecimal(tradeAndUserBo.getSalaryBase()==null?"0":tradeAndUserBo.getSalaryBase()));
+                    tradeAndUserBo.getUserId(),tradeAndUserBo.getUserName(),salaryBo.getStartDate(),salaryBo.getEndDate(),new BigDecimal(tradeAndUserBo.getSalaryBase()==null?"0":tradeAndUserBo.getSalaryBase()));
             userIdSalaryBoMap.put(tradeAndUserBo.getUserId(),salary);
             if(tradeAndUserBo.getTradeId() == null || tradeAndUserBo.getBusinessType() ==null
                || tradeAndUserBo.getTradePayStatus() ==null || tradeAndUserBo.getTradeStatus() == null){
