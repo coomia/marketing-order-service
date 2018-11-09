@@ -383,8 +383,13 @@ public class PayServiceImpl implements PayService {
     public PrePayBo prePay(String payRequestType, PaymentItem paymentItem, String authCode, String wechatAppId, String wechatOpenId){
         if(paymentItem==null||paymentItem.getId()==null)
             throw new BusinessException("销货单没有需要支付的项", ResetApiResult.STATUS_ERROR,1001);
-        if(paymentItem.getUsefulAmount()==null||paymentItem.getUsefulAmount()<=0d)
+        if(paymentItem.getUsefulAmount()==null)
             throw  new BusinessException("销货单支付金额异常",ResetApiResult.STATUS_ERROR,1003);
+        else if((paymentItem.getPayModeId().equals(1l) || paymentItem.getPayModeId().equals(2l))  && paymentItem.getUsefulAmount()<0d)
+            throw  new BusinessException("销货单支付金额异常",ResetApiResult.STATUS_ERROR,1003);
+        else if((paymentItem.getPayModeId().equals(4l) || paymentItem.getPayModeId().equals(5l))  && paymentItem.getUsefulAmount()<=0d)
+            throw  new BusinessException("销货单支付金额异常",ResetApiResult.STATUS_ERROR,1003);
+
 
         PrePayBo prePayBo =new PrePayBo();
         prePayBo.setPayRequestType(payRequestType);

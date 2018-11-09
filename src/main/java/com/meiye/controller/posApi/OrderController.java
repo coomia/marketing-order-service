@@ -7,15 +7,22 @@ import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
 import com.meiye.bo.trade.OrderDto.OrderRequestDto;
 import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.exception.BusinessException;
+import com.meiye.model.pay.Payment;
+import com.meiye.model.pay.PaymentItem;
+import com.meiye.model.pay.PaymentItemExtra;
+import com.meiye.model.setting.Tables;
+import com.meiye.model.trade.Trade;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import com.meiye.util.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -107,8 +114,8 @@ public class OrderController {
         try {
             Long newTradeId = orderService.returnTrade(cancelTradeBo);
             payService.updateRefundTradeStatus(newTradeId);
-            OrderResponseDto orderResponseDto=orderService.getOrderResponse(newTradeId, false);
-            return PosApiResult.sucess(orderResponseDto);
+//            OrderResponseDto orderResponseDto=orderService.getOrderResponse(newTradeId, false);
+            return PosApiResult.sucess(getOrderWithPaymentData(newTradeId));
         }catch (BusinessException b){
             logger.info("退货失败：",b);
             throw new BusinessException(b.getMessage());
@@ -116,5 +123,40 @@ public class OrderController {
             throw new BusinessException("退换订单接口- 退换订单失败！");
         }
 
+    }
+
+
+    public Map<String,Object> getOrderWithPaymentData(Long tradeId){
+        Map<String,Object> result=new HashMap<>();
+        OrderResponseDto orderResponseDto=orderService.getOrderResponse(tradeId,false);
+        if(orderResponseDto!=null) {
+            result.put("trade", orderResponseDto.getTrade());
+            result.put("tradeTables", orderResponseDto.getTradeTables());
+            result.put("tables", ObjectUtils.isEmpty(orderResponseDto.getTables()) ? new ArrayList<Tables>() : orderResponseDto.getTables());
+            result.put("tradeItems", orderResponseDto.getTradeItems());
+            result.put("tradeCustomers", orderResponseDto.getTradeCustomers());
+            result.put("tradePrivileges", orderResponseDto.getTradePrivileges());
+            result.put("tradeItemProperties", orderResponseDto.getTradeItemProperties());
+            result.put("tradeUsers", orderResponseDto.getTradeUsers());
+            result.put("customerCardTimes", orderResponseDto.getCustomerCardTimes());
+
+            List<Payment> payments = payService.findPaymentsByTradeId(tradeId, false);
+            result.put("payments", payments);
+            if (!ObjectUtils.isEmpty(payments)) {
+                List<Long> paymentIds = payments.stream().map(Payment::getId).distinct().collect(Collectors.toList());
+                List<PaymentItem> paymentItems = payService.findPaymentItemsByPamentId(paymentIds, false);
+                result.put("paymentItems", paymentItems);
+                if (!ObjectUtils.isEmpty(paymentItems)) {
+                    List<Long> paymentItemIds = paymentItems.stream().map(PaymentItem::getId).distinct().collect(Collectors.toList());
+                    List<PaymentItemExtra> paymentItemExtras = payService.findPaymentItemExtraByPamentItemId(paymentItemIds, false);
+                    result.put("paymentItemExtras", paymentItemExtras);
+                } else
+                    result.put("paymentItemExtras", new ArrayList<>());
+            } else {
+                result.put("paymentItemExtras", new ArrayList<>());
+                result.put("paymentItems", new ArrayList<>());
+            }
+        }
+        return result;
     }
 }
