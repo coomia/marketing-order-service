@@ -10,6 +10,7 @@ import com.meiye.model.store.Brand;
 import com.meiye.repository.part.*;
 import com.meiye.service.part.DishShopService;
 import com.meiye.system.util.WebUtil;
+import org.apache.commons.lang.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -155,11 +156,16 @@ public class DishShopServiceImpl implements DishShopService{
             }
             //如果是套餐
             else if(dishShopBo.getType()==1&&dishShopBo.getDishSetmealGroupBos()!=null){
+                if(org.springframework.util.ObjectUtils.isEmpty(dishShopBo.getDishSetmealGroupBos()))
+                    throw new BusinessException("套餐没有子品分组.");
+
                 dishShopBo.getDishSetmealGroupBos().forEach(dishSetmealGroupBo -> {
                     DishSetmealGroup dishSetmealGroup=dishSetmealGroupBo.copyTo(DishSetmealGroup.class);
                     dishSetmealGroup.setSetmealDishId(dishShop.getId());
                     dishSetmealGroupRepository.save(dishSetmealGroup);
                     if(dishSetmealGroupBo.getDishSetmealBos()!=null){
+                        if(org.springframework.util.ObjectUtils.isEmpty(dishSetmealGroupBo.getDishSetmealBos()))
+                            throw new BusinessException("子品分组("+dishSetmealGroupBo.getName()+")没有选择单品");
                         dishSetmealGroupBo.getDishSetmealBos().forEach(dishSetmealBo -> {
                             DishSetmeal dishSetmeal=dishSetmealBo.copyTo(DishSetmeal.class);
                             dishSetmeal.setDishId(dishShop.getId());
@@ -196,6 +202,9 @@ public class DishShopServiceImpl implements DishShopService{
                     }
                 } else if (dishShopBo.getType() == 1) {//套餐
                     dishSetmealGroupRepository.deleteDishSetmealGroupBySetmealDishId(dishShop.getId());
+                    if(org.springframework.util.ObjectUtils.isEmpty(dishShopBo.getDishSetmealGroupBos()))
+                        throw new BusinessException("套餐没有子品分组.");
+
                     dishShopBo.getDishSetmealGroupBos().forEach(dishSetmealGroupBo -> {
                         DishSetmealGroup dishSetmealGroup = dishSetmealGroupBo.copyTo(DishSetmealGroup.class);
                         dishSetmealGroup.setSetmealDishId(dishShop.getId());
@@ -205,6 +214,9 @@ public class DishShopServiceImpl implements DishShopService{
                             dishSetmealGroupRepository.updateDishSetmealGroup(dishSetmealGroup.getSetmealDishId(), dishSetmealGroup.getName(), dishSetmealGroup.getOrderMin(), dishSetmealGroup.getOrderMax(),dishSetmealGroup.getUpdatorName(),dishSetmealGroup.getUpdatorId(), dishSetmealGroup.getId());
                         if (dishSetmealGroupBo.getDishSetmealBos() != null) {
                             dishSetmealRepository.deleteDishSetmealByGroupAndDishId(dishShop.getId(),dishSetmealGroup.getId());
+                            if(org.springframework.util.ObjectUtils.isEmpty(dishSetmealGroupBo.getDishSetmealBos()))
+                                throw new BusinessException("子品分组("+dishSetmealGroupBo.getName()+")没有选择单品");
+
                             dishSetmealGroupBo.getDishSetmealBos().forEach(dishSetmealBo -> {
                                 if (dishSetmealBo.getStatusFlag() == 1l) {
                                     DishSetmeal dishSetmeal = dishSetmealBo.copyTo(DishSetmeal.class);

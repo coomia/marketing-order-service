@@ -20,6 +20,7 @@ import com.meiye.repository.pay.PaymentItemRepository;
 import com.meiye.repository.pay.PaymentRepository;
 import com.meiye.repository.trade.TradeItemRepository;
 import com.meiye.repository.trade.TradeRepository;
+import com.meiye.repository.trade.TradeTableRepository;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import com.meiye.system.util.WebUtil;
@@ -50,6 +51,9 @@ public class PayServiceImpl implements PayService {
 
     @Autowired
     TradeRepository tradeRepository;
+
+    @Autowired
+    TradeTableRepository tradeTableRepository;
 
     @Autowired
     PaymentRepository paymentRepository;
@@ -182,6 +186,8 @@ public class PayServiceImpl implements PayService {
         }
         trade.setServerUpdateTime(now);
         tradeRepository.save(trade);
+        //将相关联的坐台设置为空闲
+        tradeTableRepository.updateTradeTableSelfTableStatus(trade.getId());
     }
 
     @Transactional
