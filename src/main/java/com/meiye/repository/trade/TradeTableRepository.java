@@ -20,5 +20,9 @@ public interface TradeTableRepository extends JpaRepository<TradeTable,Long>{
     List<TradeTable> findAllByTradeIdAndStatusFlag(Long tradeId, Integer statusFlag);
 
     List<TradeTable> findAllByTradeId(Long tradeId);
+
+    @Modifying
+    @Query("update TradeTable tt set tt.selfTableStatus=1 where tt.tradeId=?1")
+    int updateTradeTableSelfTableStatus(Long tradeId);
 }
 

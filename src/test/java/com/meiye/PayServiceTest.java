@@ -1,8 +1,6 @@
 package com.meiye;
 
-import com.meiye.bo.trade.OrderDto.OrderResponseDto;
 import com.meiye.model.pay.PaymentItem;
-import com.meiye.model.trade.TradeItem;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import org.junit.Test;
@@ -13,7 +11,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2018/9/24 0024.

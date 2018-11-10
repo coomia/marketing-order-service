@@ -4,6 +4,9 @@ import com.meiye.bo.part.DishShopBo;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.exception.BusinessException;
 import com.meiye.service.part.DishShopService;
+import com.meiye.util.MeiYeInternalApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/public/api/part/dishShop",produces="application/json;charset=UTF-8")
 public class DishShopController {
+    static Logger logger= LoggerFactory.getLogger(DishShopController.class);
 
     @Autowired
     DishShopService dishShopService;
@@ -61,20 +65,37 @@ public class DishShopController {
 
     @PostMapping("/group/save")
     public ResetApiResult newDishGroup(@RequestBody DishShopBo dishShopBo){
-        Long id=dishShopService.saveDishShop(dishShopBo);
-        if(id!=null)
-            return findDishShop(id);
-        else
-            return ResetApiResult.error("","保存失败");
+
+        try {
+            Long id = dishShopService.saveDishShop(dishShopBo);
+            if (id != null)
+                return findDishShop(id);
+            else
+                return ResetApiResult.error("", "保存失败");
+        }catch (BusinessException exp){
+            logger.error(exp.getMessage(),exp);
+            return ResetApiResult.error(null,exp.getMessage());
+        }catch (Exception exp){
+            logger.error(exp.getMessage(),exp);
+            return ResetApiResult.error(null,"保存失败");
+        }
     }
 
     @PostMapping("/group/update")
     public ResetApiResult updateDishGroup(@RequestBody DishShopBo dishShopBo){
-        Long id=dishShopService.updateDishShop(dishShopBo);
-        if(id!=null)
-            return findDishShop(id);
-        else
-            return ResetApiResult.error("","保存失败");
+        try {
+            Long id = dishShopService.updateDishShop(dishShopBo);
+            if (id != null)
+                return findDishShop(id);
+            else
+                return ResetApiResult.error("", "更新失败");
+        }catch (BusinessException exp){
+            logger.error(exp.getMessage(),exp);
+            return ResetApiResult.error(null,exp.getMessage());
+        }catch (Exception exp){
+            logger.error(exp.getMessage(),exp);
+            return ResetApiResult.error(null,"更新失败");
+        }
     }
 
     @RequestMapping("/group/{dishShopId}/find")

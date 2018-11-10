@@ -20,6 +20,7 @@ import com.meiye.repository.pay.PaymentItemRepository;
 import com.meiye.repository.pay.PaymentRepository;
 import com.meiye.repository.trade.TradeItemRepository;
 import com.meiye.repository.trade.TradeRepository;
+import com.meiye.repository.trade.TradeTableRepository;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import com.meiye.system.util.WebUtil;
@@ -50,6 +51,9 @@ public class PayServiceImpl implements PayService {
 
     @Autowired
     TradeRepository tradeRepository;
+
+    @Autowired
+    TradeTableRepository tradeTableRepository;
 
     @Autowired
     PaymentRepository paymentRepository;
@@ -182,6 +186,8 @@ public class PayServiceImpl implements PayService {
         }
         trade.setServerUpdateTime(now);
         tradeRepository.save(trade);
+        //将相关联的坐台设置为空闲
+        tradeTableRepository.updateTradeTableSelfTableStatus(trade.getId());
     }
 
     @Transactional
@@ -383,8 +389,13 @@ public class PayServiceImpl implements PayService {
     public PrePayBo prePay(String payRequestType, PaymentItem paymentItem, String authCode, String wechatAppId, String wechatOpenId){
         if(paymentItem==null||paymentItem.getId()==null)
             throw new BusinessException("销货单没有需要支付的项", ResetApiResult.STATUS_ERROR,1001);
-        if(paymentItem.getUsefulAmount()==null||paymentItem.getUsefulAmount()<=0d)
+        if(paymentItem.getUsefulAmount()==null)
             throw  new BusinessException("销货单支付金额异常",ResetApiResult.STATUS_ERROR,1003);
+        else if((paymentItem.getPayModeId().equals(1l) || paymentItem.getPayModeId().equals(2l))  && paymentItem.getUsefulAmount()<0d)
+            throw  new BusinessException("销货单支付金额异常",ResetApiResult.STATUS_ERROR,1003);
+        else if((paymentItem.getPayModeId().equals(4l) || paymentItem.getPayModeId().equals(5l))  && paymentItem.getUsefulAmount()<=0d)
+            throw  new BusinessException("销货单支付金额异常",ResetApiResult.STATUS_ERROR,1003);
+
 
         PrePayBo prePayBo =new PrePayBo();
         prePayBo.setPayRequestType(payRequestType);
