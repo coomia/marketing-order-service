@@ -24,7 +24,7 @@ public class DishShopBo extends BusinessParentBo {
   private String brandDishUuid=UUID.randomUUID().toString();
   private Long dishTypeId;
   private String dishCode;
-  private Long type=0l;
+  private Long type;
   private String name;
   @JSONField(serialize=false)
   private String aliasName;

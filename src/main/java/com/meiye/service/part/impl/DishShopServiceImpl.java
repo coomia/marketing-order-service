@@ -25,6 +25,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -53,7 +54,7 @@ public class DishShopServiceImpl implements DishShopService{
 
     @Override
     public Page<DishShop> getDishShopPageByCriteria(Integer pageNum, Integer pageSize, DishShopBo dishShopBo) {
-        Pageable pageable = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "sort");
+        Pageable pageable = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "serverCreateTime");
         Page<DishShop> shopPage = dishShopRepository.findAll(new Specification<DishShop>() {
             @Override
             public Predicate toPredicate(Root<DishShop> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
@@ -140,6 +141,9 @@ public class DishShopServiceImpl implements DishShopService{
     public Long saveDishShop(DishShopBo dishShopBo) {
         if (dishShopBo != null) {
             DishShop dishShop = dishShopBo.copyTo(DishShop.class);
+            if(Objects.isNull(dishShop.getType())){
+                dishShop.setType(new Long(0));
+            }
             dishShopRepository.save(dishShop);
             //如果是单品
             if (dishShopBo.getType() == 0 && dishShopBo.getDishPropertyBos() != null && dishShopBo.getDishPropertyBos().size() > 0) {
