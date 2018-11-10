@@ -146,6 +146,7 @@ public class DishShopServiceImpl implements DishShopService{
                 dishShopBo.getDishPropertyBos().forEach(dishPropertyBo -> {
                     DishProperty dishProperty = dishPropertyBo.copyTo(DishProperty.class);
                     dishProperty.setDishShopId(dishShop.getId());
+                    dishProperty.setEnabledFlag(1L);
                     dishPropertyRepository.save(dishProperty);
                 });
             }
