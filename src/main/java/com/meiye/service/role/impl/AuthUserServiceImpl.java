@@ -119,8 +119,14 @@ public class AuthUserServiceImpl implements AuthUserService {
                 if (null != authUserBo.getName() && !"".equals(authUserBo.getName())) {
                     list.add(criteriaBuilder.like(root.get("name").as(String.class), authUserBo.getName()));
                 }
+                if (null != authUserBo.getEnabledFlag()){
+                    list.add(criteriaBuilder.equal(root.get("enableFlag").as(Long.class),authUserBo.getEnabledFlag()));
+                }
 
                 list.add(criteriaBuilder.equal(root.get("statusFlag").as(Long.class), 1));
+                list.add(criteriaBuilder.equal(root.get("brandIdenty").as(Long.class),WebUtil.getCurrentBrandId()));
+                list.add(criteriaBuilder.equal(root.get("shopIdenty").as(Long.class),WebUtil.getCurrentStoreId()));
+
                 Predicate[] p = new Predicate[list.size()];
                 return criteriaBuilder.and(list.toArray(p));
             }

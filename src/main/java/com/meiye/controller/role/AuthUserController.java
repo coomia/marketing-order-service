@@ -62,9 +62,10 @@ public class AuthUserController {
     @GetMapping("/load/{id}")
     public ResetApiResult load(@PathVariable Long id){
         try {
-            if(authUserService.getOneById(id) ==null)
+            AuthUserBo oneById = authUserService.getOneById(id);
+            if(oneById ==null)
                 throw new BusinessException("未找到该员工!");
-            return ResetApiResult.sucess(authUserService.getOneById(id));
+            return ResetApiResult.sucess(oneById);
         }catch (Exception e){
             throw new BusinessException("获取员工失败!");
         }
