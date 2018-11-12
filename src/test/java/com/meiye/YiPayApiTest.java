@@ -109,18 +109,19 @@ public class YiPayApiTest {
     @Test
     public void microPay(){
         StorePaymentParamBo paymentParamBo=new StorePaymentParamBo();
-        paymentParamBo.setAppid("hf19102035480OVA");
-        paymentParamBo.setAppsecret("nfePmU6VhhCPmEZzuyySvFc0xhEEUWiA");
+        paymentParamBo.setAppid("hf163356826045OA");
+        String nfePmU6VhhCPmEZzuyySvFc0xhEEUWiA = "MgAtKIRKPMMbbfycOw5b87U6NP024kWA";
+        paymentParamBo.setAppsecret(nfePmU6VhhCPmEZzuyySvFc0xhEEUWiA);
         paymentParamBo.setContextPath(callbackContextPath);
         PrePayBo prePayBo=new PrePayBo();
-        prePayBo.setOutTradeNo( "101181017192442218000000");
+        prePayBo.setOutTradeNo( "10118101711442f18000000");
         prePayBo.setTradeAmountInCent(1);
         prePayBo.setNeedYiPay(true);
-        prePayBo.setAuthCode("asssss");
-        prePayBo.setAliPay();
-//        prePayBo.setWechatPay();
-//        prePayBo.setWechatAppid("");
-//        prePayBo.setWechatOpenId("");
+//        prePayBo.setAuthCode("asssss");
+//        prePayBo.setAliPay();
+        prePayBo.setWechatPay();
+        prePayBo.setWechatAppid("wx22d9607fa73e9364");
+        prePayBo.setWechatOpenId("oTf-e4g_nqsOuXwBBZnt1eenqUWE");
 
         MicroAppPayResponseBo microAppPayResponseBo=YiPayApi.microAppPay(paymentParamBo,prePayBo,"182.139.217.242");
         System.out.println(microAppPayResponseBo.toString());
