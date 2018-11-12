@@ -17,9 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by jonyh on 08/08/18.
@@ -44,8 +42,9 @@ public class UserServiceImpl implements UserService {
             List<SimpleGrantedAuthority> authorities=new ArrayList<SimpleGrantedAuthority>();
             if(authUserBo.getRoleBo()!=null&&authUserBo.getRoleBo().getAuthRolePermissions()!=null){
                 authUserBo.getRoleBo().getAuthRolePermissions().forEach(authRolePermissionBo -> {
-                    if(authRolePermissionBo.getAuthPermissionBo()!=null)
-                        authorities.add(new SimpleGrantedAuthority(authRolePermissionBo.getAuthPermissionBo().getCode()));
+                    SimpleGrantedAuthority simpleGrantedAuthority= new SimpleGrantedAuthority(authRolePermissionBo.getAuthPermissionBo().getCode());
+                    if(authRolePermissionBo.getAuthPermissionBo()!=null&&!authorities.contains(simpleGrantedAuthority))
+                        authorities.add(simpleGrantedAuthority);
                 });
             }
             userBo.setAuthorities(authorities);

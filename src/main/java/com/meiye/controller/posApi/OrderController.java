@@ -1,6 +1,7 @@
 package com.meiye.controller.posApi;
 
 import com.alibaba.fastjson.JSON;
+import com.meiye.bo.accounting.WriteOffResultBo;
 import com.meiye.bo.system.PosApiResult;
 import com.meiye.bo.system.ResetApiResult;
 import com.meiye.bo.trade.CancelTrade.CancelTradeBo;
@@ -14,6 +15,7 @@ import com.meiye.model.setting.Tables;
 import com.meiye.model.trade.Trade;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
+import com.meiye.util.MeiYeInternalApi;
 import com.meiye.util.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +117,12 @@ public class OrderController {
             Long newTradeId = orderService.returnTrade(cancelTradeBo);
             payService.updateRefundTradeStatus(newTradeId);
 //            OrderResponseDto orderResponseDto=orderService.getOrderResponse(newTradeId, false);
-            return PosApiResult.sucess(getOrderWithPaymentData(newTradeId));
+            WriteOffResultBo returnPrivilege=MeiYeInternalApi.returnPrivilege(cancelTradeBo.getContent().getTradeId(),cancelTradeBo.getBrandID(),cancelTradeBo.getShopID());
+            if(returnPrivilege.isSuccess())
+                return PosApiResult.sucess(getOrderWithPaymentData(newTradeId));
+            else
+                return PosApiResult.error(getOrderWithPaymentData(newTradeId),1001,"反核销失败.");
+
         }catch (BusinessException b){
             logger.info("退货失败：",b);
             throw new BusinessException(b.getMessage());
