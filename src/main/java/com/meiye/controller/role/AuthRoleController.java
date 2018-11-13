@@ -8,6 +8,7 @@ import com.meiye.service.role.AuthRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,9 +23,7 @@ public class AuthRoleController {
         List<AuthRoleBo> roleBos;
         try{
             roleBos = authRoleService.findAll();
-            if(roleBos == null || roleBos.size()<1){
-                throw new BusinessException("未找到角色!");
-            }
+            roleBos = roleBos==null ? new ArrayList<AuthRoleBo>():roleBos;
         }catch (Exception e){
             throw new BusinessException("获取所有角色失败!");
         }
