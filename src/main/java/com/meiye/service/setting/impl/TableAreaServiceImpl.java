@@ -38,7 +38,7 @@ public class TableAreaServiceImpl implements TableAreaService {
             throw new BusinessException("查找工作台区域失败!");
         }
         List<TableAreaBo> tableAreaBoList = this.copy(tableAreaList);
-        return tableAreaBoList;
+        return tableAreaBoList==null?new ArrayList<TableAreaBo>():tableAreaBoList;
     }
 
     @Override
