@@ -144,7 +144,7 @@ public class BrandTypeServiceImpl implements BrandTypeService {
     private List<DishBrandTypeBo> sortBrandTypeByParentId(List<DishBrandTypeBo> dishBrandTypeBos){
         Map<DishBrandTypeBo,List<DishBrandTypeBo>> map= new HashMap<>();
         if(Objects.isNull(dishBrandTypeBos)||dishBrandTypeBos.size()<1){
-            return null;
+            return new ArrayList<DishBrandTypeBo>();
         }
         List<DishBrandTypeBo> parentDishBrandTypeBo = new ArrayList<>();
         List<DishBrandTypeBo> childrenDishBrandTypeBo = new ArrayList<>();
