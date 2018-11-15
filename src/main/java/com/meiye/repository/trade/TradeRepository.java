@@ -33,12 +33,23 @@ public interface TradeRepository extends JpaRepository<Trade,Long>{
 
     @Modifying
     @Query(value = " select new com.meiye.bo.salary.TradeAndUserBo( " +
-            " tu.tradeId,au.id,au.name,tu.roleId,tu.roleName,au.salaryBase,au.salaryPost ," +
+            " tu.tradeId,au.id,au.name,au.roleId,tu.roleName,au.salaryBase,au.salaryPost ," +
             " tt.businessType,tt.tradeType ,tt.tradeStatus ,tt.saleAmount ,tt.tradePayStatus )" +
             " from AuthUser au " +
             " left join TradeUser tu on au.id = tu.userId  and tu.statusFlag=1 " +
             " left join Trade tt on tu.tradeId = tt.id  and tt.statusFlag=1 and  tt.tradeTime >= ?1 and tt.tradeTime<= ?2" +
             " where au.statusFlag =1 and au.shopIdenty=?3 and au.brandIdenty=?4 ")
     List<TradeAndUserBo> getAllSalaryTrade(Date start, Date end, Long shopIdenty, Long brandIdenty);
+
+
+    @Modifying
+    @Query(value = " select new com.meiye.bo.salary.TradeAndUserBo( " +
+            " tu.tradeId,au.id,au.name,au.roleId,tu.roleName,au.salaryBase,au.salaryPost ," +
+            " tt.businessType,tt.tradeType ,tt.tradeStatus ,tt.saleAmount ,tt.tradePayStatus )" +
+            " from AuthUser au " +
+            " left join TradeUser tu on au.id = tu.userId  and tu.statusFlag=1 " +
+            " left join Trade tt on tu.tradeId = tt.id  and tt.statusFlag=1 and  tt.tradeTime >= ?1 and tt.tradeTime<= ?2" +
+            " where au.statusFlag =1 and au.shopIdenty=?3 and au.brandIdenty=?4 and au.id=?5")
+    List<TradeAndUserBo> getOneSalaryTrade(Date start, Date end, Long shopIdenty, Long brandIdenty,Long userId);
 }
 

@@ -15,7 +15,7 @@ public class TradeAndUserBo implements Serializable{
     private Long tradeId;
     private Long userId;
     private String userName;
-    private Integer roleId;
+    private Long roleId;
     private String roleName;
     private String salaryBase;
     private String salaryPost;
@@ -26,7 +26,7 @@ public class TradeAndUserBo implements Serializable{
     private Integer tradePayStatus;
 
     public TradeAndUserBo(Long tradeId, Long userId, String userName,
-                          Integer roleId, String roleName, String salaryBase,
+                          Long roleId, String roleName, String salaryBase,
                           String salaryPost, Integer businessType, Integer tradeType,
                           Integer tradeStatus, Double saleAmount,Integer tradePayStatus) {
         this.tradeId = tradeId;

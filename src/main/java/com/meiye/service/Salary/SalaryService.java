@@ -12,4 +12,8 @@ import java.util.List;
 public interface SalaryService {
 
     List<SalaryBo> getAllSalary(SalaryBo salaryBo);
+
+
+    SalaryBo getOneSalary(SalaryBo salaryBo);
+
 }
