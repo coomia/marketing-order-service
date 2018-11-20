@@ -204,15 +204,20 @@ public class SalaryServiceImpl implements SalaryService {
                                 TalentRule talentRule = talentRules.get(j);
                                 String dishShopId = talentRule.getDishShopId();
                                 String ruleCommission = talentRule.getRuleCommission();
-                                List<UserAndTradeItm> collect = getOneUserItem.stream().filter(item -> item.getDishId().equals(dishShopId)).collect(Collectors.toList());
-                                if (collect != null && collect.size() > 0) {
-                                    ProjectCommionsDetailBo detail = new ProjectCommionsDetailBo();
-                                    detail.setUserId(salaryBo.getUserId());
-                                    detail.setDishId(dishShopId);
-                                    detail.setCountAll(collect.size());
-                                    detail.setCommissions(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size())));
-                                    salary.getProjectCommionsDetailBos().add(detail);
-                                    salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size())));
+                                String ruleValue = talentRule.getRuleValue();
+                                if (getOneUserItem != null && getOneUserItem.size()>0) {
+                                    List<UserAndTradeItm> collect = getOneUserItem.stream().filter(
+                                            item ->item.getDishId()!=null&& item.getDishId().equals(ruleValue))
+                                            .collect(Collectors.toList());
+                                    if (collect != null && collect.size() > 0) {
+                                        ProjectCommionsDetailBo detail = new ProjectCommionsDetailBo();
+                                        detail.setUserId(salaryBo.getUserId());
+                                        detail.setDishId(dishShopId);
+                                        detail.setCountAll(collect.size());
+                                        detail.setCommissions(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size())));
+                                        salary.getProjectCommionsDetailBos().add(detail);
+                                        salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size())));
+                                    }
                                 }
                             }
                         }
@@ -222,7 +227,10 @@ public class SalaryServiceImpl implements SalaryService {
             }
         }
 
-
+        salary.setSalarySum(salary.getSalesCommissions()
+                .add(salary.getSaveCommissions())
+                .add(salary.getProjectCommissions())
+                .add(salary.getBaseSalary()));
         return salary;
     }
 
@@ -369,10 +377,21 @@ public class SalaryServiceImpl implements SalaryService {
                                     TalentRule talentRule = talentRules.get(u);
                                     String dishShopId = talentRule.getDishShopId();
                                     String ruleCommission = talentRule.getRuleCommission();
-                                    List<UserAndTradeItm> collect = userIdTradeItems.get(salary.getUserId()).stream().filter(item -> item.getDishId().equals(dishShopId)).collect(Collectors.toList());
-                                    if (collect != null && collect.size() > 0) {
-                                        salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size())));
+                                    String ruleValue = talentRule.getRuleValue();
+
+                                    List<UserAndTradeItm> userAndTradeItms = userIdTradeItems.get(salary.getUserId());
+                                    if (userAndTradeItms!=null && userAndTradeItms.size()>0){
+                                        List<UserAndTradeItm> collect = userAndTradeItms
+                                                .stream()
+                                                .filter(item -> item.getDishId() != null && item.getDishId().equals(ruleValue))
+                                                .collect(Collectors.toList());
+                                        if (collect != null && collect.size() > 0) {
+                                            salary.setProjectCommissions(
+                                            salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size()))));
+                                        }
                                     }
+
+
                                 }
                             }
                         }
@@ -380,6 +399,14 @@ public class SalaryServiceImpl implements SalaryService {
                 }
             }
         }
+
+        salaryBos.forEach(salaryBo1 -> {
+            salaryBo1.setSalarySum(salaryBo1.getSalesCommissions()
+                    .add(salaryBo1.getSaveCommissions())
+                    .add(salaryBo1.getProjectCommissions())
+                    .add(salaryBo1.getBaseSalary())
+            );
+        });
         return salaryBos;
     }
 
