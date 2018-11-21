@@ -119,7 +119,7 @@ public class SalaryServiceImpl implements SalaryService {
                                         salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(com).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                         detail.append(";" + df2.format(new BigDecimal(sum - ruleValuePre))
                                                 + "*" +
-                                                df2.format(new BigDecimal(ruleCommission).divide(new BigDecimal(100))) +"%"+
+                                                df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(new BigDecimal(com)));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
@@ -135,14 +135,14 @@ public class SalaryServiceImpl implements SalaryService {
 
                                         detail.append(";" + df2.format(new BigDecimal(ruleValue - ruleValuePre))
                                                 + "*" +
-                                                df2.format(new BigDecimal(ruleCommission).divide(new BigDecimal(100))) +"%"+
+                                                df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(com));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
 
                                         detail.append(";" + df2.format(new BigDecimal(ruleValue - ruleValuePre))
                                                 + "*" +
-                                                df2.format(new BigDecimal(ruleCommission).divide(new BigDecimal(100))) +"%"+
+                                                df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                     }
                                 }
@@ -170,7 +170,7 @@ public class SalaryServiceImpl implements SalaryService {
                                         salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(com).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                         detail.append(";" + df2.format(new BigDecimal(sum - ruleValuePre))
                                                 + "*" +
-                                                df2.format(new BigDecimal(ruleCommission).divide(new BigDecimal(100))) +"%"+
+                                                df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(new BigDecimal(com)));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
@@ -186,14 +186,14 @@ public class SalaryServiceImpl implements SalaryService {
 
                                         detail.append(";" + df2.format(new BigDecimal(ruleValue - ruleValuePre))
                                                 + "*" +
-                                                df2.format(new BigDecimal(ruleCommission).divide(new BigDecimal(100))) +
+                                                df2.format(new BigDecimal(ruleCommission)) +
                                                 "=" + df2.format(com));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
 
                                         detail.append(";" + df2.format(new BigDecimal(ruleValue - ruleValuePre))
                                                 + "*" +
-                                                df2.format(new BigDecimal(ruleCommission).divide(new BigDecimal(100))) +"%"+
+                                                df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                     }
                                 }
@@ -217,7 +217,8 @@ public class SalaryServiceImpl implements SalaryService {
                                         detail.setDishName(collect.get(0).getDishName());
                                         detail.setCommissions(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size())));
                                         salary.getProjectCommionsDetailBos().add(detail);
-                                        salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size())));
+                                        salary.setProjectCommissions(
+                                        salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size()))));
                                     }
                                 }
                             }
@@ -389,6 +390,7 @@ public class SalaryServiceImpl implements SalaryService {
                                         if (collect != null && collect.size() > 0) {
                                             salary.setProjectCommissions(
                                             salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size()))));
+
                                         }
                                     }
 
