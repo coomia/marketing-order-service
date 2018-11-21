@@ -34,4 +34,14 @@ public class PayServiceTest {
         List<PaymentItem> paymentItems=payService.findPaymentItemsByPamentId(paymentIds,false);
         System.out.println(paymentIds);
     }
+
+    @Test
+    public void testPaySucess(){
+        String outTradeNo="9b9729dc4ebf451293de3f01d29e21c5";
+
+        Long id=payService.paySuccess(outTradeNo,null);
+        System.out.println(id);
+
+
+    }
 }
