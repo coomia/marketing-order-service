@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface MeiYePosSyncMapper {
             " and status_flag=1 " +
             "</if>" +
             "<if test='!isInit'>" +
-            " and id>#{id} and IFNULL(server_update_time,server_create_time)>=#{serverUpdateTime} " +
+            " and id>#{id} and IFNULL(server_update_time,server_create_time)>=FROM_UNIXTIME(#{serverUpdateTime}) " +
             "</if> " +
             "<if test='syncConfigBo!=null'>" +
             " <if test='syncConfigBo.filterShopIdenty!=\"N\"'>" +

@@ -54,7 +54,7 @@ public class MeiYePosSyncServiceImpl implements MeiYePosSyncService {
             if(posSyncConfigBo!=null&& !ObjectUtils.isEmpty(posSyncConfigBo.getSyncTable()))
                 syncTableName=posSyncConfigBo.getSyncTable();
             Page<HashMap<String, Object>> page = PageHelper.startPage(1, pageSize);
-            List<HashMap<String, Object>> result = meiYePosSyncMapper.selectDataByTable(syncTableName, brandId, shopId, isInit, id, lastUpdateTime, posSyncConfigBo);
+            List<HashMap<String, Object>> result = meiYePosSyncMapper.selectDataByTable(syncTableName, brandId, shopId, isInit, id, lastUpdateTime/1000l, posSyncConfigBo);
             Map<String, Object> resultData = new HashMap<String, Object>();
             boolean completeSearch = false;
             Object lastId = null;

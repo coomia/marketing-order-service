@@ -23,7 +23,7 @@ public interface PayService {
     void payFailed(String outTradeNo);
 
     @Transactional
-    void paySuccess(String outTradeNo, String yiPayTradeNo);
+    Long paySuccess(String outTradeNo, String yiPayTradeNo);
 
     void refundSuccessful(Long tradeId);
 

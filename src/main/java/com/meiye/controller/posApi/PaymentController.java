@@ -88,7 +88,9 @@ public class PaymentController extends AbstractPayController {
                         if(ObjectUtil.equals(paymentItem.getPayStatus(),1)||ObjectUtil.equals(paymentItem.getPayStatus(),2)) {
                             SyncPayStatusResponseBo syncPayStatusResponseBo = YiPayApi.syncPayStatus(storePaymentParamBo, paymentItem.getUuid(), null);
                             if (syncPayStatusResponseBo.isPaySuccess()) {
-                                payService.paySuccess(syncPayStatusResponseBo.getOut_trade_no(), syncPayStatusResponseBo.getTrade_id());
+                                Long orderId=payService.paySuccess(syncPayStatusResponseBo.getOut_trade_no(), syncPayStatusResponseBo.getTrade_id());
+                                if(orderId!=null)
+                                    payService.afterPaySucess(orderId);
                             }else if(syncPayStatusResponseBo.isRefundSuccess()){
                                 payService.updateRefundStatus(paymentItem.getId(),true);
                             }else if(syncPayStatusResponseBo.isPayFailed()){
