@@ -2,6 +2,7 @@ package com.meiye.controller.pos;
 
 import com.meiye.bo.sync.MeiYePosSyncParams;
 import com.meiye.bo.system.PosApiResult;
+import com.meiye.bo.system.PosSyncApiResult;
 import com.meiye.mybatis.sync.service.MeiYePosSyncService;
 import com.meiye.system.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class MeiYePosSyncDataController {
     @PostMapping("/data")
     public PosApiResult syncData(@RequestBody MeiYePosSyncParams syncParams) throws InterruptedException, ExecutionException {
         Map<String,Object> tableDatas=new HashMap<String,Object>();
+        Integer syncComp=PosSyncApiResult.SYNC_UNCOMPLETE;
         if(syncParams.getContent()!=null&&!syncParams.getContent().keySet().isEmpty()){
             Integer pageSize=(syncParams.getSyncCount()==null?2000:syncParams.getSyncCount())/syncParams.getContent().keySet().size();
             List<Future<Map<String, Object>>> allTablsData = new ArrayList<Future<Map<String, Object>>>();
@@ -57,12 +59,12 @@ public class MeiYePosSyncDataController {
                 }
                 tableDatas.putAll(result);
             }
+
             if(completeSearch)
-                tableDatas.put("lastSyncStatus",0);
-            else
-                tableDatas.put("lastSyncStatus",1);
+                syncComp=PosSyncApiResult.SYNC_COMPLETE;
         }
-        return PosApiResult.sucess(tableDatas);
+
+        return PosSyncApiResult.sucess(tableDatas,syncComp);
     }
 
     @GetMapping("/shop/info/{deviceMac}")
