@@ -104,43 +104,43 @@ public class SalaryServiceImpl implements SalaryService {
                                 TalentRule talentRule = talentRules.get(j);
                                 float ruleValue = Float.valueOf(talentRule.getRuleValue());
                                 float ruleCommission = Float.valueOf(talentRule.getRuleCommission());
-                                float ruleValuePre = 0;
-                                if (j == 0) {
-                                    ruleValuePre = 0;
+                                float ruleValueNext = 0;
+                                if (j == talentRules.size()-1) {
+                                    ruleValueNext = Integer.MAX_VALUE;
                                 } else {
-                                    ruleValuePre = Float.valueOf(talentRules.get(j - 1).getRuleValue());
+                                    ruleValueNext = Float.valueOf(talentRules.get(j + 1).getRuleValue());
                                 }
 
                                 BigDecimal salesSum = salary.getSalesSum();
                                 float sum = salesSum.floatValue();
-                                if (sum - ruleValue <= 0 && sum - ruleValuePre > 0) {
+                                if (sum - ruleValue > 0 && sum - ruleValueNext <= 0) {
                                     if (talentPlan.getPlanMode() == 2) {
-                                        float com = (sum - ruleValuePre) * ruleCommission/100;
+                                        float com = (sum - ruleValue) * ruleCommission/100;
                                         salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(com).setScale(2, BigDecimal.ROUND_HALF_UP)));
-                                        detail.append(";" + df2.format(new BigDecimal(sum - ruleValuePre))
+                                        detail.append(";" + df2.format(new BigDecimal(sum - ruleValue))
                                                 + "*" +
                                                 df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(new BigDecimal(com)));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
-                                        detail.append(";" + df2.format(new BigDecimal(sum - ruleValuePre))
+                                        detail.append(";" + df2.format(new BigDecimal(sum - ruleValue))
                                                 + " : "
                                                 + df2.format(new BigDecimal(ruleCommission)));
                                     }
 
-                                } else if (sum - Float.valueOf(ruleValue) >= 0) {
+                                } else if (sum - ruleValue >= 0 && sum-ruleValueNext >=0) {
                                     if (talentPlan.getPlanMode() == 2) {
-                                        float com = (ruleValue - ruleValuePre) * ruleCommission/100;
+                                        float com = (ruleValueNext - ruleValue) * ruleCommission/100;
                                         salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(com)));
 
-                                        detail.append(";" + df2.format(new BigDecimal(ruleValue - ruleValuePre))
+                                        detail.append(";" + df2.format(new BigDecimal(ruleValueNext - ruleValue))
                                                 + "*" +
                                                 df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(com));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
 
-                                        detail.append(";" + df2.format(new BigDecimal(ruleValue - ruleValuePre))
+                                        detail.append(";" + df2.format(new BigDecimal(ruleValueNext - ruleValue))
                                                 + "*" +
                                                 df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
@@ -155,43 +155,43 @@ public class SalaryServiceImpl implements SalaryService {
                                 TalentRule talentRule = talentRules.get(j);
                                 float ruleValue = Float.valueOf(talentRule.getRuleValue());
                                 float ruleCommission = Float.valueOf(talentRule.getRuleCommission());
-                                float ruleValuePre = 0;
-                                if (j == 0) {
-                                    ruleValuePre = 0;
+                                float ruleValueNext = 0;
+                                if (j == talentRules.size()-1) {
+                                    ruleValueNext = Integer.MAX_VALUE;
                                 } else {
-                                    ruleValuePre = Float.valueOf(talentRules.get(j - 1).getRuleValue());
+                                    ruleValueNext = Float.valueOf(talentRules.get(j + 1).getRuleValue());
                                 }
 
                                 BigDecimal saveSum = salary.getSaveSum();
                                 float sum = saveSum.floatValue();
-                                if (sum - ruleValue <= 0 && sum - ruleValuePre > 0) {
+                                if (sum - ruleValue > 0 && sum - ruleValueNext <= 0) {
                                     if (talentPlan.getPlanMode() == 2) {
-                                        float com = (sum - ruleValuePre) * ruleCommission/100;
+                                        float com = (sum - ruleValue) * ruleCommission/100;
                                         salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(com).setScale(2, BigDecimal.ROUND_HALF_UP)));
-                                        detail.append(";" + df2.format(new BigDecimal(sum - ruleValuePre))
+                                        detail.append(";" + df2.format(new BigDecimal(sum - ruleValue))
                                                 + "*" +
                                                 df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(new BigDecimal(com)));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
-                                        detail.append(";" + df2.format(new BigDecimal(sum - ruleValuePre))
+                                        detail.append(";" + df2.format(new BigDecimal(sum - ruleValue))
                                                 + " : "
                                                 + df2.format(new BigDecimal(ruleCommission)));
                                     }
 
-                                } else if (sum - Float.valueOf(ruleValue) >= 0) {
+                                } else if (sum - ruleValue >= 0 && sum-ruleValueNext >=0) {
                                     if (talentPlan.getPlanMode() == 2) {
-                                        float com = (ruleValue - ruleValuePre) * ruleCommission/100;
+                                        float com = (ruleValueNext - ruleValue) * ruleCommission/100;
                                         salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(com)));
 
-                                        detail.append(";" + df2.format(new BigDecimal(ruleValue - ruleValuePre))
+                                        detail.append(";" + df2.format(new BigDecimal(ruleValueNext - ruleValue))
                                                 + "*" +
                                                 df2.format(new BigDecimal(ruleCommission)) +
                                                 "=" + df2.format(com));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
 
-                                        detail.append(";" + df2.format(new BigDecimal(ruleValue - ruleValuePre))
+                                        detail.append(";" + df2.format(new BigDecimal(ruleValueNext - ruleValue))
                                                 + "*" +
                                                 df2.format(new BigDecimal(ruleCommission)) +"%"+
                                                 "=" + df2.format(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
@@ -316,26 +316,26 @@ public class SalaryServiceImpl implements SalaryService {
                                     TalentRule talentRule = talentRules.get(s);
                                     float ruleValue = Float.valueOf(talentRule.getRuleValue());
                                     float ruleCommission = Float.valueOf(talentRule.getRuleCommission());
-                                    float ruleValuePre = 0;
-                                    if (s == 0) {
-                                        ruleValuePre = 0;
+                                    float ruleValueNext = 0;
+                                    if (s == talentRules.size()-1) {
+                                        ruleValueNext = Integer.MAX_VALUE;
                                     } else {
-                                        ruleValuePre = Float.valueOf(talentRules.get(s - 1).getRuleValue());
+                                        ruleValueNext = Float.valueOf(talentRules.get(s + 1).getRuleValue());
                                     }
 
                                     BigDecimal salesSum = salary.getSalesSum();
                                     float sum = salesSum.floatValue();
-                                    if (sum - ruleValue <= 0 && sum - ruleValuePre > 0) {
+                                    if (sum - ruleValue > 0 && sum - ruleValueNext <= 0) {
                                         if (talentPlan.getPlanMode() == 2) {
-                                            float com = (sum - ruleValuePre) * ruleCommission/100;
+                                            float com = (sum - ruleValue) * ruleCommission/100;
                                             salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(com).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                         } else if (talentPlan.getPlanMode() == 1) {
                                             salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                         }
 
-                                    } else if (sum - Float.valueOf(ruleValue) >= 0) {
+                                    } else if (sum - ruleValue >= 0 && sum-ruleValueNext >=0) {
                                         if (talentPlan.getPlanMode() == 2) {
-                                            float com = (ruleValue - ruleValuePre) * ruleCommission/100;
+                                            float com = (ruleValueNext - ruleValue) * ruleCommission/100;
                                             salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(com)));
                                         } else if (talentPlan.getPlanMode() == 1) {
                                             salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
@@ -347,26 +347,26 @@ public class SalaryServiceImpl implements SalaryService {
                                     TalentRule talentRule = talentRules.get(m);
                                     float ruleValue = Float.valueOf(talentRule.getRuleValue());
                                     float ruleCommission = Float.valueOf(talentRule.getRuleCommission());
-                                    float ruleValuePre = 0;
-                                    if (m == 0) {
-                                        ruleValuePre = 0;
+                                    float ruleValueNext = 0;
+                                    if (m == talentRules.size()-1) {
+                                        ruleValueNext = Integer.MAX_VALUE;
                                     } else {
-                                        ruleValuePre = Float.valueOf(talentRules.get(m - 1).getRuleValue());
+                                        ruleValueNext = Float.valueOf(talentRules.get(m + 1).getRuleValue());
                                     }
 
                                     BigDecimal saveSum = salary.getSaveSum();
                                     float sum = saveSum.floatValue();
-                                    if (sum - ruleValue <= 0 && sum - ruleValuePre > 0) {
+                                    if (sum - ruleValue > 0 && sum - ruleValueNext <= 0) {
                                         if (talentPlan.getPlanMode() == 2) {
-                                            float com = (sum - ruleValuePre) * ruleCommission/100;
+                                            float com = (sum - ruleValue) * ruleCommission/100;
                                             salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(com).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                         } else if (talentPlan.getPlanMode() == 1) {
                                             salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                         }
 
-                                    } else if (sum - Float.valueOf(ruleValue) >= 0) {
+                                    } else if (sum - ruleValue >= 0 && sum-ruleValueNext >=0) {
                                         if (talentPlan.getPlanMode() == 2) {
-                                            float com = (ruleValue - ruleValuePre) * ruleCommission/100;
+                                            float com = (ruleValueNext - ruleValue) * ruleCommission/100;
                                             salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(com)));
                                         } else if (talentPlan.getPlanMode() == 1) {
                                             salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
