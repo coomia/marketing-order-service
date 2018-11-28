@@ -25,7 +25,7 @@ public interface MeiYePosSyncMapper {
             "</if> " +
             "<if test='syncConfigBo!=null'>" +
             " <if test='syncConfigBo.filterShopIdenty!=\"N\"'>" +
-            "  and brand_identy=#{shopIdenty}" +
+            "  and shop_identy=#{shopIdenty}" +
             "</if>" +
             "<if test='syncConfigBo.filterBrandIdenty!=\"N\"'>" +
             " and brand_identy = #{brandIdenty}" +
@@ -35,7 +35,7 @@ public interface MeiYePosSyncMapper {
             "</if>" +
             "</if>" +
             "<if test='syncConfigBo==null'>" +
-            " and brand_identy=#{shopIdenty} and brand_identy = #{brandIdenty} " +
+            " and shop_identy=#{shopIdenty} and brand_identy = #{brandIdenty} " +
             "</if>" +
             "order by  IFNULL(server_update_time,server_create_time),id" +
             "</script>")
