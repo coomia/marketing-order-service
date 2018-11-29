@@ -12,22 +12,22 @@ import com.meiye.model.pay.CommercialPaySetting;
 import com.meiye.model.pay.Payment;
 import com.meiye.model.pay.PaymentItem;
 import com.meiye.model.pay.PaymentItemExtra;
+import com.meiye.model.setting.Tables;
 import com.meiye.model.trade.Trade;
 import com.meiye.model.trade.TradeItem;
+import com.meiye.model.trade.TradeTable;
 import com.meiye.repository.pay.CommercialPaySettingRepository;
 import com.meiye.repository.pay.PaymentItemExtraRepository;
 import com.meiye.repository.pay.PaymentItemRepository;
 import com.meiye.repository.pay.PaymentRepository;
+import com.meiye.repository.setting.TablesRepository;
 import com.meiye.repository.trade.TradeItemRepository;
 import com.meiye.repository.trade.TradeRepository;
 import com.meiye.repository.trade.TradeTableRepository;
 import com.meiye.service.pay.PayService;
 import com.meiye.service.posApi.OrderService;
 import com.meiye.system.util.WebUtil;
-import com.meiye.util.MeiYeInternalApi;
-import com.meiye.util.ObjectUtil;
-import com.meiye.util.UUIDUtil;
-import com.meiye.util.YiPayApi;
+import com.meiye.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +69,9 @@ public class PayServiceImpl implements PayService {
 
     @Autowired
     CommercialPaySettingRepository commercialPaySettingRepository;
+
+    @Autowired
+    TablesRepository tablesRepository;
 
     @Override
     public String getAppSercet(Integer storeId){
@@ -116,12 +119,12 @@ public class PayServiceImpl implements PayService {
 
     @Override
     @Transactional
-    public void paySuccess(String outTradeNo, String yiPayTradeNo){
+    public Long paySuccess(String outTradeNo, String yiPayTradeNo){
         PaymentItem paymentItem=paymentItemRepository.findOneByUuid(outTradeNo);
         if(paymentItem==null)
             throw new BusinessException("支付记录不存在");
         if(paymentItem.getPayStatus()!=null&&!paymentItem.getPayStatus().equals(1)&&!paymentItem.getPayStatus().equals(2))
-            return;
+            return null;
 
         Timestamp now=new Timestamp(Calendar.getInstance().getTimeInMillis());
         paymentItem.setPayStatus(3);
@@ -187,7 +190,19 @@ public class PayServiceImpl implements PayService {
         trade.setServerUpdateTime(now);
         tradeRepository.save(trade);
         //将相关联的坐台设置为空闲
+        List<TradeTable> tradeTables=tradeTableRepository.findAllByTradeIdAndStatusFlag(trade.getId(),1);
+        if(!ObjectUtils.isEmpty(tradeTables)){
+            List<Tables> tables=tablesRepository.findAllByIdIn(tradeTables.stream().map(TradeTable::getTableId).collect(Collectors.toList()));
+            if(!ObjectUtils.isEmpty(tables)){
+                for(Tables table:tables){
+                    table.setTableStatus(Constants.SELF_TABLE_STATUS_UNLOCK);
+                    table.setServerUpdateTime(now);
+                }
+            }
+            tablesRepository.saveAll(tables);
+        }
         tradeTableRepository.updateTradeTableSelfTableStatus(trade.getId());
+        return trade.getId();
     }
 
     @Transactional

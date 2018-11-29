@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,11 +21,11 @@ public interface MeiYePosSyncMapper {
             " and status_flag=1 " +
             "</if>" +
             "<if test='!isInit'>" +
-            " and id>#{id} and IFNULL(server_update_time,server_create_time)>=#{serverUpdateTime} " +
+            " and id>#{id} and IFNULL(server_update_time,server_create_time)>=FROM_UNIXTIME(#{serverUpdateTime}) " +
             "</if> " +
             "<if test='syncConfigBo!=null'>" +
             " <if test='syncConfigBo.filterShopIdenty!=\"N\"'>" +
-            "  and brand_identy=#{shopIdenty}" +
+            "  and shop_identy=#{shopIdenty}" +
             "</if>" +
             "<if test='syncConfigBo.filterBrandIdenty!=\"N\"'>" +
             " and brand_identy = #{brandIdenty}" +
@@ -34,7 +35,7 @@ public interface MeiYePosSyncMapper {
             "</if>" +
             "</if>" +
             "<if test='syncConfigBo==null'>" +
-            " and brand_identy=#{shopIdenty} and brand_identy = #{brandIdenty} " +
+            " and shop_identy=#{shopIdenty} and brand_identy = #{brandIdenty} " +
             "</if>" +
             "order by  IFNULL(server_update_time,server_create_time),id" +
             "</script>")

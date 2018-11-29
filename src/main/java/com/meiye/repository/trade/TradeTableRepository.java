@@ -22,7 +22,7 @@ public interface TradeTableRepository extends JpaRepository<TradeTable,Long>{
     List<TradeTable> findAllByTradeId(Long tradeId);
 
     @Modifying
-    @Query("update TradeTable tt set tt.selfTableStatus=1 where tt.tradeId=?1")
+    @Query("update TradeTable tt set tt.selfTableStatus=1,serverUpdateTime=now() where tt.tradeId=?1")
     int updateTradeTableSelfTableStatus(Long tradeId);
 }
 
