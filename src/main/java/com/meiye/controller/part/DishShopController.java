@@ -24,8 +24,8 @@ public class DishShopController {
         try{
             dishShopService.saveDishShop(dishShopBo);
         }catch (Exception e){
-            logger.info("品项删除失败",e);
-            throw new BusinessException("品项保存失败!");
+            logger.info("单品删除失败",e);
+            throw new BusinessException("单品保存失败!");
         }
 
         return ResetApiResult.sucess("");
@@ -47,8 +47,8 @@ public class DishShopController {
         try {
             dishShopService.updateDishShop(dishShopBo);
         }catch (Exception e){
-            logger.info("品项更新失败",e);
-            throw new BusinessException("品项更新失败!");
+            logger.info("单品更新失败",e);
+            throw new BusinessException("单品更新失败!");
         }
 
         return ResetApiResult.sucess("");
@@ -59,8 +59,8 @@ public class DishShopController {
         try {
             dishShopService.deleteDishShop(dishShopId);
         }catch (Exception e){
-            logger.info("品项删除失败",e);
-            throw new BusinessException("品项删除失败!");
+            logger.info("单品删除失败",e);
+            throw new BusinessException("单品删除失败!");
         }
 
         return ResetApiResult.sucess("");

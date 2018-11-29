@@ -374,6 +374,7 @@ public class BookingServiceImpl implements BookingService {
                 }
                 if(2 == bookingPageRequestDto.getContent().getType() ){//已超时
                     if (null != bookingPageRequestDto.getContent().getStartTime()) {
+                        list.add(criteriaBuilder.equal(root.get("orderStatus").as(Integer.class),Constants.NOT_TO_THE_STORE__STATUS));
                         list.add(criteriaBuilder.lessThan(root.get("startTime").as(Date.class),bookingPageRequestDto.getContent().getStartTime()));
                     }
                 }else{
