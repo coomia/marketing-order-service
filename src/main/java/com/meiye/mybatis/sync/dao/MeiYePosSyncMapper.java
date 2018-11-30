@@ -20,9 +20,9 @@ public interface MeiYePosSyncMapper {
             "<if test='isInit'>" +
             " and status_flag=1 " +
             "</if>" +
-            "<if test='!isInit'>" +
+//            "<if test='!isInit'>" +
             " and id>#{id} and IFNULL(server_update_time,server_create_time)>=FROM_UNIXTIME(#{serverUpdateTime}) " +
-            "</if> " +
+//            "</if> " +
             "<if test='syncConfigBo!=null'>" +
             " <if test='syncConfigBo.filterShopIdenty!=\"N\"'>" +
             "  and shop_identy=#{shopIdenty}" +
