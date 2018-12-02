@@ -661,15 +661,17 @@ public class OrderServiceImpl implements OrderService {
                 List<TradeUser> tradeUsers = order.getTradeUsers();
                 if (tradeUsers != null && tradeUsers.size()>0){
                     tradeUsers.forEach(tradeUser ->{
-                        if (tradeUser.getTradeItemId() == tradeItem.getId()) {
-                            TradeUser newTradeUser = new TradeUser();
-                            BeanUtils.copyProperties(tradeUser, newTradeUser);
-                            newTradeUser.setId(null);
-                            newTradeUser.setTradeId(tradeNewId);
-                            newTradeUser.setTradeUuid(tradeUuid);
-                            newTradeUser.setTradeItemId(newTradeItem.getId());
-                            newTradeUser.setTradeItemUuid(newTradeItem.getUuid());
-                            tradeUserRepository.save(newTradeUser);
+                        if (tradeUser.getTradeItemId() != null && tradeItem.getId()!=null) {
+                            if (tradeUser.getTradeItemId().longValue() == tradeItem.getId().longValue()) {
+                                TradeUser newTradeUser = new TradeUser();
+                                BeanUtils.copyProperties(tradeUser, newTradeUser);
+                                newTradeUser.setId(null);
+                                newTradeUser.setTradeId(tradeNewId);
+                                newTradeUser.setTradeUuid(tradeUuid);
+                                newTradeUser.setTradeItemId(newTradeItem.getId());
+                                newTradeUser.setTradeItemUuid(newTradeItem.getUuid());
+                                tradeUserRepository.save(newTradeUser);
+                            }
                         }
                     });
                 }

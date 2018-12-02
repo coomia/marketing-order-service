@@ -99,7 +99,7 @@ public class SalaryServiceImpl implements SalaryService {
                     TalentRole talentRole = talentRoles.get(k);
                     if (salary.getRoleId().intValue() == talentRole.getRoleId()) {
                         if (talentPlan.getPlanType() == 1) {
-                            StringBuffer detail = new StringBuffer(talentPlan.getPlanName());
+                            StringBuffer detail = new StringBuffer(talentPlan.getPlanName()+"/plan/");
                             for (int j = 0; j < talentRules.size(); j++) {
                                 TalentRule talentRule = talentRules.get(j);
                                 float ruleValue = Float.valueOf(talentRule.getRuleValue());
@@ -148,9 +148,9 @@ public class SalaryServiceImpl implements SalaryService {
                             }
 
                             salary.setSalesCommissionsDetail(salary.getSalesCommissionsDetail()==""?detail.toString()
-                                    :salary.getSalesCommissionsDetail()+";"+detail.toString());
+                                    :salary.getSalesCommissionsDetail()+"/and/"+detail.toString());
                         } else if (talentPlan.getPlanType() == 3) {
-                            StringBuffer detail = new StringBuffer(talentPlan.getPlanName());
+                            StringBuffer detail = new StringBuffer(talentPlan.getPlanName()+"/plan/");
                             for (int j = 0; j < talentRules.size(); j++) {
                                 TalentRule talentRule = talentRules.get(j);
                                 float ruleValue = Float.valueOf(talentRule.getRuleValue());
@@ -199,7 +199,7 @@ public class SalaryServiceImpl implements SalaryService {
                                 }
                             }
                             salary.setSaveCommissionsDetail(salary.getSaveCommissionsDetail()==""?detail.toString()
-                                    :salary.getSaveCommissionsDetail()+";"+detail.toString());
+                                    :salary.getSaveCommissionsDetail()+"/and/"+detail.toString());
                         } else if (talentPlan.getPlanType() == 2) {
                             for (int j = 0; j < talentRules.size(); j++) {
                                 TalentRule talentRule = talentRules.get(j);
