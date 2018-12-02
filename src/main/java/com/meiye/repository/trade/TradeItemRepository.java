@@ -24,7 +24,7 @@ public interface TradeItemRepository extends JpaRepository<TradeItem,Long>{
     List<TradeItem> findAllByTradeId(Long tradeId);
 
     @Modifying
-    @Query(value = "select new com.meiye.bo.salary.UserAndTradeItm (tu.userId ,tm.dishName,tm.dishId )" +
+    @Query(value = "select new com.meiye.bo.salary.UserAndTradeItm (tu.userId ,tm.dishName,tm.dishId,tm.quantity )" +
             " from TradeUser tu " +
             " left join Trade tt on tt.id = tu.tradeId and tu.statusFlag =1 " +
             " left join TradeItem tm on tt.id = tm.tradeId and  tt.statusFlag= 1 and  tt.tradeTime >= ?1 and tt.tradeTime<= ?2" +
@@ -32,7 +32,7 @@ public interface TradeItemRepository extends JpaRepository<TradeItem,Long>{
     List<UserAndTradeItm> getUserItem(Date start, Date end, Long shopIdenty, Long brandIdenty);
 
     @Modifying
-    @Query(value = "select new com.meiye.bo.salary.UserAndTradeItm (tu.userId ,tm.dishName,tm.dishId )" +
+    @Query(value = "select new com.meiye.bo.salary.UserAndTradeItm (tu.userId ,tm.dishName,tm.dishId ,tm.quantity)" +
             " from TradeUser tu " +
             " left join Trade tt on tt.id = tu.tradeId and tu.statusFlag =1 " +
             " left join TradeItem tm on tt.id = tm.tradeId and  tt.statusFlag= 1 and  tt.tradeTime >= ?1 and tt.tradeTime<= ?2" +

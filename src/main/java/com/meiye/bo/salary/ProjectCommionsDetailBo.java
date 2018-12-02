@@ -11,7 +11,7 @@ public class ProjectCommionsDetailBo implements Serializable {
     private Long userId;
     private String dishId;
     private String dishName;
-    private Integer countAll;
+    private BigDecimal countAll;
     private BigDecimal commissions;
 
 

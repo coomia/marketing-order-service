@@ -141,14 +141,14 @@ public class SalaryServiceImpl implements SalaryService {
                                         salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
 
                                         detail.append(";" + df2.format(new BigDecimal(ruleValueNext - ruleValue))
-                                                + "*" +
-                                                df2.format(new BigDecimal(ruleCommission)) +"%"+
-                                                "=" + df2.format(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
+                                                + " : "
+                                                + df2.format(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
                                     }
                                 }
                             }
 
-                            salary.setSalesCommissionsDetail(detail.toString());
+                            salary.setSalesCommissionsDetail(salary.getSalesCommissionsDetail()==""?detail.toString()
+                                    :salary.getSalesCommissionsDetail()+";"+detail.toString());
                         } else if (talentPlan.getPlanType() == 3) {
                             StringBuffer detail = new StringBuffer(talentPlan.getPlanName());
                             for (int j = 0; j < talentRules.size(); j++) {
@@ -198,7 +198,8 @@ public class SalaryServiceImpl implements SalaryService {
                                     }
                                 }
                             }
-                            salary.setSaveCommissionsDetail(detail.toString());
+                            salary.setSaveCommissionsDetail(salary.getSaveCommissionsDetail()==""?detail.toString()
+                                    :salary.getSaveCommissionsDetail()+";"+detail.toString());
                         } else if (talentPlan.getPlanType() == 2) {
                             for (int j = 0; j < talentRules.size(); j++) {
                                 TalentRule talentRule = talentRules.get(j);
@@ -213,12 +214,19 @@ public class SalaryServiceImpl implements SalaryService {
                                         ProjectCommionsDetailBo detail = new ProjectCommionsDetailBo();
                                         detail.setUserId(salaryBo.getUserId());
                                         detail.setDishId(collect.get(0).getDishId());
-                                        detail.setCountAll(collect.size());
+                                        collect.forEach(UserAndTradeItm ->{
+                                            if (detail.getCountAll()!= null) {
+                                                detail.setCountAll((detail.getCountAll().add(new BigDecimal(UserAndTradeItm.getQty()))));
+                                            }else {
+                                                detail.setCountAll(new BigDecimal(UserAndTradeItm.getQty()));
+                                            }
+                                        });
+                                       // detail.setCountAll(collect.size());
                                         detail.setDishName(collect.get(0).getDishName());
                                         detail.setCommissions(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size())));
                                         salary.getProjectCommionsDetailBos().add(detail);
                                         salary.setProjectCommissions(
-                                        salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size()))));
+                                        salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(detail.getCountAll())));
                                     }
                                 }
                             }
@@ -245,7 +253,7 @@ public class SalaryServiceImpl implements SalaryService {
                     || tradeAndUserBo.getTradePayStatus() == null || tradeAndUserBo.getTradeStatus() == null) {
                 continue;
             }
-            if (tradeAndUserBo.getBusinessType() == 1) {
+            if (tradeAndUserBo.getBusinessType() == 1 ||tradeAndUserBo.getBusinessType() == 4) {
                 salesSum = salesSum.add(getSumSales(tradeAndUserBo, salesSum));
             } else if (tradeAndUserBo.getBusinessType() == 2 || tradeAndUserBo.getBusinessType() == 3) {
                 savesSum = savesSum.add(getSumSales(tradeAndUserBo, savesSum));
@@ -387,9 +395,11 @@ public class SalaryServiceImpl implements SalaryService {
                                                 .stream()
                                                 .filter(item -> item.getDishId() != null && item.getDishId().equals(ruleValue))
                                                 .collect(Collectors.toList());
+
                                         if (collect != null && collect.size() > 0) {
+                                            double count = collect.stream().mapToDouble(UserAndTradeItm::getQty).sum();
                                             salary.setProjectCommissions(
-                                            salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(collect.size()))));
+                                            salary.getProjectCommissions().add(new BigDecimal(ruleCommission).multiply(new BigDecimal(count))));
 
                                         }
                                     }
