@@ -46,7 +46,7 @@ public interface MeiYePosSyncMapper {
     public List<PosSyncConfigBo> findAllConfigs();
 
     @Select("SELECT a.`device_mac` device_id,b.`commercial_id` shop_id,c.`id` brand_id,c.`name` brand_name,b.`commercial_name` shop_name,b.`commercial_phone` shop_phone,\n" +
-            "b.`commercial_adress` shop_address,b.`commercial_logo` shop_logo,b.`longitude`,b.`latitude` \n" +
+            "b.`commercial_adress` shop_address,b.`commercial_logo` shop_logo,b.`longitude`,b.`latitude`,b.open_time \n" +
             "FROM `shop_device` a,`commercial` b,`brand` c\n" +
             "WHERE a.`shop_identy`=b.`commercial_id` AND a.`brand_identy`=c.`id`\n" +
             "AND a.`device_mac`=#{deviceId}")
