@@ -21,7 +21,8 @@ public interface MeiYePosSyncMapper {
             " and status_flag=1 " +
             "</if>" +
 //            "<if test='!isInit'>" +
-            " and id>#{id} and IFNULL(server_update_time,server_create_time)>=FROM_UNIXTIME(#{serverUpdateTime}) " +
+            " and ((id>#{id} and IFNULL(server_update_time,server_create_time)=FROM_UNIXTIME(#{serverUpdateTime})) or " +
+            " IFNULL(server_update_time,server_create_time)>FROM_UNIXTIME(#{serverUpdateTime})) " +
 //            "</if> " +
             "<if test='syncConfigBo!=null'>" +
             " <if test='syncConfigBo.filterShopIdenty!=\"N\"'>" +
@@ -31,7 +32,9 @@ public interface MeiYePosSyncMapper {
             " and brand_identy = #{brandIdenty}" +
             "</if>" +
             "<if test='syncConfigBo.syncRecentDays!=0'>" +
+            "<if test='isInit'>" +
             " and IFNULL(server_update_time,server_create_time) > DATE_ADD(NOW(),INTERVAL #{syncConfigBo.syncRecentDays} DAY) " +
+            "</if>" +
             "</if>" +
             "</if>" +
             "<if test='syncConfigBo==null'>" +
@@ -46,7 +49,7 @@ public interface MeiYePosSyncMapper {
     public List<PosSyncConfigBo> findAllConfigs();
 
     @Select("SELECT a.`device_mac` device_id,b.`commercial_id` shop_id,c.`id` brand_id,c.`name` brand_name,b.`commercial_name` shop_name,b.`commercial_phone` shop_phone,\n" +
-            "b.`commercial_adress` shop_address,b.`commercial_logo` shop_logo,b.`longitude`,b.`latitude` \n" +
+            "b.`commercial_adress` shop_address,b.`commercial_logo` shop_logo,b.`longitude`,b.`latitude`,b.open_time \n" +
             "FROM `shop_device` a,`commercial` b,`brand` c\n" +
             "WHERE a.`shop_identy`=b.`commercial_id` AND a.`brand_identy`=c.`id`\n" +
             "AND a.`device_mac`=#{deviceId}")
