@@ -249,6 +249,8 @@ public class SalaryServiceImpl implements SalaryService {
             return;
         }
 
+        DecimalFormat df2 = new DecimalFormat("#0.00");
+
         double salesSum = oneSalaryTrade.stream()
                 .filter(tradeAndUserBo -> tradeAndUserBo.getTradeType() != null
                         && tradeAndUserBo.getTradeType() == 1
@@ -273,8 +275,8 @@ public class SalaryServiceImpl implements SalaryService {
                 .mapToDouble(value -> value.getSaleAmount())
                 .sum();
 
-        salary.setSalesSum(new BigDecimal(salesSum-salesRet));
-        salary.setSaveSum(new BigDecimal(saveSum));
+        salary.setSalesSum(new BigDecimal(salesSum-salesRet).setScale(2, BigDecimal.ROUND_HALF_UP));
+        salary.setSaveSum(new BigDecimal(saveSum).setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
     @Override
