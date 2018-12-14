@@ -34,17 +34,17 @@ public class AuthUserController {
 
     @PostMapping("/addAuthUser")
     public ResetApiResult loadBrandTypes(@RequestBody AuthUserBo authUserBo){
-        String mobile = authUserBo.getMobile();
-        String identityCard = authUserBo.getIdentityCard();
-        String errorMsg ="";
-        if(!AccountValidatorUtil.isMobile(mobile)){
-            errorMsg = "请输入正确的手机号！";
-            return ResetApiResult.error("",errorMsg);
-        }
-        if(!AccountValidatorUtil.isIDCard(identityCard)){
-            errorMsg = "请输入正确的身份证号！";
-            return ResetApiResult.error("",errorMsg);
-        }
+//        String mobile = authUserBo.getMobile();
+//        String identityCard = authUserBo.getIdentityCard();
+//        String errorMsg ="";
+//        if(!AccountValidatorUtil.isMobile(mobile)){
+//            errorMsg = "请输入正确的手机号！";
+//            return ResetApiResult.error("",errorMsg);
+//        }
+//        if(!AccountValidatorUtil.isIDCard(identityCard)){
+//            errorMsg = "请输入正确的身份证号！";
+//            return ResetApiResult.error("",errorMsg);
+//        }
         authUserService.addAuthUser(authUserBo);
         return ResetApiResult.sucess("");
     }

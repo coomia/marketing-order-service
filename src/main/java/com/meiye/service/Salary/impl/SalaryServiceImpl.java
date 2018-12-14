@@ -42,6 +42,7 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 
 @Service
@@ -66,7 +67,6 @@ public class SalaryServiceImpl implements SalaryService {
         //得到一个用户的所有订单
         List<TradeAndUserBo> oneSalaryTrade = tradeRepository.getOneSalaryTrade(salaryBo.getStartDate(), salaryBo.getEndDate()
                 , salaryBo.getShopIdenty(), salaryBo.getBrandIdenty(), salaryBo.getUserId());
-
         if (oneSalaryTrade == null || oneSalaryTrade.size() == 0) {
             throw new BusinessException("未查询到用户信息，请核对数据!");
         }
@@ -99,7 +99,7 @@ public class SalaryServiceImpl implements SalaryService {
                     TalentRole talentRole = talentRoles.get(k);
                     if (salary.getRoleId().intValue() == talentRole.getRoleId()) {
                         if (talentPlan.getPlanType() == 1) {
-                            StringBuffer detail = new StringBuffer(talentPlan.getPlanName());
+                            StringBuffer detail = new StringBuffer(talentPlan.getPlanName()+"/plan/");
                             for (int j = 0; j < talentRules.size(); j++) {
                                 TalentRule talentRule = talentRules.get(j);
                                 float ruleValue = Float.valueOf(talentRule.getRuleValue());
@@ -148,9 +148,9 @@ public class SalaryServiceImpl implements SalaryService {
                             }
 
                             salary.setSalesCommissionsDetail(salary.getSalesCommissionsDetail()==""?detail.toString()
-                                    :salary.getSalesCommissionsDetail()+";"+detail.toString());
+                                    :salary.getSalesCommissionsDetail()+"/and/"+detail.toString());
                         } else if (talentPlan.getPlanType() == 3) {
-                            StringBuffer detail = new StringBuffer(talentPlan.getPlanName());
+                            StringBuffer detail = new StringBuffer(talentPlan.getPlanName()+"/plan/");
                             for (int j = 0; j < talentRules.size(); j++) {
                                 TalentRule talentRule = talentRules.get(j);
                                 float ruleValue = Float.valueOf(talentRule.getRuleValue());
@@ -199,7 +199,7 @@ public class SalaryServiceImpl implements SalaryService {
                                 }
                             }
                             salary.setSaveCommissionsDetail(salary.getSaveCommissionsDetail()==""?detail.toString()
-                                    :salary.getSaveCommissionsDetail()+";"+detail.toString());
+                                    :salary.getSaveCommissionsDetail()+"/and/"+detail.toString());
                         } else if (talentPlan.getPlanType() == 2) {
                             for (int j = 0; j < talentRules.size(); j++) {
                                 TalentRule talentRule = talentRules.get(j);
@@ -245,32 +245,38 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     private void setSaleAndSaveSum(List<TradeAndUserBo> oneSalaryTrade, SalaryBo salary) {
-        BigDecimal salesSum = new BigDecimal(0);
-        BigDecimal savesSum = new BigDecimal(0);
-
-        for (TradeAndUserBo tradeAndUserBo : oneSalaryTrade) {
-            if (tradeAndUserBo.getTradeId() == null || tradeAndUserBo.getBusinessType() == null
-                    || tradeAndUserBo.getTradePayStatus() == null || tradeAndUserBo.getTradeStatus() == null) {
-                continue;
-            }
-            if (tradeAndUserBo.getBusinessType() == 1 ||tradeAndUserBo.getBusinessType() == 4) {
-                salesSum = salesSum.add(getSumSales(tradeAndUserBo, salesSum));
-            } else if (tradeAndUserBo.getBusinessType() == 2 || tradeAndUserBo.getBusinessType() == 3) {
-                savesSum = savesSum.add(getSumSales(tradeAndUserBo, savesSum));
-            }
+        if (oneSalaryTrade == null || oneSalaryTrade.size()== 0){
+            return;
         }
-        salary.setSalesSum(salesSum);
-        salary.setSaveSum(savesSum);
-    }
 
+        DecimalFormat df2 = new DecimalFormat("#0.00");
 
-    private BigDecimal getSumSales(TradeAndUserBo tradeAndUserBo, BigDecimal salesSum) {
-        if (tradeAndUserBo.getTradeType() == 1 && tradeAndUserBo.getTradeStatus() == 4 && tradeAndUserBo.getTradePayStatus() == 3) {
-            salesSum = salesSum.add(new BigDecimal(tradeAndUserBo.getSaleAmount().toString()));
-        } else if (tradeAndUserBo.getTradeType() == 2 && tradeAndUserBo.getTradeStatus() == 5 && tradeAndUserBo.getTradePayStatus() == 5) {
-            salesSum = salesSum.subtract(new BigDecimal(tradeAndUserBo.getSaleAmount().toString()));
-        }
-        return salesSum;
+        double salesSum = oneSalaryTrade.stream()
+                .filter(tradeAndUserBo -> tradeAndUserBo.getTradeType() != null
+                        && tradeAndUserBo.getTradeType() == 1
+                        && tradeAndUserBo.getTradeStatus() == 4
+                        && (tradeAndUserBo.getBusinessType() == 1 || tradeAndUserBo.getBusinessType() == 4))
+                .mapToDouble(value -> value.getSaleAmount())
+                .sum();
+
+        double salesRet = oneSalaryTrade.stream()
+                .filter(tradeAndUserBo -> tradeAndUserBo.getTradeType() != null
+                        && tradeAndUserBo.getTradeType() == 2
+                        && tradeAndUserBo.getTradeStatus() == 5
+                        && (tradeAndUserBo.getBusinessType() == 1 || tradeAndUserBo.getBusinessType() == 4))
+                .mapToDouble(value -> value.getSaleAmount())
+                .sum();
+
+        double saveSum = oneSalaryTrade.stream()
+                .filter(tradeAndUserBo -> tradeAndUserBo.getTradeType() != null
+                        && tradeAndUserBo.getTradeType() == 1
+                        && tradeAndUserBo.getTradeStatus() == 4
+                        && (tradeAndUserBo.getBusinessType() == 2 || tradeAndUserBo.getBusinessType() == 3))
+                .mapToDouble(value -> value.getSaleAmount())
+                .sum();
+
+        salary.setSalesSum(new BigDecimal(salesSum-salesRet).setScale(2, BigDecimal.ROUND_HALF_UP));
+        salary.setSaveSum(new BigDecimal(saveSum).setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
     @Override
@@ -297,7 +303,6 @@ public class SalaryServiceImpl implements SalaryService {
             salary.setStartDate(salaryBo.getStartDate());
             salary.setEndDate(salaryBo.getEndDate());
             salary.setBaseSalary(new BigDecimal(tradeAndUserBos.get(0).getSalaryBase() == null ? "0" : tradeAndUserBos.get(0).getSalaryBase()));
-            setSaleAndSaveSum(tradeAndUserBos, salary);
             setSaleAndSaveSum(tradeAndUserBos, salary);
             salaryBos.add(salary);
         }
