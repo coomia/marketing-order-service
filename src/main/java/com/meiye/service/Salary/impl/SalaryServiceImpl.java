@@ -186,7 +186,7 @@ public class SalaryServiceImpl implements SalaryService {
 
                                         detail.append(";" + df2.format(new BigDecimal(ruleValueNext - ruleValue))
                                                 + "*" +
-                                                df2.format(new BigDecimal(ruleCommission)) +
+                                                df2.format(new BigDecimal(ruleCommission)) + "%"+
                                                 "=" + df2.format(com));
                                     } else if (talentPlan.getPlanMode() == 1) {
                                         salary.setSaveCommissions(salary.getSaveCommissions().add(new BigDecimal(ruleCommission).setScale(2, BigDecimal.ROUND_HALF_UP)));
