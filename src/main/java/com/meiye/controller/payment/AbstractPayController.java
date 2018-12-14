@@ -71,7 +71,7 @@ public class AbstractPayController {
                             if ("ScanPay".equalsIgnoreCase(payRequestType)) {
                                 ScanPayResponseBo scanPayResponseBo = YiPayApi.scanPay(storePaymentParamBo, payReturnBo);
                                 if (scanPayResponseBo.isPaySuccess()) {
-                                    Thread.sleep(10000);
+//                                    Thread.sleep(10000);
                                     payService.paySuccess(payReturnBo.getOutTradeNo(), scanPayResponseBo.getTrade_id());
                                     payService.afterPaySucess(orderId);
                                     payResult.putAll(getOrderPaymentData(orderId));
