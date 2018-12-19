@@ -11,6 +11,7 @@ import com.meiye.repository.talent.TalentPlanRepository;
 import com.meiye.repository.talent.TalentRoleRepository;
 import com.meiye.repository.talent.TalentRuleRepository;
 import com.meiye.service.talent.TalentPlanService;
+import com.meiye.system.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -148,6 +149,8 @@ public class TalentPlanServiceImpl implements TalentPlanService{
                     list.add(criteriaBuilder.equal(root.get("enabledFlag").as(String.class), talentPlanBo.getEnabledFlag()));
                 }
                 list.add(criteriaBuilder.equal(root.get("statusFlag").as(Long.class), 1));
+                list.add(criteriaBuilder.equal(root.get("brandIdenty").as(Long.class), WebUtil.getCurrentBrandId()));
+                list.add(criteriaBuilder.equal(root.get("shopIdenty").as(Long.class), WebUtil.getCurrentStoreId()));
                 Predicate[] p = new Predicate[list.size()];
                 return criteriaBuilder.and(list.toArray(p));
             }

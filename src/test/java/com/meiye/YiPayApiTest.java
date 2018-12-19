@@ -48,8 +48,8 @@ public class YiPayApiTest {
     @Test
     public void testScanQrCodePay(){
         StorePaymentParamBo paymentParamBo=new StorePaymentParamBo();
-        paymentParamBo.setAppid(appid);
-        paymentParamBo.setAppsecret(appsecret);
+        paymentParamBo.setAppid("hf1129016484PQGA");
+        paymentParamBo.setAppsecret("lUxhOjcBWqaa7oxiFUMATAtiYfEL42WA");
         paymentParamBo.setContextPath(callbackContextPath);
         PrePayBo prePayBo=new PrePayBo();
         prePayBo.setOutTradeNo( "101181017192442218000000");

@@ -70,7 +70,7 @@ public class AbstractPayController {
                             //如果需要调用翼支付，则发起翼支付的调用
                             if ("ScanPay".equalsIgnoreCase(payRequestType)) {
                                 ScanPayResponseBo scanPayResponseBo = YiPayApi.scanPay(storePaymentParamBo, payReturnBo);
-                                if (scanPayResponseBo.isPaySuccess()) {
+                                if (scanPayResponseBo!=null&&scanPayResponseBo.isPaySuccess()) {
 //                                    Thread.sleep(10000);
                                     payService.paySuccess(payReturnBo.getOutTradeNo(), scanPayResponseBo.getTrade_id());
                                     payService.afterPaySucess(orderId);
