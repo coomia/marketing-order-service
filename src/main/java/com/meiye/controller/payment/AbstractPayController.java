@@ -65,28 +65,33 @@ public class AbstractPayController {
                     }
 
                     if (payReturnBo.isNeedYiPay()) {
-                        try {
-                            StorePaymentParamBo storePaymentParamBo = payService.getStorePaymentParamBo(accountingBo.getShopId());
-                            //如果需要调用翼支付，则发起翼支付的调用
-                            if ("ScanPay".equalsIgnoreCase(payRequestType)) {
-                                ScanPayResponseBo scanPayResponseBo = YiPayApi.scanPay(storePaymentParamBo, payReturnBo);
-                                if (scanPayResponseBo!=null&&scanPayResponseBo.isPaySuccess()) {
+                        StorePaymentParamBo storePaymentParamBo = payService.getStorePaymentParamBo(accountingBo.getShopId());
+
+                        //如果需要调用翼支付，则发起翼支付的调用
+                        if ("ScanPay".equalsIgnoreCase(payRequestType)) {
+                            ScanPayResponseBo scanPayResponseBo = YiPayApi.scanPay(storePaymentParamBo, payReturnBo);
+
+                            if (scanPayResponseBo == null)
+                                throw new BusinessException("翼支付调用超时.", ResetApiResult.STATUS_ERROR, ResetApiResult.YIPAY_API_CALL_TIMEOUT);
+                            if (scanPayResponseBo != null && scanPayResponseBo.isPaySuccess()) {
 //                                    Thread.sleep(10000);
+                                try {
                                     payService.paySuccess(payReturnBo.getOutTradeNo(), scanPayResponseBo.getTrade_id());
                                     payService.afterPaySucess(orderId);
                                     payResult.putAll(getOrderPaymentData(orderId));
-                                } else
-                                    throw new BusinessException("扫码支付失败,请手工同步订单状态", ResetApiResult.STATUS_ERROR, 1010);
-                            } else if ("ScanQrPay".equalsIgnoreCase(payRequestType)) {
-                                ScanQrCodePayResponseBo scanQrCodePayResponseBo = YiPayApi.getQrCodeForPay(storePaymentParamBo, payReturnBo);
-                                if (scanQrCodePayResponseBo.isSuccess())
-                                    payResult.put("qrcodeUrl", scanQrCodePayResponseBo.getQrcode_url());
-                                else
-                                    throw new BusinessException("获取支付二维码失败", ResetApiResult.STATUS_ERROR, 1003);
-                            }
-                        }catch (Exception exp){
-                            logger.info("翼支付调用失败：",exp);
-                            throw new BusinessException("翼支付调用失败.", ResetApiResult.STATUS_ERROR, ResetApiResult.YIPAY_API_CALL_FAILED);
+                                } catch (Exception exp) {
+                                    logger.info("翼支付调用失败：", exp);
+                                    throw new BusinessException("系统处理'支付成功'失败.", ResetApiResult.STATUS_ERROR, ResetApiResult.YIPAY_API_CALL_FAILED);
+                                }
+
+                            } else
+                                throw new BusinessException("翼支付调用失败.", ResetApiResult.STATUS_ERROR, ResetApiResult.YIPAY_API_CALL_FAILED);
+                        } else if ("ScanQrPay".equalsIgnoreCase(payRequestType)) {
+                            ScanQrCodePayResponseBo scanQrCodePayResponseBo = YiPayApi.getQrCodeForPay(storePaymentParamBo, payReturnBo);
+                            if (scanQrCodePayResponseBo!=null&&scanQrCodePayResponseBo.isSuccess())
+                                payResult.put("qrcodeUrl", scanQrCodePayResponseBo.getQrcode_url());
+                            else
+                                throw new BusinessException("获取支付二维码失败", ResetApiResult.STATUS_ERROR, ResetApiResult.YIPAY_API_CALL_FAILED);
                         }
                     } else {
                         //不需要翼支付，则开始修改订单状态为支付完成
@@ -97,29 +102,22 @@ public class AbstractPayController {
                 }catch (BusinessException exp){
                     logger.error("支付失败",exp);
                     String message="支付失败:"+exp.getMessage();
-                    BusinessException exception=exp;
                     try {
                         WriteOffResultBo returnPrivilege = MeiYeInternalApi.returnPrivilege(orderId, accountingBo.getBrandId(), accountingBo.getShopId());
 
-                        if(!ObjectUtil.equals(exp.getStatusCode(),ResetApiResult.YIPAY_API_CALL_FAILED)) {
-                            if (returnPrivilege.isSuccess())
-                                exception = new BusinessException(message, ResetApiResult.STATUS_ERROR, exp.getStatusCode());
-                            else
-                                exception = new BusinessException(message + "，调用反核销程序失败：" + returnPrivilege.getMsg(), ResetApiResult.STATUS_ERROR, exp.getStatusCode());
-                        }
+                        if (!returnPrivilege.isSuccess())
+                            message =message + "，调用反核销程序失败：" + returnPrivilege.getMsg();
                     }catch (Exception e){
-                        if(!ObjectUtil.equals(exp.getStatusCode(),ResetApiResult.YIPAY_API_CALL_FAILED)) {
-                            exception = new BusinessException(message + "，调用反核销程序失败：" + e.getMessage(), ResetApiResult.STATUS_ERROR, exp.getStatusCode());
-                        }
+                        message = message + "，调用反核销程序失败：" + e.getMessage();
                     }
-                    throw exception;
-                } catch (Exception exp){
-                    logger.error("支付失败",exp);
-                    WriteOffResultBo returnPrivilege=MeiYeInternalApi.returnPrivilege(orderId,accountingBo.getBrandId(),accountingBo.getShopId());
-                    if(returnPrivilege.isSuccess())
-                        throw new BusinessException("支付失败", ResetApiResult.STATUS_ERROR,1003);
+                    return   PosApiResult.error(getOrderPaymentData(orderId),exp.getStatusCode(),message);
+                } catch (Exception exp) {
+                    logger.error("支付失败", exp);
+                    WriteOffResultBo returnPrivilege = MeiYeInternalApi.returnPrivilege(orderId, accountingBo.getBrandId(), accountingBo.getShopId());
+                    if (returnPrivilege.isSuccess())
+                        throw new BusinessException("支付失败", ResetApiResult.STATUS_ERROR, ResetApiResult.YIPAY_API_CALL_FAILED);
                     else
-                        throw new BusinessException("支付失败，调用反核销程序失败："+returnPrivilege.getMsg(),ResetApiResult.STATUS_ERROR,1003);
+                        throw new BusinessException("支付失败，调用反核销程序失败：" + returnPrivilege.getMsg(), ResetApiResult.STATUS_ERROR, ResetApiResult.YIPAY_API_CALL_FAILED);
                 }
             }else{
                 //处理错误逻辑

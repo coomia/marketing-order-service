@@ -28,6 +28,7 @@ public class ResetApiResult extends ApiResult {
 
     public static final int POS_TRADE_CHANGED=10001000;
     public static final int YIPAY_API_CALL_FAILED=10001001;
+    public static final int YIPAY_API_CALL_TIMEOUT=1010;
     private ResetApiResult(){}
 
     public ResetApiResult(String message,String messageType,Integer statusCode,Object data){
