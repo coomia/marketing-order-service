@@ -282,7 +282,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BusinessException("预订转订单接口-版本校验失败！");
         }
         //修改预订单状态
-        booking1.setOrderStatus(Constants.SUCCESS_STATUS);
+        booking1.setOrderStatus(Constants.ARRIVE_THE_STORE__STATUS);
         booking1 = bookingRepository.save(booking1);
         //插入新订单信息
         OrderResponseDto orderResponseDto = orderService.addOrderData(orderRequestDto);

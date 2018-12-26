@@ -25,5 +25,6 @@ public class Constants {
     public static Integer SUCCESS_STATUS = 2;//已离店(开单)
     public static Integer CANCEL_STATUS = 9;//已取消
     public static Integer PENNDING_OPERATE_STATUS = -2;//未处理
+    public static Integer ARRIVE_THE_STORE__STATUS = 1;//未到店
 
 }
