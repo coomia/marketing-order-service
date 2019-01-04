@@ -57,10 +57,10 @@ public class AuthUserServiceImpl implements AuthUserService {
             AuthUser existUser=authUserOptional.get();
             authUser.setPassword(existUser.getPassword());
             authUser.setPasswordNum(existUser.getPasswordNum());
-            if(!ObjectUtils.isEmpty(authUserBo.getPassword()))
-                authUser.setPassword(new Sha1Hash(authUser.getPassword(), authUser.getName(), 100).toHex());
-            if(!ObjectUtils.isEmpty(authUserBo.getPasswordNum()))
-                authUser.setPasswordNum(new Sha1Hash(authUser.getPasswordNum(), authUser.getName(), 100).toHex());
+//            if(!ObjectUtils.isEmpty(authUserBo.getPassword()))
+//                authUser.setPassword(new Sha1Hash(authUser.getPassword(), authUser.getName(), 100).toHex());
+//            if(!ObjectUtils.isEmpty(authUserBo.getPasswordNum()))
+//                authUser.setPasswordNum(new Sha1Hash(authUser.getPasswordNum(), authUser.getName(), 100).toHex());
             if(ObjectUtil.equals(authUser.getAccount(),existUser.getAccount()))
                 userNameUsedByExistUser=true;
             if(authUser.getEnabledFlag()==null)
@@ -71,6 +71,12 @@ public class AuthUserServiceImpl implements AuthUserService {
             authUser.setEnabledFlag(1);
             authUser.setSourceFlag(1);
         }
+
+        if(!ObjectUtils.isEmpty(authUserBo.getPassword()))
+            authUser.setPassword(new Sha1Hash(authUser.getPassword(), authUser.getName(), 100).toHex());
+        if(!ObjectUtils.isEmpty(authUserBo.getPasswordNum()))
+            authUser.setPasswordNum(new Sha1Hash(authUser.getPasswordNum(), authUser.getName(), 100).toHex());
+
         authUser.setServerUpdateTime(new Timestamp(System.currentTimeMillis()));;
         if(!userNameUsedByExistUser&&Objects.nonNull(authUserRepository.findByAccountAndShopIdenty(authUser.getAccount(), authUser.getShopIdenty()))){
             throw new BusinessException("登录名已被注册，请输入新的登陆账户！");
