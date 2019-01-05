@@ -65,6 +65,14 @@ public class ResetApiResult extends ApiResult {
         return resetApiResult;
     }
 
+    public static ResetApiResult error(Object data, String errorMessage,Integer statusCode){
+        ResetApiResult resetApiResult =new ResetApiResult();
+        resetApiResult.setData(data==null?new Object():data);
+        resetApiResult.setMessage(errorMessage);
+        resetApiResult.setMessageType(STATUS_ERROR);
+        resetApiResult.setStatusCode(statusCode);
+        return resetApiResult;
+    }
 
     public static ResetApiResult sucessWithWarning(Object data, String warningMessage){
         ResetApiResult resetApiResult =new ResetApiResult();

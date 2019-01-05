@@ -78,7 +78,7 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
             }else if(WebUtil.isPosApiPath(httpServletRequest)) {
                 httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }else if(WebUtil.isInternalApiPath(httpServletRequest)){
-                httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,exp.getMessage(),1001), WebUtil.getFastJsonSerializerFeature()));
             } else if(WebUtil.isWechatApiPath(httpServletRequest)) {
                 httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }else{
@@ -92,7 +92,7 @@ public class MeiYeAuthenticationFilter extends OncePerRequestFilter {
             else if(WebUtil.isPosApiPath(httpServletRequest)) {
                 httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
             }else if(WebUtil.isInternalApiPath(httpServletRequest)){
-                httpServletResponse.getWriter().print(JSON.toJSONString(PosApiResult.error(null,exp.getMessage()), WebUtil.getFastJsonSerializerFeature()));
+                httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,exp.getMessage(),1001), WebUtil.getFastJsonSerializerFeature()));
             } else
                 httpServletResponse.getWriter().print(JSON.toJSONString(ResetApiResult.error(null,"系统错误!"), WebUtil.getFastJsonSerializerFeature()));
         }

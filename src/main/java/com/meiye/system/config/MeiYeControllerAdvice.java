@@ -35,10 +35,13 @@ public class MeiYeControllerAdvice extends FastJsonViewResponseBodyAdvice {
                 response.setStatus(HttpServletResponse.SC_OK);
                 BusinessException businessException = (BusinessException) ex;
                 return new ResetApiResult(businessException.getMessage(), businessException.getMessageType(), ResetApiResult.STATUS_CODE_200, null);
-            }else if(WebUtil.isPosApiPath(request)||WebUtil.isInternalApiPath(request)) {
+            }else if(WebUtil.isPosApiPath(request)) {
                 BusinessException businessException = (BusinessException) ex;
                 return PosApiResult.error(null,ex.getMessage());
-            }else if(WebUtil.isWechatApiPath(request)) {
+            }else if (WebUtil.isInternalApiPath(request)){
+                BusinessException businessException = (BusinessException) ex;
+                return ResetApiResult.error(null,ex.getMessage(),1001);
+            } else if(WebUtil.isWechatApiPath(request)) {
                 return PosApiResult.error(null,"未知错误.");
             }else{
                 return ResetApiResult.error(null,"未知错误.");
@@ -47,8 +50,10 @@ public class MeiYeControllerAdvice extends FastJsonViewResponseBodyAdvice {
             if(WebUtil.isMsApiPath(request)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 return ResetApiResult.user("未知错误",ResetApiResult.STATUS_ERROR,ResetApiResult.STATUS_CODE_200,null);
-            }else if(WebUtil.isPosApiPath(request)||WebUtil.isInternalApiPath(request)) {
+            }else if(WebUtil.isPosApiPath(request)) {
                 return PosApiResult.error(null,"系统未知错误.");
+            }else if(WebUtil.isInternalApiPath(request)){
+                return ResetApiResult.error(null,"系统未知错误.",1001);
             }else if(WebUtil.isWechatApiPath(request)) {
                 return PosApiResult.error(null,"未知错误.");
             }else{
