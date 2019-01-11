@@ -51,7 +51,7 @@ public class DishShopBo extends BusinessParentBo {
   @JSONField(serialize=false)
   private Long saleType;
   @JSONField(serialize=false)
-  private Double dishIncreaseUnit=0d;
+  private Double dishIncreaseUnit=1d;
   private Long isSingle=1l;
   private Long isDiscountAll=1l;
   private Long source=1l;
@@ -96,4 +96,10 @@ public class DishShopBo extends BusinessParentBo {
   private List<DishPropertyBo> dishPropertyBos;
   Integer pageNum;
   Integer pageSize;
+
+  public Double getDishIncreaseUnit(){
+    if(this.dishIncreaseUnit==null||this.dishIncreaseUnit<1d)
+      return 1d;
+    return dishIncreaseUnit;
+  }
 }
