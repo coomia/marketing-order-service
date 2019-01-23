@@ -246,6 +246,8 @@ public class MeiYeInternalApi {
                     cardTimesDetailRequestBo.setTradeCount(tradeItemBo.getQuantity());
                     cardTimesDetailRequestBo.setCreatorId(tradeItemBo.getCreatorId());
                     cardTimesDetailRequestBo.setCreatorName(tradeItemBo.getCreatorName());
+                    cardTimesDetailRequestBo.setBatchNo(tradeItemBo.getBatchNo());
+                    cardTimesDetailRequestBo.setType(tradeItemBo.getType());
                     cardTimesDetailRequestBoList.add(cardTimesDetailRequestBo);
                 }
             }

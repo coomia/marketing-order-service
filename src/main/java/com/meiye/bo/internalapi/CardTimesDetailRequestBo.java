@@ -12,4 +12,6 @@ public class CardTimesDetailRequestBo {
     private Double tradeCount;
     private Long creatorId;
     private String creatorName;
+    private String batchNo;
+    private Integer type;
 }
