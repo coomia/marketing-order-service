@@ -67,6 +67,12 @@ public class SalaryServiceImpl implements SalaryService {
         //得到一个用户的所有订单
         List<TradeAndUserBo> oneSalaryTrade = tradeRepository.getOneSalaryTrade(salaryBo.getStartDate(), salaryBo.getEndDate()
                 , salaryBo.getShopIdenty(), salaryBo.getBrandIdenty(), salaryBo.getUserId());
+        List<TradeAndUserBo> oneSalaryTrade2 = tradeRepository.getOneSalaryTrade2(salaryBo.getStartDate(), salaryBo.getEndDate()
+                , salaryBo.getShopIdenty(), salaryBo.getBrandIdenty(), salaryBo.getUserId());
+
+        if (oneSalaryTrade2 != null && oneSalaryTrade2.size()>0){
+            oneSalaryTrade.addAll(oneSalaryTrade2);
+        }
         if (oneSalaryTrade == null || oneSalaryTrade.size() == 0) {
             throw new BusinessException("未查询到用户信息，请核对数据!");
         }
@@ -131,7 +137,7 @@ public class SalaryServiceImpl implements SalaryService {
                                 } else if (sum - ruleValue >= 0 && sum-ruleValueNext >=0) {
                                     if (talentPlan.getPlanMode() == 2) {
                                         float com = (ruleValueNext - ruleValue) * ruleCommission/100;
-                                        salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(com)));
+                                        salary.setSalesCommissions(salary.getSalesCommissions().add(new BigDecimal(com)).setScale(2, BigDecimal.ROUND_HALF_UP));
 
                                         detail.append(";" + df2.format(new BigDecimal(ruleValueNext - ruleValue))
                                                 + "*" +
@@ -240,7 +246,7 @@ public class SalaryServiceImpl implements SalaryService {
         salary.setSalarySum(salary.getSalesCommissions()
                 .add(salary.getSaveCommissions())
                 .add(salary.getProjectCommissions())
-                .add(salary.getBaseSalary()));
+                .add(salary.getBaseSalary()).setScale(2, BigDecimal.ROUND_HALF_UP));
         return salary;
     }
 
@@ -255,7 +261,8 @@ public class SalaryServiceImpl implements SalaryService {
                 .filter(tradeAndUserBo -> tradeAndUserBo.getTradeType() != null
                         && tradeAndUserBo.getTradeType() == 1
                         && tradeAndUserBo.getTradeStatus() == 4
-                        && (tradeAndUserBo.getBusinessType() == 1 || tradeAndUserBo.getBusinessType() == 4))
+                        && (tradeAndUserBo.getBusinessType() == 1 || tradeAndUserBo.getBusinessType() == 4)
+                        && tradeAndUserBo.getSaleAmount() != null)
                 .mapToDouble(value -> value.getSaleAmount())
                 .sum();
 
@@ -263,7 +270,8 @@ public class SalaryServiceImpl implements SalaryService {
                 .filter(tradeAndUserBo -> tradeAndUserBo.getTradeType() != null
                         && tradeAndUserBo.getTradeType() == 2
                         && tradeAndUserBo.getTradeStatus() == 5
-                        && (tradeAndUserBo.getBusinessType() == 1 || tradeAndUserBo.getBusinessType() == 4))
+                        && (tradeAndUserBo.getBusinessType() == 1 || tradeAndUserBo.getBusinessType() == 4)
+                        && tradeAndUserBo.getSaleAmount() != null)
                 .mapToDouble(value -> value.getSaleAmount())
                 .sum();
 
@@ -271,7 +279,8 @@ public class SalaryServiceImpl implements SalaryService {
                 .filter(tradeAndUserBo -> tradeAndUserBo.getTradeType() != null
                         && tradeAndUserBo.getTradeType() == 1
                         && tradeAndUserBo.getTradeStatus() == 4
-                        && (tradeAndUserBo.getBusinessType() == 2 || tradeAndUserBo.getBusinessType() == 3))
+                        && (tradeAndUserBo.getBusinessType() == 2 || tradeAndUserBo.getBusinessType() == 3)
+                        && tradeAndUserBo.getSaleAmount() != null)
                 .mapToDouble(value -> value.getSaleAmount())
                 .sum();
 
@@ -284,6 +293,10 @@ public class SalaryServiceImpl implements SalaryService {
         DecimalFormat df2 = new DecimalFormat("#0.00");
         //得到订单相关的信息
         List<TradeAndUserBo> allSalaryTrade = tradeRepository.getAllSalaryTrade(salaryBo.getStartDate(), salaryBo.getEndDate(), salaryBo.getShopIdenty(), salaryBo.getBrandIdenty());
+        List<TradeAndUserBo> allSalaryTrade2 = tradeRepository.getAllSalaryTrade2(salaryBo.getStartDate(), salaryBo.getEndDate(), salaryBo.getShopIdenty(), salaryBo.getBrandIdenty());
+        if (allSalaryTrade2 != null && allSalaryTrade2.size()>0){
+            allSalaryTrade.addAll(allSalaryTrade2);
+        }
 
         //获得销售金额
         if (allSalaryTrade == null || allSalaryTrade.size() == 0) {
@@ -419,10 +432,13 @@ public class SalaryServiceImpl implements SalaryService {
         }
 
         salaryBos.forEach(salaryBo1 -> {
+            salaryBo1.setSalesCommissions(salaryBo1.getSalesCommissions().setScale(2, BigDecimal.ROUND_HALF_UP));
+            salaryBo1.setSaveCommissions(salaryBo1.getSaveCommissions().setScale(2,BigDecimal.ROUND_HALF_UP));
+            salaryBo1.setProjectCommissions(salaryBo1.getProjectCommissions().setScale(2,BigDecimal.ROUND_HALF_UP));
             salaryBo1.setSalarySum(salaryBo1.getSalesCommissions()
                     .add(salaryBo1.getSaveCommissions())
                     .add(salaryBo1.getProjectCommissions())
-                    .add(salaryBo1.getBaseSalary())
+                    .add(salaryBo1.getBaseSalary().setScale(2,BigDecimal.ROUND_HALF_UP))
             );
         });
         return salaryBos;
