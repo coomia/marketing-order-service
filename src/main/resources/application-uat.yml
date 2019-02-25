@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://rm-m5e838987b5zfu576jo.mysql.rds.aliyuncs.com:3306/zhongmei
+    url: jdbc:mysql://rm-m5ebyh5wn38ohzr6nfo.mysql.rds.aliyuncs.com:3306/zhongmei
     username: zhongmeiyunfu
     password: Zs463423266
     driver-class-name: com.mysql.jdbc.Driver
